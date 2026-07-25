@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国传统非遗工坊 · 十二瓣绣球 3D数字交互展示</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js and OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background-color: #0b090c;
+            color: #f3f4f6;
+            overflow: hidden;
+        }
+        .font-calligraphy {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+        /* Glassmorphism Sidebar */
+        .glass-panel {
+            background: rgba(18, 14, 20, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        .gold-border {
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+        .gold-text {
+            color: #f3ca67;
+            text-shadow: 0 0 10px rgba(243, 202, 103, 0.3);
+        }
+        .gold-gradient-bg {
+            background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+        }
+        .silk-pink-bg {
+            background: linear-gradient(135deg, #e02575 0%, #990040 100%);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(212, 175, 55, 0.8);
+        }
+        /* Canvas Container */
+        #webgl-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="relative w-screen h-screen select-none">
+
+    <!-- 3D WebGL Canvas -->
+    <div id="webgl-container"></div>
+
+    <!-- UI Overlay Layer -->
+    <div class="relative z-10 w-full h-full flex flex-col justify-between pointer-events-none p-4 md:p-6">
+        
+        <!-- Top Navigation / Header -->
+        <header class="flex justify-between items-center w-full pointer-events-auto">
+            <div class="glass-panel rounded-2xl px-6 py-3 flex items-center gap-4 border">
+                <div class="w-10 h-10 rounded-full gold-gradient-bg flex items-center justify-center text-stone-900 font-bold text-xl shadow-lg">
+                    <i class="fa-solid fa-gem"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-wider text-amber-100 font-calligraphy">十二瓣传统绣球 · 3D数字化研析</h1>
+                    <p class="text-xs text-amber-200/60">赤道与垂直4花瓣相连结构 / 八面玲珑镂空工艺</p>
+                </div>
+            </div>
+
+            <!-- Top Right Action Buttons -->
+            <div class="flex items-center gap-3">
+                <button id="btn-culture" class="glass-panel px-4 py-2.5 rounded-xl text-xs md:text-sm text-amber-200 hover:text-white hover:border-amber-400 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-amber-400"></i>
+                    <span>结构文化解密</span>
+                </button>
+                <button id="btn-reset-cam" class="glass-panel p-2.5 rounded-xl text-amber-200 hover:text-white hover:border-amber-400 transition-all" title="重置视角">
+                    <i class="fa-solid fa-arrows-to-dot text-base"></i>
+                </button>
+                <button id="btn-screenshot" class="glass-panel p-2.5 rounded-xl text-amber-200 hover:text-white hover:border-amber-400 transition-all" title="高清截屏">
+                    <i class="fa-solid fa-camera text-base"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace (Center Left Controls & Floating Panels) -->
+        <div class="flex-1 flex justify-between items-center my-4 overflow-hidden pointer-events-none">
+            
+            <!-- Left Control Panel (Drawer / Sidebar) -->
+            <aside class="glass-panel w-80 md:w-96 max-h-full rounded-2xl p-5 overflow-y-auto pointer-events-auto flex flex-col gap-6 border">
+                <div class="border-b border-amber-500/20 pb-3 flex justify-between items-center">
+                    <h2 class="text-base font-bold text-amber-200 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-amber-400"></i> 参数与外观定制
+                    </h2>
+                    <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">12瓣正对称</span>
+                </div>
+
+                <!-- Section 1: Interactive Structural Dynamics -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-stone-400 uppercase tracking-wider">三维形态与拆解</h3>
+                    
+                    <!-- Explode View Slider -->
+                    <div>
+                        <div class="flex justify-between text-xs text-amber-100 mb-1">
+                            <span>花瓣拆解/爆破视图</span>
+                            <span id="val-explode" class="text-amber-400 font-mono">0%</span>
+                        </div>
+                        <input type="range" id="slider-explode" min="0" max="100" value="0" class="w-full accent-amber-400 bg-stone-800 rounded-lg h-1.5 cursor-pointer">
+                    </div>
+
+                    <!-- SolidWorks 3D Extrude to Center Focus Slider -->
+                    <div>
+                        <div class="flex justify-between text-xs text-amber-100 mb-1">
+                            <span>花瓣向球心立体拉伸 (SolidWorks拉伸聚焦)</span>
+                            <span id="val-extrude" class="text-amber-400 font-mono">50%</span>
+                        </div>
+                        <input type="range" id="slider-extrude" min="0" max="85" value="50" class="w-full accent-amber-400 bg-stone-800 rounded-lg h-1.5 cursor-pointer" title="花瓣沿法线向球心3D拉伸，8个镂空窗口保持透明穿透">
+                    </div>
+
+                    <!-- Hollow Gap Slider -->
+                    <div>
+                        <div class="flex justify-between text-xs text-amber-100 mb-1">
+                            <span>花瓣宽度 (镂空比例)</span>
+                            <span id="val-width" class="text-amber-400 font-mono">0.48</span>
+                        </div>
+                        <input type="range" id="slider-width" min="0.25" max="0.60" step="0.01" value="0.48" class="w-full accent-amber-400 bg-stone-800 rounded-lg h-1.5 cursor-pointer">
+                    </div>
+
+                    <!-- Petal Puffiness Slider -->
+                    <div>
+                        <div class="flex justify-between text-xs text-amber-100 mb-1">
+                            <span>锦瓣饱满度 (立体鼓度)</span>
+                            <span id="val-puff" class="text-amber-400 font-mono">0.12</span>
+                        </div>
+                        <input type="range" id="slider-puff" min="0.02" max="0.25" step="0.01" value="0.12" class="w-full accent-amber-400 bg-stone-800 rounded-lg h-1.5 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Section 2: Colors & Materials -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-stone-400 uppercase tracking-wider">传统色彩与材质</h3>
+                    
+                    <!-- Silk Color Presets -->
+                    <div>
+                        <label class="block text-xs text-amber-100 mb-2">主面料绸缎色彩</label>
+                        <div class="grid grid-cols-5 gap-2" id="silk-color-picker">
+                            <button data-color="#e02575" class="w-8 h-8 rounded-full border-2 border-white shadow-md transition-transform hover:scale-110 active:scale-95" style="background-color: #e02575;" title="胭脂洋红"></button>
+                            <button data-color="#c62828" class="w-8 h-8 rounded-full border-2 border-transparent shadow-md transition-transform hover:scale-110 active:scale-95" style="background-color: #c62828;" title="朱砂宫红"></button>
+                            <button data-color="#1565c0" class="w-8 h-8 rounded-full border-2 border-transparent shadow-md transition-transform hover:scale-110 active:scale-95" style="background-color: #1565c0;" title="景泰藏蓝"></button>
+                            <button data-color="#2e7d32" class="w-8 h-8 rounded-full border-2 border-transparent shadow-md transition-transform hover:scale-110 active:scale-95" style="background-color: #2e7d32;" title="松柏翡翠"></button>
+                            <button data-color="#6a1b9a" class="w-8 h-8 rounded-full border-2 border-transparent shadow-md transition-transform hover:scale-110 active:scale-95" style="background-color: #6a1b9a;" title="紫气东来"></button>
+                        </div>
+                    </div>
+
+                    <!-- Gold Edge Color -->
+                    <div>
+                        <label class="block text-xs text-amber-100 mb-2">包边金线质感</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button data-gold="#ffd700" class="btn-gold-color py-1.5 px-3 rounded-lg border border-amber-400/50 text-xs text-amber-200 flex items-center justify-center gap-1.5 bg-amber-500/10 hover:bg-amber-500/20">
+                                <span class="w-3 h-3 rounded-full inline-block" style="background-color: #ffd700;"></span> 织金线
+                            </button>
+                            <button data-gold="#e6be8a" class="btn-gold-color py-1.5 px-3 rounded-lg border border-stone-600 text-xs text-stone-300 flex items-center justify-center gap-1.5 bg-stone-800 hover:bg-stone-700">
+                                <span class="w-3 h-3 rounded-full inline-block" style="background-color: #e6be8a;"></span> 香槟银金
+                            </button>
+                            <button data-gold="#b87333" class="btn-gold-color py-1.5 px-3 rounded-lg border border-stone-600 text-xs text-stone-300 flex items-center justify-center gap-1.5 bg-stone-800 hover:bg-stone-700">
+                                <span class="w-3 h-3 rounded-full inline-block" style="background-color: #b87333;"></span> 古法红铜
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Embroidery Pattern selector -->
+                    <div>
+                        <label class="block text-xs text-amber-100 mb-2">刺绣纹样选择</label>
+                        <select id="select-pattern" class="w-full bg-stone-900 border border-amber-500/30 rounded-xl px-3 py-2 text-xs text-amber-200 focus:outline-none focus:border-amber-400">
+                            <option value="phoenix">凤舞祥云纹 (图片同款多色刺绣)</option>
+                            <option value="floral">富贵牡丹唐草纹</option>
+                            <option value="dragon">金丝龙鳞锦纹</option>
+                            <option value="satin">素雅缎面 (无刺绣印花)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section 3: Accessories & Animation -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-stone-400 uppercase tracking-wider">配件与环境控制</h3>
+                    
+                    <!-- Tassel Toggle -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-amber-100">流苏挂坠配置</span>
+                        <div class="flex gap-1 bg-stone-900 p-1 rounded-xl border border-stone-700">
+                            <button data-tassel="5" class="btn-tassel-cfg px-2.5 py-1 rounded-lg text-xs bg-amber-500 text-stone-900 font-bold">5流苏 (完整版)</button>
+                            <button data-tassel="1" class="btn-tassel-cfg px-2.5 py-1 rounded-lg text-xs text-stone-400 hover:text-stone-200">单流苏</button>
+                            <button data-tassel="0" class="btn-tassel-cfg px-2.5 py-1 rounded-lg text-xs text-stone-400 hover:text-stone-200">隐藏流苏</button>
+                        </div>
+                    </div>
+
+                    <!-- Auto Rotation -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-amber-100">自动旋转展示</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-autospin" checked class="sr-only peer">
+                            <div class="w-9 h-5 bg-stone-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- Lighting Preset -->
+                    <div>
+                        <label class="block text-xs text-amber-100 mb-2">光照展厅场景</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button data-light="museum" class="btn-light-preset py-1.5 rounded-lg border border-amber-400 text-xs text-amber-300 bg-amber-500/10">博物馆聚光</button>
+                            <button data-light="festive" class="btn-light-preset py-1.5 rounded-lg border border-stone-700 text-xs text-stone-400 bg-stone-900">暖色灯笼光</button>
+                            <button data-light="studio" class="btn-light-preset py-1.5 rounded-lg border border-stone-700 text-xs text-stone-400 bg-stone-900">无影棚日光</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Overlay Legend / Specs -->
+            <div class="hidden xl:flex flex-col gap-3 pointer-events-auto mr-4">
+                <div class="glass-panel p-4 rounded-xl max-w-xs border text-xs space-y-2">
+                    <div class="font-bold text-amber-300 border-b border-amber-500/20 pb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shapes text-amber-400"></i> 12瓣几何拓扑结构说明
+                    </div>
+                    <p class="text-stone-300 leading-relaxed">
+                        根据实物要求建模：
+                    </p>
+                    <ul class="list-disc list-inside text-stone-400 space-y-1">
+                        <li><strong class="text-amber-200">6个核心连节点</strong> (上、下、赤道4节点)</li>
+                        <li><strong class="text-amber-200">12片独立纺锤橄榄花瓣</strong> (赤道4瓣 + 上半半球4瓣 + 下半半球4瓣)</li>
+                        <li><strong class="text-amber-200">两端相连 / 中部镂空</strong>：每个花瓣仅在两端与另外3片花瓣交汇（共4瓣汇聚一极），中部自然拱起，形成 <span class="text-amber-300 font-semibold">8个正三边形透光镂空</span>。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Status Bar -->
+        <footer class="w-full pointer-events-auto flex justify-between items-center text-xs text-stone-400">
+            <div class="glass-panel px-4 py-2 rounded-xl flex items-center gap-4">
+                <span class="flex items-center gap-1.5 text-amber-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> WebGL 3D 实时渲染中
+                </span>
+                <span class="text-stone-600">|</span>
+                <span>结构逻辑：正八面体棱边展开 / 12花瓣球形托</span>
+            </div>
+
+            <div class="glass-panel px-4 py-2 rounded-xl text-amber-200/80">
+                按住鼠标左键旋转 · 滚轮缩放 · 右键平移
+            </div>
+        </footer>
+    </div>
+
+    <!-- Culture Info Modal -->
+    <div id="modal-culture" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel max-w-2xl w-full rounded-2xl p-6 md:p-8 border relative max-h-[90vh] overflow-y-auto">
+            <button id="btn-close-modal" class="absolute top-4 right-4 text-stone-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-amber-300 font-calligraphy mb-1">八面玲珑 · 十二瓣绣球制作技艺</h2>
+                <p class="text-xs text-amber-200/60">中国传统非物质文化遗产品析</p>
+            </div>
+
+            <div class="space-y-4 text-sm text-stone-300 leading-relaxed">
+                <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <h3 class="font-bold text-amber-200 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-cube text-amber-400"></i> 一、 几何结构解析
+                    </h3>
+                    <p>
+                        十二瓣绣球在传统几何民俗中被称为“八面玲珑球”。其数学原型对应于<strong>正八面体的12条棱边</strong>。球体共有6个顶点（顶部、底部及赤道线上的四个正交方位）。每个顶点处恰好由4个弧形花瓣的端点相交连接，12个弧形花瓣在空间中自然张开拱起，使得球面留出8个对称的等边三角透光镂空窗口。
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-stone-900 border border-stone-800">
+                    <h3 class="font-bold text-amber-200 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-scissors text-amber-400"></i> 二、 制作工序与工艺特点
+                    </h3>
+                    <p>
+                        1. <strong>剪制纸样</strong>：裁剪12片大小完全一致的双端尖、中间宽的榄核形（Vesica Piscis）锦瓣硬纸衬底。<br>
+                        2. <strong>锦缎绷面与刺绣</strong>：将红/粉主色绸缎包裹于纸衬上，用金丝与彩线绣出凤羽祥云或牡丹纹样。<br>
+                        3. <strong>滚边盘金</strong>：用金色编织绳或金属盘线沿着每片花瓣的两侧边缘进行包边锁缝。<br>
+                        4. <strong>节点合缝与串珠</strong>：将12片花瓣按照“赤道4片一圈，上下半球各4片”的方位，在6个节点处用强线固定，并缝上珍珠与琉璃珠装饰。<br>
+                        5. <strong>流苏与挂绳安装</strong>：在底部节点和赤道4节点下挂长丝流苏与琥珀花苞珠。
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-stone-900 border border-stone-800">
+                    <h3 class="font-bold text-amber-200 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-heart text-amber-400"></i> 三、 寓意与民俗象征
+                    </h3>
+                    <p>
+                        十二瓣代表“一年十二个月份，月月圆满”；六个节点象征“天地四方，六合同春”；八个透光镂空则象征“八面玲珑、四通八达”。是喜庆吉祥、求福寄情的高级手工艺礼品。
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <button id="btn-modal-ok" class="gold-gradient-bg px-8 py-2.5 rounded-xl text-stone-900 font-bold hover:brightness-110 transition-all">
+                    理解并继续探索
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Application State
+        const state = {
+            silkColor: '#e02575',
+            goldColor: '#ffd700',
+            pattern: 'phoenix',
+            explode: 0,
+            extrudeDepth: 0.50, // 3D Extrusion depth towards center origin (0-0.85)
+            widthFactor: 0.48, // Width of petal controlling hollow size
+            puffFactor: 0.12,  // 3D convex bulge
+            tasselConfig: 5,   // 5 tassels, 1 tassel, or 0
+            autoRotate: true,
+            lightPreset: 'museum'
+        };
+
+        // Three.js Scene Components
+        let scene, camera, renderer, controls;
+        let ballGroup, petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup;
+        let petalMaterials = [], goldMaterials = [];
+        let proceduralTexture;
+
+        // Vertices of Regular Octahedron (Radius = 1)
+        // 6 Nodes: 0:Top(0,1,0), 1:Bottom(0,-1,0), 2:Right(1,0,0), 3:Left(-1,0,0), 4:Front(0,0,1), 5:Back(0,0,-1)
+        const R = 2.2; // Base Sphere Radius
+        const NODES = [
+            new THREE.Vector3(0, R, 0),   // 0: Top
+            new THREE.Vector3(0, -R, 0),  // 1: Bottom
+            new THREE.Vector3(R, 0, 0),   // 2: Right (+X)
+            new THREE.Vector3(-R, 0, 0),  // 3: Left (-X)
+            new THREE.Vector3(0, 0, R),   // 4: Front (+Z)
+            new THREE.Vector3(0, 0, -R)   // 5: Back (-Z)
+        ];
+
+        // 12 Edges connecting pairs of orthogonal node vertices
+        const EDGES = [
+            // Equator Ring (4 petals horizontally connected along equator)
+            { a: 2, b: 4, type: 'equator' }, // Right to Front
+            { a: 4, b: 3, type: 'equator' }, // Front to Left
+            { a: 3, b: 5, type: 'equator' }, // Left to Back
+            { a: 5, b: 2, type: 'equator' }, // Back to Right
+
+            // Top Hemisphere (4 vertical petals connecting Top node 0 to equator)
+            { a: 0, b: 2, type: 'top' },
+            { a: 0, b: 4, type: 'top' },
+            { a: 0, b: 3, type: 'top' },
+            { a: 0, b: 5, type: 'top' },
+
+            // Bottom Hemisphere (4 vertical petals connecting Bottom node 1 to equator)
+            { a: 1, b: 2, type: 'bottom' },
+            { a: 1, b: 4, type: 'bottom' },
+            { a: 1, b: 3, type: 'bottom' },
+            { a: 1, b: 5, type: 'bottom' }
+        ];
+
+        // Utility function to adjust hex color brightness for inner lining fabric
+        function adjustColorBrightness(hex, percent) {
+            let num = parseInt(hex.replace('#', ''), 16);
+            let amt = Math.round(2.55 * percent);
+            let R = (num >> 16) + amt;
+            let G = (num >> 8 & 0x00FF) + amt;
+            let B = (num & 0x0000FF) + amt;
+            R = Math.min(255, Math.max(0, R));
+            G = Math.min(255, Math.max(0, G));
+            B = Math.min(255, Math.max(0, B));
+            return '#' + (0x1000000 + (R << 16) + (G << 8) + B).toString(16).slice(1);
+        }
+
+        // Generate dynamic CanvasTexture for silk weave fabric & embroidery patterns
+        function generateEmbroideryTexture(silkColor, pattern) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Base Silk Fabric Color
+            ctx.fillStyle = silkColor;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Fine Silk Weave Grain Lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 512; i += 4) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(512, i);
+                ctx.stroke();
+            }
+
+            if (pattern === 'satin') {
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.wrapS = THREE.ClampToEdgeWrapping;
+                texture.wrapT = THREE.ClampToEdgeWrapping;
+                return texture;
+            }
+
+            // Draw Phoenix Flame & Floral Motif Embroidery
+            ctx.save();
+            ctx.translate(256, 256);
+
+            const drawEmbroideryCurve = (strokeColor, lineWidth, pathPoints) => {
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = lineWidth;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                pathPoints.forEach((pt, idx) => {
+                    if (idx === 0) ctx.moveTo(pt[0], pt[1]);
+                    else ctx.lineTo(pt[0], pt[1]);
+                });
+                ctx.stroke();
+            };
+
+            const colors = pattern === 'phoenix' 
+                ? ['#ffd700', '#00e5ff', '#ff66b2', '#ffffff'] 
+                : pattern === 'floral' 
+                ? ['#ffd700', '#76ff03', '#ff4081', '#ffffff']
+                : ['#ffd700', '#ff9100', '#ff3d00', '#fff59d'];
+
+            // Symmetrical embroidery stitching across petal surface
+            for (let side = -1; side <= 1; side += 2) {
+                // Gold central feather/flame
+                drawEmbroideryCurve(colors[0], 6, [
+                    [0, 180 * side], [20 * side, 100 * side], [40 * side, 20 * side], [10 * side, -80 * side], [0, -160 * side]
+                ]);
+                // Cyan/Accent flourish
+                drawEmbroideryCurve(colors[1], 4, [
+                    [15 * side, 140 * side], [50 * side, 60 * side], [65 * side, -10 * side], [30 * side, -70 * side]
+                ]);
+                // Pink detail
+                drawEmbroideryCurve(colors[2], 3, [
+                    [5 * side, 160 * side], [30 * side, 90 * side], [45 * side, 10 * side]
+                ]);
+                // White highlight stitch
+                drawEmbroideryCurve(colors[3], 2, [
+                    [0, 175 * side], [15 * side, 105 * side], [35 * side, 25 * side]
+                ]);
+            }
+
+            ctx.restore();
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            return texture;
+        }
+
+        // Dynamic Canvas Canvas Texture for Silk Fabric & Embroidery
+        // Parametric Construction of 1 Volumetric Petal Segment (Extruded towards center)
+        function createPetalMesh(A, B, radius, widthFactor, puffFactor) {
+            const uSegments = 32;
+            const vSegments = 16;
+
+            const outerPositions = [];
+            const innerPositions = [];
+            const leftBorderOuter = [];
+            const leftBorderInner = [];
+            const rightBorderOuter = [];
+            const rightBorderInner = [];
+
+            // Calculate Midpoint direction on Sphere
+            const midVector = new THREE.Vector3().addVectors(A, B).normalize();
+            const depthRatio = Math.max(0, Math.min(0.85, state.extrudeDepth));
+
+            // 1. Build Outer Surface Vertices & Inner Extruded Vertices
+            for (let i = 0; i <= uSegments; i++) {
+                const u = i / uSegments; // Parameter along length [0, 1]
+                
+                // Interpolate along great-circle arc from A to B
+                const currentCenter = new THREE.Vector3().subVectors(B, A).multiplyScalar(u).add(A).normalize();
+                
+                // Arc tangent vector
+                const chord = new THREE.Vector3().subVectors(B, A);
+                const tangent = chord.clone().sub(currentCenter.clone().multiplyScalar(chord.dot(currentCenter))).normalize();
+                
+                // Normal to sphere surface
+                const normal = currentCenter.clone();
+                
+                // Binormal (width direction across petal)
+                const side = new THREE.Vector3().crossVectors(normal, tangent).normalize();
+
+                // Width envelope: 0 at ends u=0 and u=1, max width in middle u=0.5
+                const currentWidth = widthFactor * Math.sin(Math.PI * u);
+
+                const rowOuter = [];
+                const rowInner = [];
+
+                for (let j = 0; j <= vSegments; j++) {
+                    const v = (j / vSegments) - 0.5; // Parameter across width [-0.5, 0.5]
+                    
+                    // Convex Puff Profile (embroidered pillow effect)
+                    const puff = puffFactor * Math.cos(Math.PI * v) * Math.sin(Math.PI * u);
+
+                    // Outer Surface Point on Sphere
+                    const posOuter = currentCenter.clone().multiplyScalar(radius)
+                        .add(side.clone().multiplyScalar(v * currentWidth * radius))
+                        .add(normal.clone().multiplyScalar(puff * radius));
+
+                    // SolidWorks Extrusion: Point tapered inwards towards Center (0,0,0)
+                    const posInner = posOuter.clone().multiplyScalar(1 - depthRatio);
+
+                    rowOuter.push(posOuter);
+                    rowInner.push(posInner);
+
+                    if (j === 0) {
+                        leftBorderOuter.push(posOuter.clone());
+                        leftBorderInner.push(posInner.clone());
+                    }
+                    if (j === vSegments) {
+                        rightBorderOuter.push(posOuter.clone());
+                        rightBorderInner.push(posInner.clone());
+                    }
+                }
+
+                outerPositions.push(rowOuter);
+                innerPositions.push(rowInner);
+            }
+
+            // --- A. Outer Front Silk Face Geometry ---
+            const outerGeom = new THREE.BufferGeometry();
+            const outerPosArr = [];
+            const outerUvs = [];
+            const outerIndices = [];
+
+            const stride = vSegments + 1;
+            for (let i = 0; i <= uSegments; i++) {
+                for (let j = 0; j <= vSegments; j++) {
+                    const p = outerPositions[i][j];
+                    outerPosArr.push(p.x, p.y, p.z);
+                    outerUvs.push(i / uSegments, j / vSegments);
+                }
+            }
+
+            for (let i = 0; i < uSegments; i++) {
+                for (let j = 0; j < vSegments; j++) {
+                    const a = i * stride + j;
+                    const b = (i + 1) * stride + j;
+                    const c = (i + 1) * stride + j + 1;
+                    const d = i * stride + j + 1;
+                    outerIndices.push(a, b, d);
+                    outerIndices.push(b, c, d);
+                }
+            }
+
+            outerGeom.setAttribute('position', new THREE.Float32BufferAttribute(outerPosArr, 3));
+            outerGeom.setAttribute('uv', new THREE.Float32BufferAttribute(outerUvs, 2));
+            outerGeom.setIndex(outerIndices);
+            outerGeom.computeVertexNormals();
+
+            // Silk Material
+            const silkMat = new THREE.MeshPhysicalMaterial({
+                map: proceduralTexture,
+                roughness: 0.35,
+                metalness: 0.05,
+                clearcoat: 0.3,
+                clearcoatRoughness: 0.2,
+                side: THREE.FrontSide
+            });
+            petalMaterials.push(silkMat);
+
+            const outerMesh = new THREE.Mesh(outerGeom, silkMat);
+
+            // --- B. Extruded Side Walls Geometry (Connecting Outer Rim to Inner Center Core) ---
+            const wallGroup = new THREE.Group();
+            if (depthRatio > 0.01) {
+                const wallGeom = new THREE.BufferGeometry();
+                const wallPosArr = [];
+                const wallIndices = [];
+
+                // Build Side Walls for Left Border & Right Border
+                const addWallStrip = (outerPts, innerPts, reverse) => {
+                    const startIndex = wallPosArr.length / 3;
+                    for (let k = 0; k < outerPts.length; k++) {
+                        const po = outerPts[k];
+                        const pi = innerPts[k];
+                        wallPosArr.push(po.x, po.y, po.z);
+                        wallPosArr.push(pi.x, pi.y, pi.z);
+                    }
+                    for (let k = 0; k < outerPts.length - 1; k++) {
+                        const o1 = startIndex + k * 2;
+                        const i1 = startIndex + k * 2 + 1;
+                        const o2 = startIndex + (k + 1) * 2;
+                        const i2 = startIndex + (k + 1) * 2 + 1;
+
+                        if (!reverse) {
+                            wallIndices.push(o1, i1, o2);
+                            wallIndices.push(i1, i2, o2);
+                        } else {
+                            wallIndices.push(o1, o2, i1);
+                            wallIndices.push(i1, o2, i2);
+                        }
+                    }
+                };
+
+                // Add Left and Right Extrusion Walls
+                addWallStrip(leftBorderOuter, leftBorderInner, false);
+                addWallStrip(rightBorderOuter, rightBorderInner, true);
+
+                wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wallPosArr, 3));
+                wallGeom.setIndex(wallIndices);
+                wallGeom.computeVertexNormals();
+
+                // Inner Lining Satin Material
+                const wallMat = new THREE.MeshStandardMaterial({
+                    color: adjustColorBrightness(state.silkColor, -40),
+                    roughness: 0.4,
+                    metalness: 0.1,
+                    side: THREE.DoubleSide
+                });
+
+                const wallMesh = new THREE.Mesh(wallGeom, wallMat);
+                wallGroup.add(wallMesh);
+            }
+
+            // --- C. Gold Piping Rim Tube ---
+            const trimCurvePoints = [...leftBorderOuter, ...rightBorderOuter.reverse()];
+            const trimCurve = new THREE.CatmullRomCurve3(trimCurvePoints, true);
+            const trimGeom = new THREE.TubeGeometry(trimCurve, 64, 0.04, 8, true);
+
+            const goldMat = new THREE.MeshStandardMaterial({
+                color: state.goldColor,
+                metalness: 0.9,
+                roughness: 0.2
+            });
+            goldMaterials.push(goldMat);
+
+            const trimMesh = new THREE.Mesh(trimGeom, goldMat);
+
+            // Group Petal + Walls + Gold Rim together
+            const petalGroup = new THREE.Group();
+            petalGroup.add(outerMesh);
+            petalGroup.add(wallGroup);
+            petalGroup.add(trimMesh);
+
+            // Store metadata for explode calculations
+            petalGroup.userData = {
+                centerDir: midVector.clone(),
+                nodeA: A,
+                nodeB: B
+            };
+
+            return petalGroup;
+        }
+
+        // Create Pearls at the 6 Node Vertices
+        function buildPearlNodes() {
+            pearlsGroup.clear();
+
+            NODES.forEach((pos) => {
+                const nodeGroup = new THREE.Group();
+                nodeGroup.position.copy(pos);
+
+                // Main Center Pearl
+                const pearlGeom = new THREE.SphereGeometry(0.18, 24, 24);
+                const pearlMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xfffcf5,
+                    roughness: 0.1,
+                    metalness: 0.1,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.05
+                });
+                const mainPearl = new THREE.Mesh(pearlGeom, pearlMat);
+                nodeGroup.add(mainPearl);
+
+                // Small Pearl Ring Around Vertex
+                const subPearlCount = 4;
+                for (let i = 0; i < subPearlCount; i++) {
+                    const angle = (i / subPearlCount) * Math.PI * 2;
+                    const subPearl = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.08, 16, 16),
+                        pearlMat
+                    );
+                    subPearl.position.set(
+                        Math.cos(angle) * 0.22,
+                        0,
+                        Math.sin(angle) * 0.22
+                    );
+                    nodeGroup.add(subPearl);
+                }
+
+                pearlsGroup.add(nodeGroup);
+            });
+        }
+
+        // Build Hanging Silk Tassels with Pearl Beads & Amber Caps
+        function buildTassels(configCount) {
+            tasselsGroup.clear();
+            if (configCount === 0) return;
+
+            // Determine which nodes receive tassels
+            // Config 5: Bottom node (1) + 4 Equator nodes (2, 3, 4, 5)
+            // Config 1: Bottom node (1) only
+            const targetNodeIndices = configCount === 5 ? [1, 2, 3, 4, 5] : [1];
+
+            targetNodeIndices.forEach((nodeIdx) => {
+                const nodePos = NODES[nodeIdx];
+                const tasselGroup = new THREE.Group();
+                tasselGroup.position.copy(nodePos);
+
+                const isMainBottom = (nodeIdx === 1);
+                const scale = isMainBottom ? 1.0 : 0.75;
+
+                // 1. Dangled Bead String (3 Pearls + 1 Amber Drop Cap)
+                const beadMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xfff8e7,
+                    roughness: 0.1,
+                    clearcoat: 1.0
+                });
+                const amberMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xffa000,
+                    transmission: 0.8,
+                    opacity: 1,
+                    transparent: true,
+                    roughness: 0.2,
+                    ior: 1.5
+                });
+
+                // Beads
+                for (let b = 0; b < 3; b++) {
+                    const bead = new THREE.Mesh(new THREE.SphereGeometry(0.08 * scale, 16, 16), beadMat);
+                    bead.position.y = -0.3 * (b + 1) * scale;
+                    tasselGroup.add(bead);
+                }
+
+                // Amber Lotus/Bell Cap
+                const capGeom = new THREE.ConeGeometry(0.18 * scale, 0.4 * scale, 16);
+                const capMesh = new THREE.Mesh(capGeom, amberMat);
+                capMesh.position.y = -1.2 * scale;
+                capMesh.rotation.x = Math.PI; // Bell facing down
+                tasselGroup.add(capMesh);
+
+                // 2. Silk Fringe Skirt (Long Tassel Threads)
+                const tasselSilkMat = new THREE.MeshStandardMaterial({
+                    color: state.silkColor,
+                    roughness: 0.4,
+                    metalness: 0.1
+                });
+                const skirtGeom = new THREE.CylinderGeometry(0.06 * scale, 0.14 * scale, 2.2 * scale, 16);
+                skirtGeom.translate(0, -1.1 * scale, 0); // Origin at top of tassel skirt
+                const skirtMesh = new THREE.Mesh(skirtGeom, tasselSilkMat);
+                skirtMesh.position.y = -1.2 * scale;
+                tasselGroup.add(skirtMesh);
+
+                tasselsGroup.add(tasselGroup);
+            });
+        }
+
+        // Top Ribbon Loop
+        function buildTopRibbon() {
+            ribbonGroup.clear();
+            const topNode = NODES[0];
+
+            const ribbonMat = new THREE.MeshStandardMaterial({
+                color: state.silkColor,
+                roughness: 0.3,
+                side: THREE.DoubleSide
+            });
+
+            // Torus loop
+            const loopGeom = new THREE.TorusGeometry(0.6, 0.05, 16, 32, Math.PI * 1.8);
+            const loopMesh = new THREE.Mesh(loopGeom, ribbonMat);
+            loopMesh.position.set(topNode.x, topNode.y + 0.6, topNode.z);
+            loopMesh.rotation.z = Math.PI / 2;
+
+            ribbonGroup.add(loopMesh);
+        }
+
+        function rebuildEntireBall() {
+            petalMaterials = [];
+            goldMaterials = [];
+            petalsGroup.clear();
+
+            // 1. Generate Texture
+            proceduralTexture = generateEmbroideryTexture(state.silkColor, state.pattern);
+
+            // 2. Create All 12 Petals
+            EDGES.forEach((edge) => {
+                const nodeA = NODES[edge.a];
+                const nodeB = NODES[edge.b];
+
+                const petal = createPetalMesh(
+                    nodeA,
+                    nodeB,
+                    R,
+                    state.widthFactor,
+                    state.puffFactor
+                );
+                petalsGroup.add(petal);
+            });
+
+            // 3. Build Nodes, Tassels & Ribbon
+            buildPearlNodes();
+            buildTassels(state.tasselConfig);
+            buildTopRibbon();
+
+            // 4. Apply current Explode Displacement
+            updateExplodeDisplacement();
+        }
+
+        // Update Explode Slider Position Outward
+        function updateExplodeDisplacement() {
+            const factor = state.explode / 100;
+            petalsGroup.children.forEach((petalGroup) => {
+                const dir = petalGroup.userData.centerDir;
+                petalGroup.position.copy(dir.clone().multiplyScalar(factor * 1.8));
+            });
+        }
+
+        function initThree() {
+            const container = document.getElementById('webgl-container');
+
+            // Scene
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x0b090c, 0.03);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 1.5, 9);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            container.appendChild(renderer.domElement);
+
+            // Orbit Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxDistance = 20;
+            controls.minDistance = 3;
+
+            // Groups
+            ballGroup = new THREE.Group();
+            petalsGroup = new THREE.Group();
+            tasselsGroup = new THREE.Group();
+            pearlsGroup = new THREE.Group();
+            ribbonGroup = new THREE.Group();
+
+            ballGroup.add(petalsGroup);
+            ballGroup.add(tasselsGroup);
+            ballGroup.add(pearlsGroup);
+            ballGroup.add(ribbonGroup);
+            scene.add(ballGroup);
+
+            // Lights
+            setupLighting();
+
+            // Initial Build
+            rebuildEntireBall();
+
+            // Resize Event Listener
+            window.addEventListener('resize', onWindowResize);
+
+            // Animation Loop
+            animate();
+        }
+
+        // Setup Scene Lights
+        let keyLight, fillLight, rimLight, ambientLight;
+        function setupLighting() {
+            ambientLight = new THREE.AmbientLight(0xfff5ea, 0.8);
+            scene.add(ambientLight);
+
+            keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            keyLight.position.set(5, 8, 5);
+            scene.add(keyLight);
+
+            fillLight = new THREE.DirectionalLight(0xffa07a, 0.6);
+            fillLight.position.set(-5, -2, -5);
+            scene.add(fillLight);
+
+            rimLight = new THREE.DirectionalLight(0xffd700, 1.0);
+            rimLight.position.set(0, 5, -8);
+            scene.add(rimLight);
+        }
+
+        // Switch Lighting Presets
+        function applyLightPreset(preset) {
+            if (preset === 'museum') {
+                ambientLight.intensity = 0.6;
+                keyLight.intensity = 1.8;
+                keyLight.color.setHex(0xffffff);
+                scene.fog.color.setHex(0x0b090c);
+            } else if (preset === 'festive') {
+                ambientLight.intensity = 0.9;
+                keyLight.intensity = 2.0;
+                keyLight.color.setHex(0xffaa44);
+                scene.fog.color.setHex(0x1a0a05);
+            } else if (preset === 'studio') {
+                ambientLight.intensity = 1.2;
+                keyLight.intensity = 1.0;
+                keyLight.color.setHex(0xffffff);
+                scene.fog.color.setHex(0x121212);
+            }
+        }
+
+        // Window Resize Handler
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Render Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Auto Rotation
+            if (state.autoRotate) {
+                ballGroup.rotation.y += 0.005;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function setupUIEventListeners() {
+            // Explode Slider
+            const sliderExplode = document.getElementById('slider-explode');
+            sliderExplode.addEventListener('input', (e) => {
+                state.explode = parseFloat(e.target.value);
+                document.getElementById('val-explode').innerText = `${state.explode}%`;
+                updateExplodeDisplacement();
+            });
+
+            // SolidWorks Extrude Depth Slider
+            const sliderExtrude = document.getElementById('slider-extrude');
+            sliderExtrude.addEventListener('input', (e) => {
+                state.extrudeDepth = parseFloat(e.target.value) / 100;
+                document.getElementById('val-extrude').innerText = `${e.target.value}%`;
+                rebuildEntireBall();
+            });
+
+            // Width / Hollow Slider
+            const sliderWidth = document.getElementById('slider-width');
+            sliderWidth.addEventListener('input', (e) => {
+                state.widthFactor = parseFloat(e.target.value);
+                document.getElementById('val-width').innerText = state.widthFactor.toFixed(2);
+                rebuildEntireBall();
+            });
+
+            // Puffiness Slider
+            const sliderPuff = document.getElementById('slider-puff');
+            sliderPuff.addEventListener('input', (e) => {
+                state.puffFactor = parseFloat(e.target.value);
+                document.getElementById('val-puff').innerText = state.puffFactor.toFixed(2);
+                rebuildEntireBall();
+            });
+
+            // Silk Color Buttons
+            const colorButtons = document.querySelectorAll('#silk-color-picker button');
+            colorButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    colorButtons.forEach((b) => b.classList.replace('border-white', 'border-transparent'));
+                    btn.classList.replace('border-transparent', 'border-white');
+
+                    state.silkColor = btn.dataset.color;
+                    rebuildEntireBall();
+                });
+            });
+
+            // Gold Trim Buttons
+            const goldButtons = document.querySelectorAll('.btn-gold-color');
+            goldButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    goldButtons.forEach((b) => {
+                        b.classList.remove('border-amber-400/50', 'bg-amber-500/10', 'text-amber-200');
+                        b.classList.add('border-stone-600', 'bg-stone-800', 'text-stone-300');
+                    });
+                    btn.classList.remove('border-stone-600', 'bg-stone-800', 'text-stone-300');
+                    btn.classList.add('border-amber-400/50', 'bg-amber-500/10', 'text-amber-200');
+
+                    state.goldColor = btn.dataset.gold;
+                    goldMaterials.forEach((mat) => mat.color.set(state.goldColor));
+                });
+            });
+
+            // Embroidery Pattern Select
+            document.getElementById('select-pattern').addEventListener('change', (e) => {
+                state.pattern = e.target.value;
+                rebuildEntireBall();
+            });
+
+            // Tassel Config Buttons
+            const tasselBtns = document.querySelectorAll('.btn-tassel-cfg');
+            tasselBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    tasselBtns.forEach((b) => {
+                        b.classList.remove('bg-amber-500', 'text-stone-900', 'font-bold');
+                        b.classList.add('text-stone-400');
+                    });
+                    btn.classList.add('bg-amber-500', 'text-stone-900', 'font-bold');
+                    btn.classList.remove('text-stone-400');
+
+                    state.tasselConfig = parseInt(btn.dataset.tassel);
+                    buildTassels(state.tasselConfig);
+                });
+            });
+
+            // Auto Rotation Toggle
+            document.getElementById('toggle-autospin').addEventListener('change', (e) => {
+                state.autoRotate = e.target.checked;
+            });
+
+            // Light Preset Buttons
+            const lightBtns = document.querySelectorAll('.btn-light-preset');
+            lightBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    lightBtns.forEach((b) => {
+                        b.classList.remove('border-amber-400', 'text-amber-300', 'bg-amber-500/10');
+                        b.classList.add('border-stone-700', 'text-stone-400', 'bg-stone-900');
+                    });
+                    btn.classList.add('border-amber-400', 'text-amber-300', 'bg-amber-500/10');
+                    btn.classList.remove('border-stone-700', 'text-stone-400', 'bg-stone-900');
+
+                    state.lightPreset = btn.dataset.light;
+                    applyLightPreset(state.lightPreset);
+                });
+            });
+
+            // Reset Camera
+            document.getElementById('btn-reset-cam').addEventListener('click', () => {
+                camera.position.set(0, 1.5, 9);
+                controls.target.set(0, 0, 0);
+                ballGroup.rotation.set(0, 0, 0);
+            });
+
+            // Take High-Res Screenshot
+            document.getElementById('btn-screenshot').addEventListener('click', () => {
+                renderer.render(scene, camera);
+                const dataURL = renderer.domElement.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = '12瓣中国绣球_3D模型.png';
+                link.href = dataURL;
+                link.click();
+            });
+
+            // Cultural Modal Handlers
+            const modal = document.getElementById('modal-culture');
+            document.getElementById('btn-culture').addEventListener('click', () => {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+            });
+
+            const closeModal = () => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            };
+            document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+            document.getElementById('btn-modal-ok').addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+
+        // Initialize App on Window Load
+        window.onload = () => {
+            initThree();
+            setupUIEventListeners();
+        };
+    </script>
+</body>
+</html>
