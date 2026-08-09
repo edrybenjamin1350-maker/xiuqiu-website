@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>靖西壮族绣球 · 十二瓣文化长卷</title>
+<meta name="description" content="以十二瓣立体绣球为视觉主体，滚动即旋转，讲述壮族绣球起源、婚嫁习俗、非遗工艺、三月三节庆、刺绣纹样、现代文创与文旅传承的文化长卷。">
+<meta name="keywords" content="靖西绣球,壮族绣球,非物质文化遗产,三月三,壮族文化,十二瓣绣球">
+<meta name="theme-color" content="#120a10">
+<style>
+    :root{
+        --rose:#D82880;
+        --gold:#D4AF37;
+        --red:#FF3A3A;
+        --yellow:#FFD02F;
+        --cyan:#00C2D1;
+        --tassel:#C41E70;
+        --blue:#00A8BB;
+        --pearl:#FFF8F8;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:auto}
+    body{
+        font-family:'Noto Serif SC','PingFang SC','Microsoft YaHei','STKaiti',serif;
+        background:#120a10;
+        color:#f3e9e6;
+        overflow-x:hidden;
+    }
+    .font-calligraphy{font-family:'STKaiti','KaiTi','Kaiti SC','KaiTi_GB2312',serif}
+    .ic{width:1em;height:1em;display:inline-block;vertical-align:-0.125em}
+    .bg-pattern{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;opacity:.10}
+    .brand-row{display:flex;align-items:center;gap:12px}
+    .brand-badge{width:40px;height:40px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;box-shadow:0 8px 18px rgba(0,0,0,.45)}
+    .brand-title{font-size:clamp(18px,1.6vw,24px);color:#fdeecb;letter-spacing:.08em}
+    .brand-sub{font-size:11px;color:rgba(243,224,160,.5);letter-spacing:.3em;margin-top:2px}
+    .mobile-title{font-size:18px;color:#fdeecb}
+    @media (min-width:768px){.top-label{display:inline}}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:#160b12}
+    ::-webkit-scrollbar-thumb{background:rgba(212,175,55,.35);border-radius:4px}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(212,175,55,.7)}
+
+    /* ---------- 背景 ---------- */
+    #bg{position:fixed;top:0;right:0;bottom:0;left:0;z-index:0;pointer-events:none}
+    #bg .vignette{
+        position:absolute;top:0;right:0;bottom:0;left:0;
+        background:
+            radial-gradient(ellipse at 50% 40%, rgba(216,40,128,.14), transparent 58%),
+            radial-gradient(ellipse at 50% 115%, rgba(0,168,187,.12), transparent 52%),
+            linear-gradient(180deg,#190c14,#120a10 50%,#0d070c);
+    }
+    #bg .grain{
+        position:absolute;top:0;right:0;bottom:0;left:0;opacity:.55;mix-blend-mode:overlay;
+        background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px),
+            repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 3px);
+    }
+
+    /* ---------- 长卷章节 ---------- */
+    #sections{position:relative;z-index:10}
+    .sec{position:relative;height:100vh;pointer-events:none}
+    .sec .num{
+        position:absolute;left:4vw;top:50%;transform:translateY(-50%);
+        font-size:clamp(130px,24vh,280px);font-weight:700;line-height:1;
+        color:transparent;-webkit-text-stroke:1px rgba(212,175,55,.16);
+        font-family:'Ma Shan Zheng',cursive;user-select:none;
+    }
+    .sec .label{
+        position:absolute;left:calc(4vw + 96px);top:50%;transform:translateY(-50%);
+        writing-mode:vertical-rl;letter-spacing:.45em;color:rgba(243,233,230,.3);
+        font-size:13px;text-transform:uppercase;user-select:none;
+    }
+
+    /* ---------- 3D 舞台 ---------- */
+    #stage{
+        position:fixed;top:0;right:0;bottom:0;left:0;z-index:20;display:flex;align-items:center;justify-content:center;
+        pointer-events:none;
+    }
+    #modelCanvas{
+        width:min(560px,74vmin);height:min(560px,74vmin);
+        display:block;cursor:grab;touch-action:pan-y;
+    }
+    #modelCanvas.dragging{cursor:grabbing}
+    #glow{
+        position:absolute;left:50%;top:50%;width:min(620px,82vmin);height:min(620px,82vmin);
+        margin:calc(min(620px,82vmin) / -2) 0 0 calc(min(620px,82vmin) / -2);
+        border-radius:50%;pointer-events:none;opacity:0;transition:opacity .6s ease;
+        background:radial-gradient(circle, rgba(255,208,47,.38), rgba(216,40,128,.22) 45%, transparent 70%);
+        filter:blur(10px);
+    }
+
+    /* ---------- 右侧文化卡片 ---------- */
+    #panel{
+        position:fixed;right:3vw;top:50%;transform:translateY(-50%);z-index:40;
+        width:410px;max-width:38vw;height:470px;max-height:64vh;pointer-events:none;
+    }
+    .panel-card{
+        position:absolute;top:0;right:0;bottom:0;left:0;border-radius:18px;
+        background:rgba(28,14,24,.86);
+        border:1px solid rgba(212,175,55,.38);
+        box-shadow:0 18px 50px rgba(0,0,0,.55), inset 0 0 40px rgba(216,40,128,.05);
+        padding:26px 28px;opacity:0;transform:translateX(34px);
+        transition:none;
+        display:flex;flex-direction:column;pointer-events:none;
+    }
+    body.anim .panel-card{transition:opacity .55s ease, transform .55s ease}
+    .panel-card.on{opacity:1;transform:none;pointer-events:auto}
+    .panel-card .chip{
+        display:inline-flex;align-items:center;gap:8px;
+        font-size:12px;letter-spacing:.2em;color:var(--yellow);
+        border:1px solid rgba(255,208,47,.35);background:rgba(255,208,47,.08);
+        padding:5px 12px;border-radius:999px;align-self:flex-start;
+    }
+    .panel-card h2{
+        font-size:clamp(24px,2.2vw,30px);color:#ffe9c2;margin-top:14px;
+        text-shadow:0 0 18px rgba(216,40,128,.35);
+    }
+    .panel-card .sub{font-size:12px;color:rgba(243,233,230,.5);margin-top:4px;letter-spacing:.12em}
+    .panel-card .divider{height:1px;margin:16px 0;background:linear-gradient(90deg,var(--gold),transparent)}
+    .panel-card .body{
+        flex:1;overflow-y:auto;font-size:14.5px;line-height:1.95;color:rgba(243,233,230,.88);
+        text-align:justify;padding-right:4px;
+    }
+    .panel-card .body::-webkit-scrollbar{width:3px}
+    .panel-card .hint{
+        margin-top:14px;font-size:12.5px;color:rgba(212,175,55,.8);
+        display:flex;align-items:center;gap:8px;letter-spacing:.08em;
+    }
+    .panel-card .hint i{animation:bob 1.6s ease-in-out infinite}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+    /* ---------- 顶部与底部指示 ---------- */
+    #header{
+        position:fixed;top:0;left:0;right:0;z-index:50;
+        display:flex;justify-content:space-between;align-items:center;
+        padding:18px 3vw;pointer-events:none;
+    }
+    #header .brand{pointer-events:none}
+    #header .actions{display:flex;gap:10px;pointer-events:auto}
+    .btn-glass{
+        display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+        background:rgba(22,12,19,.7);border:1px solid rgba(212,175,55,.35);
+        color:#f0d9a8;border-radius:12px;padding:9px 14px;font-size:13px;
+        transition:all .25s ease;
+    }
+    .btn-glass:hover{background:rgba(216,40,128,.22);border-color:var(--gold);color:#fff}
+    a.btn-glass{text-decoration:none}
+
+    #dots{
+        position:fixed;left:50%;bottom:4vh;transform:translateX(-50%);z-index:40;
+        display:flex;gap:11px;align-items:center;
+        background:rgba(22,12,19,.55);padding:9px 16px;border-radius:999px;
+        border:1px solid rgba(212,175,55,.18);
+    }
+    .dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--gold);opacity:.45;transition:all .35s ease}
+    .dot.on{background:var(--rose);opacity:1;transform:scale(1.4);box-shadow:0 0 10px rgba(216,40,128,.9)}
+    #scrollHint{
+        position:fixed;left:50%;bottom:12vh;transform:translateX(-50%);z-index:40;
+        color:rgba(255,248,248,.75);font-size:13px;letter-spacing:.3em;text-align:center;
+        opacity:0;transition:opacity .6s ease;pointer-events:none;
+    }
+    #scrollHint.show{opacity:1}
+    #scrollHint .mouse{
+        width:22px;height:34px;margin:0 auto 8px;border:1.5px solid rgba(255,248,248,.7);
+        border-radius:12px;position:relative;
+    }
+    #scrollHint .mouse::after{
+        content:'';position:absolute;left:50%;top:6px;width:3px;height:7px;border-radius:3px;
+        background:var(--gold);transform:translateX(-50%);animation:wheel 1.6s ease-in-out infinite;
+    }
+    @keyframes wheel{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,10px)}}
+
+    #mobileBar{
+        position:fixed;left:0;right:0;bottom:0;z-index:45;display:none;
+        background:rgba(22,12,19,.9);border-top:1px solid rgba(212,175,55,.3);
+        padding:14px 18px;text-align:center;
+    }
+    @media (max-width:1023px){
+        #panel{display:none}
+        #mobileBar{display:block}
+    }
+    @media (max-width:640px){
+        #modelCanvas{width:84vmin;height:84vmin}
+        .sec .num{left:2vw}
+        .sec .label{left:calc(2vw + 62px)}
+    }
+
+    /* ---------- 收尾全屏特效 ---------- */
+    #burst{position:fixed;top:0;right:0;bottom:0;left:0;z-index:60;pointer-events:none;opacity:0;transition:none}
+    body.anim #burst{transition:opacity .7s ease}
+    #burst.show{opacity:1}
+    .ring{
+        position:absolute;left:50%;top:50%;width:78vmin;height:78vmin;
+        margin:-39vmin 0 0 -39vmin;border-radius:50%;
+        border:2px solid rgba(212,175,55,.75);
+        box-shadow:0 0 30px rgba(212,175,55,.35), inset 0 0 40px rgba(216,40,128,.25);
+        animation:ringPulse 2.6s ease-out infinite;
+    }
+    .ring.r2{animation-delay:.85s}.ring.r3{animation-delay:1.7s}
+    @keyframes ringPulse{
+        0%{transform:scale(.32);opacity:.95}
+        100%{transform:scale(1.22);opacity:0}
+    }
+    #burst .burst-text{
+        position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+        text-align:center;font-family:'Ma Shan Zheng',cursive;
+        color:var(--yellow);text-shadow:0 0 24px rgba(255,208,47,.75),0 0 60px rgba(216,40,128,.6);
+        font-size:clamp(34px,5vw,58px);letter-spacing:.18em;animation:burstIn 1.4s ease both;
+    }
+    #burst .burst-sub{
+        position:absolute;left:50%;top:calc(52% + 58px);transform:translateX(-50%);
+        font-size:14px;letter-spacing:.5em;color:rgba(243,233,230,.8);
+        text-shadow:0 0 12px rgba(0,0,0,.6);animation:burstIn 1.4s .35s ease both;
+    }
+    @keyframes burstIn{0%{opacity:0;transform:translate(-50%,16px) scale(.9)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+    @keyframes burstInSub{0%{opacity:0;transform:translateX(-50%) translateY(12px)}100%{opacity:1;transform:translateX(-50%) translateY(0)}}
+    #burst .burst-sub{animation:burstInSub 1.4s .35s ease both}
+    .spark{
+        position:absolute;width:5px;height:5px;border-radius:50%;background:var(--yellow);
+        box-shadow:0 0 10px var(--yellow),0 0 22px var(--rose);
+        animation:sparkFloat 3.2s ease-in-out infinite;
+    }
+    @keyframes sparkFloat{
+        0%{transform:translate(0,0);opacity:0}
+        15%{opacity:1}
+        100%{transform:translate(var(--dx), var(--dy));opacity:0}
+    }
+</style>
+</head>
+<body>
+
+<!-- 底层：壮族织锦暗纹背景 -->
+<div id="bg">
+    <svg class="bg-pattern" aria-hidden="true">
+        <defs>
+            <pattern id="brocade" width="96" height="96" patternUnits="userSpaceOnUse">
+                <rect width="96" height="96" fill="none"/>
+                <path d="M48 6 L90 48 L48 90 L6 48 Z" fill="none" stroke="#D4AF37" stroke-width="1.2"/>
+                <path d="M48 24 L72 48 L48 72 L24 48 Z" fill="none" stroke="#D82880" stroke-width="1"/>
+                <circle cx="48" cy="48" r="3.5" fill="#00A8BB"/>
+                <path d="M48 0 L54 10 L48 20 L42 10 Z" fill="#C41E70"/>
+                <path d="M0 96 L6 86 L12 96 Z" fill="#FFD02F"/>
+            </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#brocade)"/>
+    </svg>
+    <div class="grain"></div>
+    <div class="vignette"></div>
+</div>
+
+<!-- 长卷章节（由 JS 生成） -->
+<main id="sections"></main>
+
+<!-- 3D 绣球舞台 -->
+<div id="stage">
+    <div id="glow"></div>
+    <canvas id="modelCanvas"></canvas>
+</div>
+
+<!-- 右侧文化卡片 -->
+<aside id="panel"></aside>
+
+<!-- 移动端底部条 -->
+<div id="mobileBar"><span id="mobileTitle" class="font-calligraphy mobile-title"></span></div>
+
+<!-- 顶部 -->
+<header id="header">
+    <div class="brand brand-row">
+        <div class="brand-badge" style="background:linear-gradient(135deg,#D4AF37,#aa7c11);color:#2b1a08">
+            <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>
+        </div>
+        <div>
+            <h1 class="font-calligraphy brand-title">十二瓣绣球 · 壮族非遗文化长卷</h1>
+            <p class="brand-sub">滚动即旋转 · 十二瓣八章</p>
+        </div>
+    </div>
+    <div class="actions">
+        <button id="btnAuto" class="btn-glass"><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>自动演示</span></button>
+        <button id="btnTop" class="btn-glass"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span class="top-label">回顶</span></button>
+    </div>
+</header>
+
+<!-- 底部进度点 -->
+<div id="dots"></div>
+
+<!-- 滚动提示 -->
+<div id="scrollHint">
+    <div class="mouse"></div>
+    向下滚动 · 绣球随页旋转
+</div>
+
+<!-- 收尾特效 -->
+<div id="burst">
+    <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div>
+    <div class="spark" style="left:18%;top:22%;--dx:36px;--dy:52px"></div>
+    <div class="spark" style="left:82%;top:18%;--dx:-42px;--dy:60px"></div>
+    <div class="spark" style="left:12%;top:70%;--dx:48px;--dy:-44px"></div>
+    <div class="spark" style="left:88%;top:66%;--dx:-40px;--dy:-50px"></div>
+    <div class="spark" style="left:50%;top:12%;--dx:8px;--dy:46px"></div>
+    <div class="spark" style="left:30%;top:86%;--dx:30px;--dy:-30px"></div>
+    <div class="spark" style="left:70%;top:88%;--dx:-28px;--dy:-34px"></div>
+    <div class="burst-text">圆满一周 · 传承不息</div>
+    <div class="burst-sub">愿壮乡祝福，转给世界，也转给下一个千年</div>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script>
+/* ========== 数据：八瓣 × 八章 ========== */
+const DATA = [
+    {
+        n:'壹', title:'绣球起源', sub:'壮族民俗诞生',
+        icon:'star',
+        body:'绣球，壮族古称“飞砣”，最早源于壮族先民狩猎与作战时的投掷器具，后随岁月流转，演变为青年男女传情达意的信物。宋代文献中已见“绣球”之名。在漫长的农耕时光里，姑娘们把对丰收、平安与美满的祈愿一针一线绣进彩球——抛向心仪之人，也抛向吉祥与春天。'
+    },
+    {
+        n:'贰', title:'抛绣球 · 婚嫁习俗', sub:'一球定情',
+        icon:'heart',
+        body:'歌圩三月三，壮家姑娘手持彩绣球，于人群之中看定意中人，彩球抛出、后生接住、互赠信物，一段良缘便由此结下。绣球因此成为壮族婚恋文化中最浪漫的信物：五彩绣球抛如意，一抛定终身。在婚礼上，绣球更寓意团圆和美、情比金坚。'
+    },
+    {
+        n:'叁', title:'非遗手工 · 十二瓣缝制工艺', sub:'金边不歪 · 珠串不松',
+        icon:'craft',
+        body:'一枚十二瓣绣球，要经裁布、贴瓣、刺绣、合缝、镶珠、缀穗六道大工序：十二片大红缎面各自绣上花鸟纹样，以金线锁边包缝，瓣与瓣交汇处缀白珍珠与金珠，底部垂挂渐变琉璃坠与长款玫红流苏，顶部束玫红缎吊绳。全程手工，讲究针脚细密、珠串匀称。壮族绣球制作技艺已被列入非物质文化遗产代表性项目名录。'
+    },
+    {
+        n:'肆', title:'三月三 · 节庆活动', sub:'万人歌海 · 彩球起落',
+        icon:'drum',
+        body:'农历三月初三，是壮族最盛大的歌圩节。村村寨寨对山歌、抛绣球、跳竹竿舞、吃五色糯米饭，山水之间皆是歌声。绣球是歌圩上最亮眼的风景：万人歌海之中，彩球起落如花雨，是壮族人民最热烈的情感表达，也是春天里最盛大的狂欢。'
+    },
+    {
+        n:'伍', title:'刺绣纹样 · 图腾寓意', sub:'穿在身上的史诗',
+        icon:'feather',
+        body:'绣球上常见的凤凰、火焰、云纹与缠枝纹，皆有深意：凤凰象征吉祥与和美，火焰寓意热情与生命，青蓝如江水，玫红似木棉，金线则映照太阳的光泽。每一种颜色、每一道纹样，都不是随意为之，而是壮族先民将对自然、祖先与生活的理解织进针脚，成为“穿在身上的史诗”。'
+    },
+    {
+        n:'陆', title:'现代文创 · 绣球新生', sub:'老手艺 × 新设计',
+        icon:'gift',
+        body:'今天的绣球正走出博物馆：缩小成钥匙扣与胸针，化作城市伴手礼与文创盲盒，登上大型运动会与节庆舞台。老手艺遇上新设计，传统纹样借力新材料与新工艺，让年轻人把“非遗”戴在身上、带回家中，也让千年绣球有了新的呼吸。'
+    },
+    {
+        n:'柒', title:'文旅打卡 · 绣球之乡', sub:'靖西旧州 · 绣球一条街',
+        icon:'location',
+        body:'广西靖西旧州古镇被誉为“绣球之乡”：家家户户门前挂绣球、摆绣架，鹅泉流水与青石老街之间，绣球作坊与非遗工坊吸引着八方来客。到旧州，看绣娘飞针走线，亲手挑选一枚彩球带走，是许多旅人心中最鲜活的壮乡记忆。'
+    },
+    {
+        n:'捌', title:'传承展望 · 圆满一周', sub:'从村寨到数字屏幕',
+        icon:'circle',
+        body:'球转一周，四季圆满。从村寨歌圩到数字屏幕，绣球正在被更多人看见与传承：非遗进校园、青年设计师共创、3D 数字化展示……愿这一枚十二瓣彩球，把壮乡的祝福与匠心，转给世界，也转给下一个千年。'
+    }
+];
+
+const ICONS = {
+    star:'<path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/>',
+    heart:'<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-3 4.5 4.5 0 0 1 8 3c0 5.8-8 11-8 11z"/>',
+    craft:'<path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/>',
+    drum:'<path d="M4 10a8 4 0 0 1 16 0v4a8 4 0 0 1-16 0z"/><path d="M12 14v7M8 21h8"/>',
+    feather:'<path d="M20 4C14 4 9 7 6 14l-3 6 6-3c7-3 10-8 10-13z"/><path d="M11 13l3-3" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+    gift:'<path d="M4 11h16v9H4z"/><path d="M12 11v9"/><path d="M12 11c-3-3-8-2.5-7 .5 1 2 6 1 7-.5zM12 11c3-3 8-2.5 7 .5-1 2-6 1-7-.5z"/>',
+    location:'<path d="M12 21s-7-6.4-7-11a7 7 0 0 1 14 0c0 4.6-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+    circle:'<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+const iconSvg = (name) => `<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+
+/* ========== 生成章节 / 十二瓣模型 / 卡片 / 进度点 ========== */
+const NUM_CN = ['一','二','三','四','五','六','七','八'];
+
+const sectionsEl = document.getElementById('sections');
+DATA.forEach((d, i) => {
+    const sec = document.createElement('section');
+    sec.className = 'sec';
+    sec.innerHTML = `<div class="num">${d.n}</div><div class="label">第${NUM_CN[i]}章 · ${d.title}</div>`;
+    sectionsEl.appendChild(sec);
+});
+
+/* ---------- 十二瓣绣球模型（移植自 绣球模型.html） ---------- */
+const MODEL_R = 2.2;
+const NODES = [
+    new THREE.Vector3(0, MODEL_R, 0),
+    new THREE.Vector3(0, -MODEL_R, 0),
+    new THREE.Vector3(MODEL_R, 0, 0),
+    new THREE.Vector3(-MODEL_R, 0, 0),
+    new THREE.Vector3(0, 0, MODEL_R),
+    new THREE.Vector3(0, 0, -MODEL_R)
+];
+const EDGES = [
+    { a: 2, b: 4, type: 'equator' },
+    { a: 4, b: 3, type: 'equator' },
+    { a: 3, b: 5, type: 'equator' },
+    { a: 5, b: 2, type: 'equator' },
+    { a: 0, b: 2, type: 'top' },
+    { a: 0, b: 4, type: 'top' },
+    { a: 0, b: 3, type: 'top' },
+    { a: 0, b: 5, type: 'top' },
+    { a: 1, b: 2, type: 'bottom' },
+    { a: 1, b: 4, type: 'bottom' },
+    { a: 1, b: 3, type: 'bottom' },
+    { a: 1, b: 5, type: 'bottom' }
+];
+const MODEL_STATE = {
+    silkColor: '#e02575',
+    goldColor: '#ffd700',
+    pattern: 'phoenix',
+    extrudeDepth: 0.5,
+    widthFactor: 0.48,
+    puffFactor: 0.12,
+    tasselConfig: 5
+};
+let scene, camera, renderer;
+let ballGroup, petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup;
+let petalMaterials = [], goldMaterials = [], proceduralTexture, petalDirs = [];
+
+function adjustColorBrightness(hex, percent) {
+    let num = parseInt(hex.replace('#', ''), 16);
+    let amt = Math.round(2.55 * percent);
+    let R = (num >> 16) + amt, G = (num >> 8 & 0x00FF) + amt, B = (num & 0x0000FF) + amt;
+    R = Math.min(255, Math.max(0, R));
+    G = Math.min(255, Math.max(0, G));
+    B = Math.min(255, Math.max(0, B));
+    return '#' + (0x1000000 + (R << 16) + (G << 8) + B).toString(16).slice(1);
+}
+
+function generateEmbroideryTexture(silkColor, pattern) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = silkColor;
+    ctx.fillRect(0, 0, 512, 512);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 512; i += 4) {
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke();
+    }
+    if (pattern === 'satin') {
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = THREE.ClampToEdgeWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        return texture;
+    }
+    ctx.save();
+    ctx.translate(256, 256);
+    const drawEmbroideryCurve = (strokeColor, lineWidth, pathPoints) => {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        pathPoints.forEach((pt, idx) => {
+            if (idx === 0) ctx.moveTo(pt[0], pt[1]);
+            else ctx.lineTo(pt[0], pt[1]);
+        });
+        ctx.stroke();
+    };
+    const colors = pattern === 'phoenix'
+        ? ['#ffd700', '#00e5ff', '#ff66b2', '#ffffff']
+        : pattern === 'floral'
+        ? ['#ffd700', '#76ff03', '#ff4081', '#ffffff']
+        : ['#ffd700', '#ff9100', '#ff3d00', '#fff59d'];
+    for (let side = -1; side <= 1; side += 2) {
+        drawEmbroideryCurve(colors[0], 6, [
+            [0, 180 * side], [20 * side, 100 * side], [40 * side, 20 * side], [10 * side, -80 * side], [0, -160 * side]
+        ]);
+        drawEmbroideryCurve(colors[1], 4, [
+            [15 * side, 140 * side], [50 * side, 60 * side], [65 * side, -10 * side], [30 * side, -70 * side]
+        ]);
+        drawEmbroideryCurve(colors[2], 3, [
+            [5 * side, 160 * side], [30 * side, 90 * side], [45 * side, 10 * side]
+        ]);
+        drawEmbroideryCurve(colors[3], 2, [
+            [0, 175 * side], [15 * side, 105 * side], [35 * side, 25 * side]
+        ]);
+    }
+    ctx.restore();
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    return texture;
+}
+
+function createPetalMesh(A, B, radius, widthFactor, puffFactor) {
+    const uSegments = 20, vSegments = 10;
+    const outerPositions = [], innerPositions = [];
+    const leftBorderOuter = [], leftBorderInner = [], rightBorderOuter = [], rightBorderInner = [];
+    const midVector = new THREE.Vector3().addVectors(A, B).normalize();
+    const depthRatio = Math.max(0, Math.min(0.85, MODEL_STATE.extrudeDepth));
+    for (let i = 0; i <= uSegments; i++) {
+        const u = i / uSegments;
+        const currentCenter = new THREE.Vector3().subVectors(B, A).multiplyScalar(u).add(A).normalize();
+        const chord = new THREE.Vector3().subVectors(B, A);
+        const tangent = chord.clone().sub(currentCenter.clone().multiplyScalar(chord.dot(currentCenter))).normalize();
+        const normal = currentCenter.clone();
+        const side = new THREE.Vector3().crossVectors(normal, tangent).normalize();
+        const currentWidth = widthFactor * Math.sin(Math.PI * u);
+        const rowOuter = [], rowInner = [];
+        for (let j = 0; j <= vSegments; j++) {
+            const v = (j / vSegments) - 0.5;
+            const puff = puffFactor * Math.cos(Math.PI * v) * Math.sin(Math.PI * u);
+            const posOuter = currentCenter.clone().multiplyScalar(radius)
+                .add(side.clone().multiplyScalar(v * currentWidth * radius))
+                .add(normal.clone().multiplyScalar(puff * radius));
+            const posInner = posOuter.clone().multiplyScalar(1 - depthRatio);
+            rowOuter.push(posOuter);
+            rowInner.push(posInner);
+            if (j === 0) { leftBorderOuter.push(posOuter.clone()); leftBorderInner.push(posInner.clone()); }
+            if (j === vSegments) { rightBorderOuter.push(posOuter.clone()); rightBorderInner.push(posInner.clone()); }
+        }
+        outerPositions.push(rowOuter);
+        innerPositions.push(rowInner);
+    }
+    const outerGeom = new THREE.BufferGeometry();
+    const outerPosArr = [], outerUvs = [], outerIndices = [];
+    const stride = vSegments + 1;
+    for (let i = 0; i <= uSegments; i++) {
+        for (let j = 0; j <= vSegments; j++) {
+            const p = outerPositions[i][j];
+            outerPosArr.push(p.x, p.y, p.z);
+            outerUvs.push(i / uSegments, j / vSegments);
+        }
+    }
+    for (let i = 0; i < uSegments; i++) {
+        for (let j = 0; j < vSegments; j++) {
+            const a = i * stride + j, b = a + stride, c = b + 1, d = a + 1;
+            outerIndices.push(a, b, d, b, c, d);
+        }
+    }
+    outerGeom.setAttribute('position', new THREE.Float32BufferAttribute(outerPosArr, 3));
+    outerGeom.setAttribute('uv', new THREE.Float32BufferAttribute(outerUvs, 2));
+    outerGeom.setIndex(outerIndices);
+    outerGeom.computeVertexNormals();
+    const silkMat = new THREE.MeshPhysicalMaterial({
+        map: proceduralTexture,
+        roughness: 0.35,
+        metalness: 0.05,
+        clearcoat: 0.3,
+        clearcoatRoughness: 0.2,
+        side: THREE.FrontSide
+    });
+    petalMaterials.push(silkMat);
+    const outerMesh = new THREE.Mesh(outerGeom, silkMat);
+    const wallGroup = new THREE.Group();
+    if (depthRatio > 0.01) {
+        const wallGeom = new THREE.BufferGeometry();
+        const wallPosArr = [], wallIndices = [];
+        const addWallStrip = (outerPts, innerPts, reverse) => {
+            const startIndex = wallPosArr.length / 3;
+            for (let k = 0; k < outerPts.length; k++) {
+                const po = outerPts[k], pi = innerPts[k];
+                wallPosArr.push(po.x, po.y, po.z);
+                wallPosArr.push(pi.x, pi.y, pi.z);
+            }
+            for (let k = 0; k < outerPts.length - 1; k++) {
+                const o1 = startIndex + k * 2, i1 = startIndex + k * 2 + 1;
+                const o2 = startIndex + (k + 1) * 2, i2 = startIndex + (k + 1) * 2 + 1;
+                if (!reverse) {
+                    wallIndices.push(o1, i1, o2, i1, i2, o2);
+                } else {
+                    wallIndices.push(o1, o2, i1, i1, o2, i2);
+                }
+            }
+        };
+        addWallStrip(leftBorderOuter, leftBorderInner, false);
+        addWallStrip(rightBorderOuter, rightBorderInner, true);
+        wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wallPosArr, 3));
+        wallGeom.setIndex(wallIndices);
+        wallGeom.computeVertexNormals();
+        const wallMat = new THREE.MeshStandardMaterial({
+            color: adjustColorBrightness(MODEL_STATE.silkColor, -40),
+            roughness: 0.4,
+            metalness: 0.1,
+            side: THREE.DoubleSide
+        });
+        wallGroup.add(new THREE.Mesh(wallGeom, wallMat));
+    }
+    const trimCurvePoints = [...leftBorderOuter, ...rightBorderOuter.reverse()];
+    const trimCurve = new THREE.CatmullRomCurve3(trimCurvePoints, true);
+    const trimGeom = new THREE.TubeGeometry(trimCurve, 32, 0.04, 6, true);
+    const goldMat = new THREE.MeshStandardMaterial({
+        color: MODEL_STATE.goldColor,
+        metalness: 0.9,
+        roughness: 0.2
+    });
+    goldMaterials.push(goldMat);
+    const petalGroup = new THREE.Group();
+    petalGroup.add(outerMesh);
+    petalGroup.add(wallGroup);
+    petalGroup.add(new THREE.Mesh(trimGeom, goldMat));
+    petalGroup.userData = { centerDir: midVector.clone(), nodeA: A, nodeB: B };
+    petalDirs.push(midVector.clone());
+    return petalGroup;
+}
+
+function buildPearlNodes() {
+    pearlsGroup.clear();
+    NODES.forEach((pos) => {
+        const nodeGroup = new THREE.Group();
+        nodeGroup.position.copy(pos);
+        const pearlMat = new THREE.MeshPhysicalMaterial({
+            color: 0xfffcf5,
+            roughness: 0.1,
+            metalness: 0.1,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.05
+        });
+        nodeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(0.18, 14, 12), pearlMat));
+        for (let i = 0; i < 4; i++) {
+            const angle = (i / 4) * Math.PI * 2;
+            const subPearl = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), pearlMat);
+            subPearl.position.set(Math.cos(angle) * 0.22, 0, Math.sin(angle) * 0.22);
+            nodeGroup.add(subPearl);
+        }
+        pearlsGroup.add(nodeGroup);
+    });
+}
+
+function buildTassels(configCount) {
+    tasselsGroup.clear();
+    if (configCount === 0) return;
+    const targetNodeIndices = configCount === 5 ? [1, 2, 3, 4, 5] : [1];
+    targetNodeIndices.forEach((nodeIdx) => {
+        const nodePos = NODES[nodeIdx];
+        const tasselGroup = new THREE.Group();
+        tasselGroup.position.copy(nodePos);
+        const isMainBottom = (nodeIdx === 1);
+        const scale = isMainBottom ? 1.0 : 0.75;
+        const beadMat = new THREE.MeshPhysicalMaterial({
+            color: 0xfff8e7,
+            roughness: 0.1,
+            clearcoat: 1.0
+        });
+        const amberMat = new THREE.MeshStandardMaterial({ color: 0xffa000, roughness: 0.25, metalness: 0.05 });
+        for (let b = 0; b < 3; b++) {
+            const bead = new THREE.Mesh(new THREE.SphereGeometry(0.08 * scale, 10, 8), beadMat);
+            bead.position.y = -0.3 * (b + 1) * scale;
+            tasselGroup.add(bead);
+        }
+        const capGeom = new THREE.ConeGeometry(0.18 * scale, 0.4 * scale, 10);
+        const capMesh = new THREE.Mesh(capGeom, amberMat);
+        capMesh.position.y = -1.2 * scale;
+        capMesh.rotation.x = Math.PI;
+        tasselGroup.add(capMesh);
+        const tasselSilkMat = new THREE.MeshStandardMaterial({
+            color: MODEL_STATE.silkColor,
+            roughness: 0.4,
+            metalness: 0.1
+        });
+        const skirtGeom = new THREE.CylinderGeometry(0.06 * scale, 0.14 * scale, 2.2 * scale, 10);
+        skirtGeom.translate(0, -1.1 * scale, 0);
+        const skirtMesh = new THREE.Mesh(skirtGeom, tasselSilkMat);
+        skirtMesh.position.y = -1.2 * scale;
+        tasselGroup.add(skirtMesh);
+        tasselsGroup.add(tasselGroup);
+    });
+}
+
+function buildTopRibbon() {
+    ribbonGroup.clear();
+    const topNode = NODES[0];
+    const ribbonMat = new THREE.MeshStandardMaterial({
+        color: MODEL_STATE.silkColor,
+        roughness: 0.3,
+        side: THREE.DoubleSide
+    });
+    const loopGeom = new THREE.TorusGeometry(0.6, 0.05, 10, 20, Math.PI * 1.8);
+    const loopMesh = new THREE.Mesh(loopGeom, ribbonMat);
+    loopMesh.position.set(topNode.x, topNode.y + 0.6, topNode.z);
+    loopMesh.rotation.z = Math.PI / 2;
+    ribbonGroup.add(loopMesh);
+}
+
+function buildHomeModel() {
+    petalMaterials = [];
+    goldMaterials = [];
+    petalDirs = [];
+    petalsGroup.clear();
+    proceduralTexture = generateEmbroideryTexture(MODEL_STATE.silkColor, MODEL_STATE.pattern);
+    EDGES.forEach((edge) => {
+        petalsGroup.add(createPetalMesh(NODES[edge.a], NODES[edge.b], MODEL_R, MODEL_STATE.widthFactor, MODEL_STATE.puffFactor));
+    });
+    buildPearlNodes();
+    buildTassels(MODEL_STATE.tasselConfig);
+    buildTopRibbon();
+}
+
+function setupLights() {
+    scene.add(new THREE.AmbientLight(0xfff5ea, 0.8));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    keyLight.position.set(5, 8, 5);
+    scene.add(keyLight);
+    const fillLight = new THREE.DirectionalLight(0xffa07a, 0.6);
+    fillLight.position.set(-5, -2, -5);
+    scene.add(fillLight);
+    const rimLight = new THREE.DirectionalLight(0xffd700, 1.0);
+    rimLight.position.set(0, 5, -8);
+    scene.add(rimLight);
+}
+
+let dragRot = 0;
+function initHomeModel() {
+    const canvas = document.getElementById('modelCanvas');
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0.2, 12);
+    camera.lookAt(0, -1.2, 0);
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(canvas.clientWidth || 560, canvas.clientHeight || 560, false);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    ballGroup = new THREE.Group();
+    petalsGroup = new THREE.Group();
+    tasselsGroup = new THREE.Group();
+    pearlsGroup = new THREE.Group();
+    ribbonGroup = new THREE.Group();
+    ballGroup.add(petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup);
+    scene.add(ballGroup);
+    setupLights();
+    buildHomeModel();
+    let dragging = false, dragLast = 0;
+    canvas.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        dragging = true;
+        dragLast = e.clientX;
+        canvas.classList.add('dragging');
+        canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        dragRot += (e.clientX - dragLast) * 0.4;
+        dragLast = e.clientX;
+    });
+    const endDrag = () => { dragging = false; canvas.classList.remove('dragging'); };
+    canvas.addEventListener('pointerup', endDrag);
+    canvas.addEventListener('pointercancel', endDrag);
+}
+initHomeModel();
+
+/* 右侧卡片 */
+const panelEl = document.getElementById('panel');
+DATA.forEach((d, i) => {
+    const card = document.createElement('div');
+    card.className = 'panel-card';
+    card.innerHTML = `
+        <span class="chip">${iconSvg(d.icon)} 第${NUM_CN[i]}章 · ${i + 1}/8</span>
+        <h2 class="font-calligraphy">${d.title}</h2>
+        <p class="sub">${d.sub}</p>
+        <div class="divider"></div>
+        <div class="body">${d.body}</div>
+        <div class="hint"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5 5 5-5M7 16l5 5 5-5"/></svg><span class="hintText"></span></div>`;
+    panelEl.appendChild(card);
+});
+
+/* 进度点 */
+const dotsEl = document.getElementById('dots');
+DATA.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' on' : '');
+    dotsEl.appendChild(dot);
+});
+
+const cards = [...document.querySelectorAll('.panel-card')];
+const dots = [...document.querySelectorAll('.dot')];
+const mobileTitle = document.getElementById('mobileTitle');
+const scrollHint = document.getElementById('scrollHint');
+const burst = document.getElementById('burst');
+const btnAuto = document.getElementById('btnAuto');
+
+/* ========== 滚动联动 ========== */
+let rot = 0;
+let active = 0;
+let velS = 0;
+let lastY = window.scrollY;
+let lastT = performance.now();
+let autoOn = false;
+let autoStart = 0;
+let autoDir = 1;
+
+const norm360 = (a) => { a = a % 360; return a < 0 ? a + 360 : a; };
+const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - innerHeight);
+
+function setPanel(idx){
+    cards.forEach((c, i) => c.classList.toggle('on', i === idx));
+    dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+    mobileTitle.textContent = `第${NUM_CN[idx]}章 · ${DATA[idx].title}`;
+    const hint = cards[idx].querySelector('.hintText');
+    if (idx === 7) hint.textContent = '已转满一周 · 圆满收官';
+    else hint.textContent = `继续滚动 · 切换至第 ${NUM_CN[idx + 1]} 章`;
+    scrollHint.classList.toggle('show', idx === 0);
+    burst.classList.toggle('show', idx === 7);
+}
+
+function tick(now){
+    requestAnimationFrame(tick);
+    const max = maxScroll();
+    const p = Math.min(1, Math.max(0, window.scrollY / max));
+    const target = p * 360;
+    rot += (target - rot) * 0.16;
+    if (Math.abs(target - rot) < 0.02) rot = target;
+
+    const idx = Math.min(7, Math.floor(norm360(rot) / 45));
+    if (idx !== active){ active = idx; setPanel(idx); }
+
+    const totalDeg = rot + dragRot;
+    const rad = totalDeg * Math.PI / 180;
+    if (ballGroup) {
+        ballGroup.rotation.y = rad;
+        let best = -1, bestAng = 1e9;
+        for (let i = 0; i < petalDirs.length; i++) {
+            const d = petalDirs[i];
+            const x2 = d.x * Math.cos(rad) + d.z * Math.sin(rad);
+            const z2 = -d.x * Math.sin(rad) + d.z * Math.cos(rad);
+            const ang = Math.abs(Math.atan2(x2, z2));
+            if (ang < bestAng) { bestAng = ang; best = i; }
+        }
+        petalMaterials.forEach((m, i) => {
+            if (i === best) { m.emissive.setHex(0xffb020); m.emissiveIntensity = 0.3; }
+            else { m.emissive.setHex(0x000000); m.emissiveIntensity = 0; }
+        });
+    }
+
+    const glow = document.getElementById('glow');
+    if (glow) glow.style.opacity = (0.55 + 0.22 * Math.sin(now * 0.0022)).toFixed(2);
+
+    const dt = Math.max(16, now - lastT);
+    const v = (window.scrollY - lastY) / dt;
+    velS += (v - velS) * 0.08;
+    lastY = window.scrollY; lastT = now;
+
+    const amp = Math.min(24, Math.max(2, Math.abs(velS) * 0.45 + 1.5));
+    const speed = 1.8 + amp * 0.055;
+    const swing = amp * Math.sin(now * 0.001 * speed);
+    if (tasselsGroup) tasselsGroup.rotation.z = swing * Math.PI / 180;
+
+    if (renderer) {
+        const canvas = renderer.domElement;
+        const cw = canvas.clientWidth || 560, ch = canvas.clientHeight || 560;
+        const pr = renderer.getPixelRatio();
+        if (canvas.width !== Math.floor(cw * pr) || canvas.height !== Math.floor(ch * pr)) {
+            renderer.setSize(cw, ch, false);
+            camera.aspect = cw / ch;
+            camera.updateProjectionMatrix();
+        }
+        renderer.render(scene, camera);
+    }
+}
+
+/* 自动演示（26s 上行 + 26s 下行，用户滚动即停） */
+function startAuto(){
+    autoOn = true; autoStart = performance.now(); autoDir = 1;
+    btnAuto.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg><span>停止</span>';
+}
+function stopAuto(){
+    autoOn = false;
+    btnAuto.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>自动演示</span>';
+}
+function autoStep(now){
+    if (!autoOn) return;
+    const t = (now - autoStart) / 1000;
+    const period = 26;
+    let e = (t % (period * 2)) / period;
+    if (e > 1) e = 2 - e;
+    e = e * e * (3 - 2 * e);
+    window.scrollTo(0, e * maxScroll());
+    requestAnimationFrame(autoStep);
+}
+btnAuto.addEventListener('click', () => autoOn ? stopAuto() : (startAuto(), requestAnimationFrame(autoStep)));
+document.getElementById('btnTop').addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+window.addEventListener('wheel', () => { if (autoOn) stopAuto(); }, {passive: true});
+window.addEventListener('touchstart', () => { if (autoOn) stopAuto(); }, {passive: true});
+
+/* 截图 / 直达参数：?sec=3 */
+window.addEventListener('load', () => {
+    requestAnimationFrame(tick);
+    setPanel(0);
+    requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('anim')));
+    const secQ = parseInt(new URLSearchParams(location.search).get('sec') || '', 10);
+    const secH = parseInt((location.hash.match(/sec=(\d+)/) || [])[1] || '', 10);
+    const sec = !isNaN(secQ) ? secQ : secH;
+    if (!isNaN(sec)) setTimeout(() => window.scrollTo(0, (Math.min(7, Math.max(0, sec)) / 8) * maxScroll()), 80);
+});
+</script>
+</body>
+</html>

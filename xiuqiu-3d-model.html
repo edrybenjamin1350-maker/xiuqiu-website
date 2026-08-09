@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>靖西壮族绣球 · 三维模型</title>
+<style>
+    html,body{margin:0;height:100%;overflow:hidden;background:radial-gradient(ellipse at 50% 38%, #25131c 0%, #160a11 55%, #0c060a 100%)}
+    #c{position:fixed;top:0;left:0;width:100%;height:100%;display:block;cursor:grab;background:#0c060a}
+    #c:active{cursor:grabbing}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="lib/three.min.js"></script>
+<script src="lib/OrbitControls.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    const R = 0.9;                 // 球半径
+    const PUFF = 0.055 * R;        // 花瓣鼓起量
+    const DEG = Math.PI / 180;
+
+    /* ---------- 渲染器 / 相机 / 控制 ---------- */
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x12080e);
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.05, 40);
+    camera.position.set(1.0, -0.3, 7.2);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.5;
+    controls.minDistance = 2.4;
+    controls.maxDistance = 10;
+    controls.enablePan = false;
+
+    /* ---------- 灯光 ---------- */
+    scene.add(new THREE.AmbientLight(0xffe6d8, 0.55));
+    const key = new THREE.DirectionalLight(0xfff1e0, 1.15);
+    key.position.set(2.2, 3.4, 3.6); scene.add(key);
+    const fill = new THREE.DirectionalLight(0x9fc4ff, 0.35);
+    fill.position.set(-3.4, -1.2, -2.6); scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xffd27a, 0.6);
+    rim.position.set(-1.6, 1.9, -4.0); scene.add(rim);
+    const topLight = new THREE.PointLight(0xfff0d0, 0.45, 10);
+    topLight.position.set(0, 4.2, 1.2); scene.add(topLight);
+
+    /* ---------- 材质 ---------- */
+    function makeFabricTexture() {
+        const cv = document.createElement('canvas'); cv.width = 256; cv.height = 256;
+        const x = cv.getContext('2d');
+        x.fillStyle = '#c6c6c6'; x.fillRect(0, 0, 256, 256);
+        const img = x.getImageData(0, 0, 256, 256), d = img.data;
+        for (let i = 0; i < d.length; i += 4) {
+            const n = 192 + (Math.random() - 0.5) * 28;
+            d[i] = d[i + 1] = d[i + 2] = n; d[i + 3] = 255;
+        }
+        x.putImageData(img, 0, 0);
+        x.strokeStyle = 'rgba(255,255,255,0.10)';
+        for (let yy = 0; yy < 256; yy += 4) { x.beginPath(); x.moveTo(0, yy + 1); x.lineTo(256, yy + 1); x.stroke(); }
+        x.strokeStyle = 'rgba(0,0,0,0.15)';
+        for (let xx = 0; xx < 256; xx += 4) { x.beginPath(); x.moveTo(xx + 2, 0); x.lineTo(xx + 2, 256); x.stroke(); }
+        const t = new THREE.CanvasTexture(cv);
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.repeat.set(3, 4); t.anisotropy = 4;
+        return t;
+    }
+    const weaveTex = makeFabricTexture();
+    const silk = (color, roughness) => new THREE.MeshStandardMaterial({ color, map: weaveTex, roughness: roughness || 0.42, metalness: 0.06 });
+    const M = {
+        red: silk(0xd22a1f),
+        redDeep: silk(0xa91c18),
+        redOrange: silk(0xe2432a),
+        gold: new THREE.MeshStandardMaterial({ color: 0xe7b13c, metalness: 0.75, roughness: 0.24 }),
+        goldLight: new THREE.MeshStandardMaterial({ color: 0xf6cf62, metalness: 0.6, roughness: 0.3 }),
+        pearl: new THREE.MeshStandardMaterial({ color: 0xfff6ec, roughness: 0.13, metalness: 0.08 }),
+        whiteThread: new THREE.MeshStandardMaterial({ color: 0xfdf6ee, roughness: 0.55, metalness: 0.0 }),
+        yellow: new THREE.MeshStandardMaterial({ color: 0xf2c63a, roughness: 0.5 }),
+        blue: new THREE.MeshStandardMaterial({ color: 0x3f7fd4, roughness: 0.5 }),
+        pink: new THREE.MeshStandardMaterial({ color: 0xef8fb0, roughness: 0.5 }),
+        green: new THREE.MeshStandardMaterial({ color: 0x4c9440, roughness: 0.55 }),
+        greenDark: new THREE.MeshStandardMaterial({ color: 0x35722f, roughness: 0.55 }),
+        tassel: new THREE.MeshStandardMaterial({ color: 0xe9c23c, roughness: 0.62, metalness: 0.02 })
+    };
+
+    /* ---------- 球面工具：花瓣局部点 / 世界点 ---------- */
+    function surfacePoint(phi, theta) {
+        const sp = Math.sin(phi), cp = Math.cos(phi);
+        const st = Math.sin(theta), ct = Math.cos(theta);
+        const base = new THREE.Vector3(sp * ct, cp, sp * st);
+        const n = base.clone().normalize();
+        const puff = PUFF * Math.sin(phi) * Math.cos(4 * theta);
+        return { pos: base.clone().add(n.clone().multiplyScalar(puff)), nrm: n };
+    }
+    function petalPoint(angleA, phi, theta) {
+        const s = surfacePoint(phi, theta);
+        const ca = Math.cos(angleA), sa = Math.sin(angleA);
+        return {
+            pos: new THREE.Vector3(s.pos.x * ca + s.pos.z * sa, s.pos.y, -s.pos.x * sa + s.pos.z * ca),
+            nrm: new THREE.Vector3(s.nrm.x * ca + s.nrm.z * sa, s.nrm.y, -s.nrm.x * sa + s.nrm.z * ca)
+        };
+    }
+
+    const ballGroup = new THREE.Group();
+    ballGroup.position.y = 1.35;
+    scene.add(ballGroup);
+
+    /* ---------- 1) 八片花瓣 ---------- */
+    const PETAL_COLORS = [M.red, M.redOrange, M.red, M.redDeep, M.red, M.redOrange, M.red, M.redDeep];
+    function buildPetal(angleA, material) {
+        const uSeg = 22, vSeg = 10;
+        const pos = [], nrm = [], uv = [], idx = [];
+        for (let i = 0; i <= uSeg; i++) {
+            const phi = Math.PI * i / uSeg;
+            for (let j = 0; j <= vSeg; j++) {
+                const theta = -Math.PI / 8 + (Math.PI / 4) * j / vSeg;
+                const s = petalPoint(angleA, phi, theta);
+                pos.push(s.pos.x, s.pos.y, s.pos.z);
+                nrm.push(s.nrm.x, s.nrm.y, s.nrm.z);
+                uv.push(i / uSeg, j / vSeg);
+            }
+        }
+        const stride = vSeg + 1;
+        for (let i = 0; i < uSeg; i++) {
+            for (let j = 0; j < vSeg; j++) {
+                const a = i * stride + j, b = a + stride, c = b + 1, d = a + 1;
+                idx.push(a, b, d, b, c, d);
+            }
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        g.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+        g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+        g.setIndex(idx);
+        g.computeVertexNormals();
+        return new THREE.Mesh(g, material);
+    }
+
+    /* ---------- 2) 金色滚边（每片花瓣左侧缝线） ---------- */
+    function buildPiping(angleA) {
+        const pts = [];
+        const N = 26;
+        for (let i = 0; i <= N; i++) {
+            const phi = Math.PI * (0.03 + 0.94 * i / N);
+            const s = petalPoint(angleA, phi, -Math.PI / 8);
+            pts.push(s.pos.clone().add(s.nrm.clone().multiplyScalar(0.007)));
+        }
+        const curve = new THREE.CatmullRomCurve3(pts);
+        return new THREE.Mesh(new THREE.TubeGeometry(curve, 40, 0.016, 8, false), M.gold);
+    }
+
+    /* ---------- 3) 刺绣花卉 / 藤蔓 / 边缘珠饰 ---------- */
+    function addFlower(angleA, phi, theta, scale, petalMat, centerMat, petalCount) {
+        const s = petalPoint(angleA, phi, theta);
+        const g = new THREE.Group();
+        g.position.copy(s.pos);
+        g.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), s.nrm);
+        for (let k = 0; k < petalCount; k++) {
+            const m = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 6), petalMat);
+            const ang = (k / petalCount) * Math.PI * 2;
+            m.scale.set(0.052 * scale, 0.015 * scale, 0.033 * scale);
+            m.position.set(Math.cos(ang) * 0.074 * scale, 0, Math.sin(ang) * 0.074 * scale);
+            m.rotation.y = ang + Math.PI / 2;
+            g.add(m);
+        }
+        const cen = new THREE.Mesh(new THREE.SphereGeometry(0.02 * scale, 10, 8), centerMat);
+        g.add(cen);
+        ballGroup.add(g);
+        return g;
+    }
+
+    function addVine(angleA, phi1, theta1, phi2, theta2, leafCount) {
+        const pts = [];
+        const N = 18;
+        for (let i = 0; i <= N; i++) {
+            const s = petalPoint(angleA, phi1 + (phi2 - phi1) * i / N, theta1 + (theta2 - theta1) * i / N);
+            pts.push(s.pos.clone().add(s.nrm.clone().multiplyScalar(0.012)));
+        }
+        const curve = new THREE.CatmullRomCurve3(pts);
+        const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 26, 0.0052, 6, false), M.greenDark);
+        const g = new THREE.Group();
+        g.add(tube);
+        for (let i = 1; i <= leafCount; i++) {
+            const t = i / (leafCount + 1);
+            const p = curve.getPointAt(t);
+            const tan = curve.getTangentAt(t).normalize();
+            const leaf = new THREE.Mesh(new THREE.SphereGeometry(1, 6, 4), M.green);
+            leaf.scale.set(0.042, 0.008, 0.021);
+            leaf.position.copy(p);
+            leaf.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), tan);
+            g.add(leaf);
+        }
+        ballGroup.add(g);
+        return g;
+    }
+
+    function addEdgeDiamond(angleA, phi, theta, mat, size) {
+        const s = petalPoint(angleA, phi, theta);
+        const m = new THREE.Mesh(new THREE.OctahedronGeometry(size, 0), mat);
+        m.position.copy(s.pos.clone().add(s.nrm.clone().multiplyScalar(0.014)));
+        m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), s.nrm);
+        ballGroup.add(m);
+        return m;
+    }
+
+    function seededRand(seed) {
+        let s = seed >>> 0;
+        return function () {
+            s = (s * 9301 + 49297) % 233280;
+            return s / 233280;
+        };
+    }
+
+    const SMALL_COLORS = [M.blue, M.yellow, M.pink];
+    const petals = [];
+    for (let i = 0; i < 8; i++) {
+        const A = i * 45 * DEG;
+        const petalMesh = buildPetal(A, PETAL_COLORS[i]);
+        ballGroup.add(petalMesh);
+        ballGroup.add(buildPiping(A));
+
+        // 中央白色五瓣花
+        addFlower(A, 90 * DEG, 0, 1.0, M.whiteThread, M.yellow, 5);
+
+        // 两条藤蔓：花朵向两侧自然延伸
+        addVine(A, 88 * DEG, 0, 62 * DEG, 13 * DEG, 3);
+        addVine(A, 92 * DEG, 0, 118 * DEG, -11 * DEG, 3);
+
+        // 2~3 朵小型彩色花，手工错落分布
+        const rnd = seededRand(0x51 + i * 977);
+        const smallCount = 2 + Math.floor(rnd() * 2);
+        for (let k = 0; k < smallCount; k++) {
+            const phi = (45 + rnd() * 90) * DEG;
+            const theta = (-18 + rnd() * 36) * DEG;
+            const dist = Math.abs((phi / DEG) - 90) + Math.abs(theta / DEG) * 0.6;
+            if (dist < 22) continue;
+            addFlower(A, phi, theta, 0.58 + rnd() * 0.12, SMALL_COLORS[(i + k) % 3], M.yellow, 5);
+        }
+
+        // 边缘珠饰：连续花边菱形
+        const edgePhis = [26, 62, 118, 154];
+        edgePhis.forEach((ph, k) => {
+            const mat = (i + k) % 2 === 0 ? M.pearl : M.goldLight;
+            addEdgeDiamond(A, ph * DEG, -Math.PI / 8, mat, 0.016);
+            addEdgeDiamond(A, ph * DEG, Math.PI / 8, mat, 0.016);
+        });
+    }
+
+    /* ---------- 4) 赤道拼缝珍珠节点 ---------- */
+    for (let i = 0; i < 8; i++) {
+        const A = (i * 45 + 22.5) * DEG;
+        const s = petalPoint(A, 90 * DEG, 0);
+        const pearl = new THREE.Mesh(new THREE.SphereGeometry(0.022, 12, 10), M.pearl);
+        pearl.position.copy(s.pos.clone().add(s.nrm.clone().multiplyScalar(0.016)));
+        ballGroup.add(pearl);
+    }
+
+    /* ---------- 5) 顶部：金珠串 + 连接结 + 红绳环 ---------- */
+    const topKnot = new THREE.Mesh(new THREE.SphereGeometry(0.055, 14, 12), M.gold);
+    topKnot.position.set(0, R + 0.012, 0);
+    ballGroup.add(topKnot);
+    const topRing = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.016, 10, 26), M.gold);
+    topRing.position.set(0, R + 0.018, 0);
+    topRing.rotation.x = Math.PI / 2;
+    ballGroup.add(topRing);
+    const redLoop = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.012, 8, 20), M.red);
+    redLoop.position.set(0, R + 0.11, 0);
+    redLoop.rotation.x = Math.PI / 2;
+    ballGroup.add(redLoop);
+    for (let k = 0; k < 6; k++) {
+        const b = new THREE.Mesh(new THREE.SphereGeometry(0.031, 12, 10), M.gold);
+        const phi = 18 * DEG;
+        const rad = R * Math.sin(phi), y = R * Math.cos(phi);
+        const ang = k * 60 * DEG;
+        b.position.set(Math.cos(ang) * rad, y, Math.sin(ang) * rad);
+        ballGroup.add(b);
+    }
+
+    /* ---------- 6) 底部：红色线结 + 金珠 + 黄色长流苏 ---------- */
+    const tassel = new THREE.Group();
+    tassel.position.set(0, -R - 0.02, 0);
+    const knotRed = new THREE.Mesh(new THREE.SphereGeometry(0.055, 12, 10), M.red);
+    knotRed.position.y = -0.02;
+    tassel.add(knotRed);
+    const beadGold = new THREE.Mesh(new THREE.SphereGeometry(0.038, 12, 10), M.gold);
+    beadGold.position.y = -0.1;
+    tassel.add(beadGold);
+
+    const trnd = seededRand(0x778899);
+    const STRAND_COUNT = 20;
+    const strandGroup = new THREE.Group();
+    for (let i = 0; i < STRAND_COUNT; i++) {
+        const ang = (i / STRAND_COUNT) * Math.PI * 2 + trnd() * 0.12;
+        const spread = 0.045 + trnd() * 0.08;
+        const bend = 0.05 + trnd() * 0.11;
+        const L = 2.62 + (trnd() - 0.5) * 0.3;
+        const dx = Math.cos(ang), dz = Math.sin(ang);
+        const pts = [
+            new THREE.Vector3(0, -0.14, 0),
+            new THREE.Vector3(dx * spread * 0.4, -0.85, dz * spread * 0.4),
+            new THREE.Vector3(dx * (spread + bend * 0.55), -1.75, dz * (spread + bend * 0.55)),
+            new THREE.Vector3(dx * (spread + bend), -0.14 - L, dz * (spread + bend))
+        ];
+        const curve = new THREE.CatmullRomCurve3(pts);
+        const strand = new THREE.Mesh(new THREE.TubeGeometry(curve, 22, 0.0068, 6, false), M.tassel);
+        strandGroup.add(strand);
+    }
+    tassel.add(strandGroup);
+    ballGroup.add(tassel);
+
+    /* ---------- 动画 ---------- */
+    function animate(time) {
+        requestAnimationFrame(animate);
+        const cw = renderer.domElement.clientWidth || window.innerWidth;
+        const ch = renderer.domElement.clientHeight || window.innerHeight;
+        if (renderer.domElement.width !== Math.floor(cw * renderer.getPixelRatio()) ||
+            renderer.domElement.height !== Math.floor(ch * renderer.getPixelRatio())) {
+            renderer.setSize(cw, ch, false);
+            camera.aspect = cw / ch;
+            camera.updateProjectionMatrix();
+        }
+        const t = time * 0.001;
+        tassel.rotation.z = Math.sin(t * 1.05) * 0.028 + Math.sin(t * 0.72 + 1.8) * 0.014;
+        tassel.rotation.x = Math.sin(t * 0.86 + 0.7) * 0.02;
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight, false);
+    });
+})();
+</script>
+</body>
+</html>
