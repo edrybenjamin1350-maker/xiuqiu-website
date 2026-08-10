@@ -147,7 +147,7 @@
     #petalNavigator.interacting{border-color:rgba(255,208,47,.8);box-shadow:0 12px 34px rgba(0,0,0,.34),0 0 22px rgba(216,40,128,.2)}
     .petal-nav-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;font-size:10px;letter-spacing:.18em;color:rgba(255,236,197,.58)}
     #petalNavLabel{font-weight:400;color:#ffd75a;letter-spacing:.12em}
-    #petalTrack{position:relative;display:grid;grid-template-columns:repeat(12,1fr);gap:5px;cursor:ew-resize}
+    #petalTrack{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;cursor:ew-resize}
     #petalTrack::before{content:'';position:absolute;left:2%;right:2%;top:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,208,47,.6),transparent);pointer-events:none}
     .petal-stop{
         position:relative;z-index:1;width:100%;height:14px;padding:0;border:0;background:transparent;cursor:ew-resize;
@@ -398,6 +398,186 @@
         #dots{display:none}
         .mobile-title{color:var(--museum-red-dark)}
     }
+
+    /* ========== 主页 2.0：彩色光影与极简章节入口 ========== */
+    #bg .vignette{
+        background:
+            radial-gradient(circle at 12% 22%,rgba(139,36,49,.16),transparent 28%),
+            radial-gradient(circle at 88% 26%,rgba(36,125,128,.13),transparent 30%),
+            radial-gradient(circle at 73% 84%,rgba(221,147,66,.15),transparent 32%),
+            radial-gradient(circle at 26% 80%,rgba(117,77,139,.10),transparent 30%),
+            radial-gradient(ellipse at 50% 43%,rgba(255,255,255,.98),rgba(255,252,243,.76) 37%,transparent 68%),
+            linear-gradient(145deg,#f4e9df 0%,#f7f2e9 36%,#e9f0eb 69%,#f3e7dc 100%);
+    }
+    #bg .grain{opacity:.28}
+    .bg-pattern{opacity:.052;filter:saturate(.8)}
+    #stage{isolation:isolate}
+    #stage::before{
+        content:'';position:absolute;left:50%;top:50%;width:min(720px,88vmin);height:min(720px,88vmin);
+        transform:translate(-50%,-50%);border-radius:50%;z-index:0;pointer-events:none;
+        background:
+            radial-gradient(circle at 39% 30%,rgba(255,255,255,.98),rgba(255,249,229,.72) 23%,transparent 49%),
+            conic-gradient(from 215deg,rgba(136,38,49,.10),rgba(220,165,74,.16),rgba(43,128,127,.10),rgba(136,38,49,.10));
+        filter:blur(8px);box-shadow:0 0 0 1px rgba(255,255,255,.5),0 34px 90px rgba(88,59,39,.12);
+    }
+    #stage::after{
+        content:'';position:absolute;left:50%;top:70%;width:min(420px,52vmin);height:70px;
+        transform:translateX(-50%);border-radius:50%;z-index:1;pointer-events:none;
+        background:radial-gradient(ellipse,rgba(78,47,32,.2),rgba(127,31,40,.08) 38%,transparent 72%);filter:blur(14px);
+    }
+    #glow{z-index:1;background:radial-gradient(circle,rgba(255,255,255,.92),rgba(243,197,101,.26) 34%,rgba(58,143,138,.11) 54%,transparent 72%)}
+    #modelCanvas{position:relative;z-index:3;filter:drop-shadow(0 26px 24px rgba(67,42,30,.2)) drop-shadow(0 4px 8px rgba(127,31,40,.12))}
+    body.immersive #modelCanvas{filter:drop-shadow(0 34px 32px rgba(67,42,30,.26))}
+
+    #panel{width:360px;max-width:30vw;height:250px;max-height:none}
+    .panel-card{
+        padding:0;border-radius:4px;overflow:hidden;
+        background:linear-gradient(145deg,rgba(255,254,250,.97),rgba(251,246,237,.94));
+        border:1px solid rgba(127,31,40,.2);box-shadow:0 28px 70px rgba(72,43,29,.15),0 4px 12px rgba(127,31,40,.06);
+    }
+    .panel-card::before{left:9px;right:9px;top:9px;bottom:9px;border-color:rgba(127,31,40,.1)}
+    .chapter-link{
+        position:relative;z-index:1;width:100%;height:100%;padding:34px;
+        display:flex;align-items:center;justify-content:space-between;gap:24px;
+        color:var(--museum-red-dark);text-decoration:none;
+        background:
+            radial-gradient(circle at 96% 8%,rgba(173,139,70,.16),transparent 38%),
+            linear-gradient(135deg,transparent 52%,rgba(127,31,40,.035));
+        transition:background .35s ease,color .35s ease;
+    }
+    .chapter-link::before{content:'';position:absolute;left:34px;top:29px;width:38px;height:2px;background:var(--museum-red);opacity:.75}
+    .chapter-link h2{
+        max-width:250px;margin:0!important;color:inherit!important;font-size:clamp(36px,3.3vw,48px)!important;
+        line-height:1.24;letter-spacing:.06em;text-shadow:none!important;
+    }
+    .chapter-arrow{
+        flex:none;width:46px;height:46px;border:1px solid rgba(127,31,40,.32);border-radius:50%;
+        display:flex;align-items:center;justify-content:center;font-size:23px;transition:transform .35s ease,background .35s ease,color .35s ease;
+    }
+    .chapter-link:hover{color:#fffaf2;background:linear-gradient(135deg,var(--museum-red),#9d3c40)}
+    .chapter-link:hover::before{background:#e7c984}
+    .chapter-link:hover .chapter-arrow{transform:translate(4px,-4px);background:#fffaf2;color:var(--museum-red);border-color:#fffaf2}
+    .chapter-link:focus-visible{outline:3px solid rgba(127,31,40,.25);outline-offset:-5px}
+
+    @media (max-width:1180px){#panel{max-width:34vw}}
+
+    /* ========== 暗色五彩展厅 ========== */
+    body{background:#08090d;color:#f4eadf}
+    #bg .vignette{
+        background:
+            radial-gradient(circle at 8% 18%,rgba(192,43,75,.38),transparent 30%),
+            radial-gradient(circle at 92% 20%,rgba(24,139,142,.32),transparent 31%),
+            radial-gradient(circle at 76% 86%,rgba(213,125,40,.3),transparent 34%),
+            radial-gradient(circle at 22% 82%,rgba(104,57,151,.34),transparent 34%),
+            radial-gradient(circle at 54% 18%,rgba(41,77,152,.25),transparent 27%),
+            radial-gradient(ellipse at 50% 47%,rgba(28,24,31,.28),rgba(9,10,14,.76) 62%,rgba(5,6,9,.96) 100%),
+            linear-gradient(145deg,#160b12,#080b10 50%,#110b13);
+        background-size:118% 118%;animation:auroraDrift 16s ease-in-out infinite alternate;
+    }
+    @keyframes auroraDrift{
+        0%{background-position:0% 0%,100% 0%,100% 100%,0% 100%,50% 0%,50% 50%,50% 50%}
+        100%{background-position:5% 4%,95% 6%,93% 94%,7% 92%,58% 6%,50% 50%,50% 50%}
+    }
+    #bg .grain{opacity:.48;mix-blend-mode:overlay;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,rgba(255,255,255,.014) 0 1px,transparent 1px 5px)}
+    .bg-pattern{opacity:.075;filter:saturate(1.2)}
+    #stage::before{
+        background:
+            radial-gradient(circle at 42% 34%,rgba(255,250,228,.27),rgba(226,176,82,.13) 24%,transparent 51%),
+            conic-gradient(from 210deg,rgba(185,43,75,.2),rgba(225,157,62,.18),rgba(34,148,145,.18),rgba(72,80,164,.16),rgba(185,43,75,.2));
+        box-shadow:0 0 0 1px rgba(255,255,255,.05),0 40px 110px rgba(0,0,0,.38);filter:blur(10px);
+    }
+    #stage::after{background:radial-gradient(ellipse,rgba(0,0,0,.48),rgba(138,41,57,.12) 42%,transparent 72%)}
+    #glow{background:radial-gradient(circle,rgba(255,248,218,.34),rgba(231,171,66,.2) 34%,rgba(27,139,139,.13) 54%,transparent 73%)}
+    #modelCanvas{filter:drop-shadow(0 32px 30px rgba(0,0,0,.46)) drop-shadow(0 0 18px rgba(243,190,88,.13))}
+
+    #header{background:rgba(10,10,14,.78);border-bottom-color:rgba(229,194,124,.18);box-shadow:0 10px 34px rgba(0,0,0,.25)}
+    #header::after{background:linear-gradient(90deg,transparent 3%,#8e2634 18%,#c79b4a 50%,#257f83 82%,transparent 97%);opacity:.72}
+    .brand-title{color:#fff1da}.brand-sub{color:rgba(245,225,199,.5)}
+    #museumNav a{color:rgba(244,232,217,.76)}
+    #museumNav a:hover,#museumNav a.on{color:#ffe4aa}
+    #museumNav a::after{background:linear-gradient(90deg,#a52f47,#d6a957,#3a9998)}
+    .btn-glass,#exitImmersion .btn-glass{background:rgba(19,17,23,.72);border-color:rgba(229,194,124,.32);color:#f6e7ce;backdrop-filter:blur(12px)}
+    .btn-glass:hover{background:rgba(127,31,40,.82);border-color:#d9b66b;color:#fff}
+    #petalNavigator{background:rgba(12,12,17,.66);border-color:rgba(229,194,124,.2);box-shadow:0 16px 40px rgba(0,0,0,.27);backdrop-filter:blur(18px) saturate(1.15)}
+    #petalNavigator.interacting{border-color:rgba(229,194,124,.5);box-shadow:0 16px 44px rgba(0,0,0,.34),0 0 28px rgba(40,134,135,.08)}
+    .petal-nav-meta{color:rgba(244,231,212,.54)}#petalNavLabel{color:#f1cc7d}
+    #petalTrack::before{background:linear-gradient(90deg,transparent,rgba(229,194,124,.5),transparent)}
+    .petal-stop::before{background:#17131a;border-color:rgba(229,194,124,.72)}
+
+    .sec .num{-webkit-text-stroke:1px rgba(242,199,119,.13)}
+    .sec .label{color:rgba(247,230,205,.35)}
+    #scrollHint{color:rgba(244,229,208,.58)}
+    #scrollHint .mouse{border-color:rgba(244,229,208,.58)}
+    #scrollHint .mouse::after{background:#d7ad61}
+    #dots{background:rgba(12,12,17,.64);border-color:rgba(229,194,124,.2);box-shadow:0 12px 32px rgba(0,0,0,.28);backdrop-filter:blur(12px)}
+    .dot{border-color:#d9b261}.dot.on{background:#a92e49;box-shadow:0 0 0 3px rgba(226,176,82,.14),0 0 12px rgba(180,44,76,.52)}
+    #mobileBar{background:rgba(10,10,14,.92);border-top-color:rgba(229,194,124,.2)}
+    .mobile-title{color:#f4dcae}
+
+    .panel-card{
+        background:
+            radial-gradient(circle at 90% 18%,rgba(216,145,55,.1),transparent 42%),
+            radial-gradient(circle at 8% 92%,rgba(35,137,139,.08),transparent 48%),
+            linear-gradient(145deg,rgba(17,15,22,.38),rgba(11,14,19,.14));
+        border-color:rgba(241,211,151,.035);
+        box-shadow:0 30px 80px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.025);
+        backdrop-filter:blur(18px) saturate(1.14);
+    }
+    .panel-card::before{border-color:rgba(241,211,151,.025)}
+    .chapter-link{
+        color:#fff0d5;background:
+            radial-gradient(circle at 96% 8%,rgba(227,164,67,.16),transparent 37%),
+            radial-gradient(circle at 12% 92%,rgba(37,139,139,.13),transparent 42%),
+            linear-gradient(135deg,rgba(150,39,61,.055),rgba(14,13,19,.06));
+        text-shadow:0 6px 24px rgba(0,0,0,.32);
+    }
+    .chapter-link::before{background:linear-gradient(90deg,#c43e55,#dda74d,#3d9998)}
+    .chapter-arrow{border-color:rgba(244,216,157,.34);color:#f1d395;background:rgba(255,255,255,.025)}
+    .chapter-link:hover{color:#fff8e8;background:linear-gradient(135deg,rgba(136,33,53,.78),rgba(19,82,84,.62))}
+    .chapter-link:hover::before{background:#f2cd7d}
+    .chapter-link:hover .chapter-arrow{background:#f6e3b6;color:#6b2028;border-color:#f6e3b6}
+
+    #burst .burst-text{color:#f1c86d;text-shadow:0 0 24px rgba(225,157,62,.42),0 0 70px rgba(164,37,68,.3)}
+    #burst .burst-sub{color:rgba(245,229,207,.72)}
+    .ring{border-color:rgba(225,173,78,.42);box-shadow:0 0 30px rgba(225,173,78,.15),inset 0 0 45px rgba(41,139,139,.11)}
+
+    /* 章节信息直接融入展厅背景 */
+    #panel{width:400px;max-width:32vw;height:210px}
+    .panel-card{
+        overflow:visible;padding:0;border:0;border-radius:0;
+        background:none;box-shadow:none;backdrop-filter:none;
+    }
+    .panel-card::before{display:none}
+    .chapter-link{
+        justify-content:flex-end;gap:10px;padding:18px 0;background:none;
+        text-shadow:0 7px 28px rgba(0,0,0,.46);
+    }
+    .chapter-link::before{display:none}
+    .chapter-link h2{max-width:300px;text-align:right}
+    .chapter-link h2 span{display:block}
+    .chapter-link:hover{background:none;color:#fff8e8}
+    .chapter-link:hover h2{text-shadow:0 0 28px rgba(229,176,91,.22)!important}
+    .chapter-link:focus-visible{outline:1px solid rgba(242,205,125,.55);outline-offset:10px}
+
+    /* 左侧章序：小字置于大字下方 */
+    .section-mark{
+        position:absolute;left:4vw;top:50%;transform:translateY(-50%);
+        display:flex;flex-direction:column;align-items:flex-start;user-select:none;
+    }
+    .sec .num{
+        position:relative;left:auto;top:auto;transform:none;
+        font-size:clamp(130px,24vh,280px);
+    }
+    .sec .label{
+        position:relative;left:auto;top:auto;transform:none;margin-top:12px;
+        writing-mode:horizontal-tb;letter-spacing:.22em;font-size:13px;white-space:nowrap;
+    }
+    @media (max-width:640px){
+        .section-mark{left:2vw}
+        .sec .num{left:auto}
+        .sec .label{left:auto;font-size:11px;letter-spacing:.12em}
+    }
+    @media(prefers-reduced-motion:reduce){#bg .vignette{animation:none}}
 </style>
 </head>
 <body>
@@ -457,8 +637,8 @@
         <a href="#sec=6" data-section="6">绣球之乡</a>
         <a href="3d-model.html">数字研析</a>
     </nav>
-    <nav id="petalNavigator" aria-label="十二瓣绣球导览">
-        <div class="petal-nav-meta"><span>十二瓣导览 · 横向滑动</span><strong id="petalNavLabel">滑动观瓣</strong></div>
+    <nav id="petalNavigator" aria-label="多样绣球导览">
+        <div class="petal-nav-meta"><span>多样绣球 · 横向滑动</span><strong id="petalNavLabel">滑动换球</strong></div>
         <div id="petalTrack"></div>
     </nav>
     <div class="actions">
@@ -555,7 +735,7 @@ const sectionsEl = document.getElementById('sections');
 DATA.forEach((d, i) => {
     const sec = document.createElement('section');
     sec.className = 'sec';
-    sec.innerHTML = `<div class="num">${d.n}</div><div class="label">第${NUM_CN[i]}章 · ${d.title}</div>`;
+    sec.innerHTML = `<div class="section-mark"><div class="num">${d.n}</div><div class="label">第${NUM_CN[i]}章 · ${d.title}</div></div>`;
     sectionsEl.appendChild(sec);
 });
 
@@ -607,15 +787,27 @@ const COLOR_THEMES = [
     { name:'珊瑚瑞雪', petals:['#dd5b56','#f08378','#f6b1aa','#fff2eb','#c94743','#e96d68','#f7d0c8','#d95955','#fff8f2','#ef9289','#c83d42','#f5bcb4'], panels:['#ef8673','#f5b3a2','#fff0e4','#d95d55','#f6c4b6','#e77367','#fff5eb','#e99583'], accent:'#ece5df', pearl:'#ffffff', tassels:['#fff5ef','#e77470','#d4d7db'], ribbon:'#e2605e' },
     { name:'香槟玉粉', petals:['#c8a27d','#ead9c6','#d8b79b','#f3e7df','#b99272','#e8c7bd','#f6eee7','#d6b69e','#e7d1c0','#f1ddd5','#c4a184','#eadbd0'], panels:['#d9b993','#f0dfc8','#c9a57f','#ead2b5','#f6e8d4','#d3b18b','#e6cbaa','#f4e1cc'], accent:'#e8d7bd', pearl:'#fffdf8', tassels:['#f7eee5','#dbc5b3','#c9aa8e'], ribbon:'#e6c8c2' }
 ];
+function makeVividColor(color, saturationScale = 1.26) {
+    const result = new THREE.Color(color);
+    const hsl = {};
+    result.getHSL(hsl);
+    result.setHSL(
+        hsl.h,
+        Math.min(1, hsl.s * saturationScale + .035),
+        Math.min(.82, hsl.l * 1.035 + .008)
+    );
+    return result;
+}
+
 COLOR_THEMES.forEach((theme) => {
     theme.colors = {
-        petals: theme.petals.map((color) => new THREE.Color(color)),
-        petalSides: theme.petals.map((color) => new THREE.Color(color).multiplyScalar(.58)),
-        panels: theme.panels.map((color) => new THREE.Color(color)),
-        accent: new THREE.Color(theme.accent),
-        pearl: new THREE.Color(theme.pearl),
-        tassels: theme.tassels.map((color) => new THREE.Color(color)),
-        ribbon: new THREE.Color(theme.ribbon)
+        petals: theme.petals.map((color) => makeVividColor(color, 1.34)),
+        petalSides: theme.petals.map((color) => makeVividColor(color, 1.18).multiplyScalar(.66)),
+        panels: theme.panels.map((color) => makeVividColor(color, 1.3)),
+        accent: makeVividColor(theme.accent, 1.22),
+        pearl: makeVividColor(theme.pearl, 1.08),
+        tassels: theme.tassels.map((color) => makeVividColor(color, 1.32)),
+        ribbon: makeVividColor(theme.ribbon, 1.32)
     };
 });
 let scene, camera, renderer;
@@ -1041,16 +1233,31 @@ function buildHomeModel() {
 }
 
 function setupLights() {
-    scene.add(new THREE.AmbientLight(0xfff5ea, 0.8));
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
-    keyLight.position.set(5, 8, 5);
+    // 屏幕前方的柔和主光负责塑造瓣面，自阴影由环境光与侧后补光托住。
+    scene.add(new THREE.AmbientLight(0xfff7ed, 0.86));
+    const keyLight = new THREE.DirectionalLight(0xfff7ee, 1.82);
+    keyLight.position.set(0.8, 3.8, 8);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    keyLight.shadow.camera.near = .5;
+    keyLight.shadow.camera.far = 20;
+    keyLight.shadow.camera.left = -6;
+    keyLight.shadow.camera.right = 6;
+    keyLight.shadow.camera.top = 6;
+    keyLight.shadow.camera.bottom = -7;
+    keyLight.shadow.bias = -.00035;
+    keyLight.shadow.normalBias = .035;
+    keyLight.shadow.radius = 4;
     scene.add(keyLight);
-    const fillLight = new THREE.DirectionalLight(0xffa07a, 0.6);
+    const fillLight = new THREE.DirectionalLight(0x8cd8d1, 0.64);
     fillLight.position.set(-5, -2, -5);
     scene.add(fillLight);
-    const rimLight = new THREE.DirectionalLight(0xffd700, 1.0);
+    const rimLight = new THREE.DirectionalLight(0xffc75c, 0.92);
     rimLight.position.set(0, 5, -8);
     scene.add(rimLight);
+    const frontGlow = new THREE.PointLight(0xffe3b2, 0.42, 18);
+    frontGlow.position.set(-1.8, 0.8, 6.5);
+    scene.add(frontGlow);
 }
 
 let dragRot = 0;
@@ -1083,8 +1290,10 @@ function initHomeModel() {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(canvas.clientWidth || 560, canvas.clientHeight || 560, false);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.24;
     ballGroup = new THREE.Group();
     fillPanelsGroup = new THREE.Group();
     petalsGroup = new THREE.Group();
@@ -1095,6 +1304,11 @@ function initHomeModel() {
     scene.add(ballGroup);
     setupLights();
     buildHomeModel();
+    ballGroup.traverse((object) => {
+        if (!object.isMesh) return;
+        object.castShadow = true;
+        object.receiveShadow = true;
+    });
     let dragging = false, dragLast = 0;
     canvas.addEventListener('pointerdown', (e) => {
         if (e.pointerType !== 'mouse') return;
@@ -1118,8 +1332,8 @@ function initHomeModel() {
 }
 initHomeModel();
 
-/* 顶部十二瓣导览：横向滑动，原地旋转并切换整球配色 */
-const PETAL_GUIDE_LABELS = ['锦羽','迎春','青鸾','桃华','丹凤','兰影','丰穗','蝶舞','牡丹','瑞鸟','云兰','团圆'];
+/* 顶部多样绣球导览：六种唯一配色，原地旋转并切换整球配色 */
+const PETAL_GUIDE_LABELS = COLOR_THEMES.map((theme) => theme.name);
 const petalNavigator = document.getElementById('petalNavigator');
 const petalTrack = document.getElementById('petalTrack');
 const petalNavLabel = document.getElementById('petalNavLabel');
@@ -1127,7 +1341,7 @@ const petalStops = PETAL_GUIDE_LABELS.map((label, index) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'petal-stop';
-    button.setAttribute('aria-label', `第 ${index + 1} 瓣 · ${label}`);
+    button.setAttribute('aria-label', `第 ${index + 1} 款绣球 · ${label}`);
     button.setAttribute('aria-pressed', 'false');
     button.style.setProperty('--stop-color', COLOR_THEMES[index % COLOR_THEMES.length].petals[0]);
     button.addEventListener('pointerenter', () => selectTopPetal(index));
@@ -1141,9 +1355,9 @@ const petalStops = PETAL_GUIDE_LABELS.map((label, index) => {
 });
 
 function selectTopPetal(index) {
-    topPetalIndex = Math.min(11, Math.max(0, index));
-    const themeIndex = topPetalIndex % COLOR_THEMES.length;
-    petalNavLabel.textContent = `第 ${topPetalIndex + 1} 瓣 · ${COLOR_THEMES[themeIndex].name}`;
+    topPetalIndex = Math.min(PETAL_GUIDE_LABELS.length - 1, Math.max(0, index));
+    const themeIndex = topPetalIndex;
+    petalNavLabel.textContent = `第 ${topPetalIndex + 1} 款 · ${COLOR_THEMES[themeIndex].name}`;
     if (lastThemePetalIndex !== topPetalIndex) {
         lastThemePetalIndex = topPetalIndex;
         activeThemeIndex = themeIndex;
@@ -1160,7 +1374,7 @@ function leaveTopPetalGuide() {
     topPetalActive = false;
     lastThemePetalIndex = -1;
     petalNavigator.classList.remove('interacting');
-    petalNavLabel.textContent = '滑动观瓣';
+    petalNavLabel.textContent = '滑动换球';
     petalStops.forEach((stop) => {
         stop.classList.remove('on');
         stop.setAttribute('aria-pressed', 'false');
@@ -1175,7 +1389,7 @@ petalNavigator.addEventListener('pointerenter', () => {
 petalNavigator.addEventListener('pointermove', (event) => {
     const rect = petalTrack.getBoundingClientRect();
     const ratio = Math.min(.9999, Math.max(0, (event.clientX - rect.left) / rect.width));
-    selectTopPetal(Math.floor(ratio * 12));
+    selectTopPetal(Math.floor(ratio * PETAL_GUIDE_LABELS.length));
 });
 petalNavigator.addEventListener('pointerleave', leaveTopPetalGuide);
 petalNavigator.addEventListener('focusout', (event) => {
@@ -1187,13 +1401,12 @@ const panelEl = document.getElementById('panel');
 DATA.forEach((d, i) => {
     const card = document.createElement('div');
     card.className = 'panel-card';
+    const titleLines = d.title.split(/\s*·\s*/).filter(Boolean);
     card.innerHTML = `
-        <span class="chip">${iconSvg(d.icon)} 第${NUM_CN[i]}章 · ${i + 1}/8</span>
-        <h2 class="font-calligraphy">${d.title}</h2>
-        <p class="sub">${d.sub}</p>
-        <div class="divider"></div>
-        <div class="body">${d.body}</div>
-        <div class="hint"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5 5 5-5M7 16l5 5 5-5"/></svg><span class="hintText"></span></div>`;
+        <a class="chapter-link" href="chapter.html?chapter=${i + 1}" aria-label="阅读第${NUM_CN[i]}章：${d.title}">
+            <h2 class="font-calligraphy">${titleLines.map(line => `<span>${line}</span>`).join('')}</h2>
+            <span class="chapter-arrow" aria-hidden="true">↗</span>
+        </a>`;
     panelEl.appendChild(card);
 });
 
@@ -1236,9 +1449,6 @@ function setPanel(idx){
     dots.forEach((d, i) => d.classList.toggle('on', i === idx));
     museumNavLinks.forEach((link) => link.classList.toggle('on', Number(link.dataset.section) === idx));
     mobileTitle.textContent = `第${NUM_CN[idx]}章 · ${DATA[idx].title}`;
-    const hint = cards[idx].querySelector('.hintText');
-    if (idx === 7) hint.textContent = '已转满一周 · 圆满收官';
-    else hint.textContent = `继续滚动 · 切换至第 ${NUM_CN[idx + 1]} 章`;
     scrollHint.classList.toggle('show', idx === 0);
     burst.classList.toggle('show', idx === 7);
 }

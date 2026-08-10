@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>靖西绣球 · 章节详情</title>
+<meta name="description" content="靖西壮族绣球非遗文化长卷章节详情。">
+<style>
+    :root{
+        --red:#7f1f28;--red-dark:#54161c;--ink:#312a27;--muted:#81756d;
+        --paper:#f5f0e8;--card:#fffdf8;--line:#d9cdbd;--gold:#ad8b46;
+        --accent-a:rgba(139,36,49,.16);--accent-b:rgba(36,125,128,.13);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+        min-height:100vh;color:var(--ink);font-family:'Noto Serif SC','Songti SC','STSong','Microsoft YaHei',serif;
+        background:
+            radial-gradient(circle at 10% 18%,var(--accent-a),transparent 30%),
+            radial-gradient(circle at 88% 26%,var(--accent-b),transparent 31%),
+            radial-gradient(circle at 72% 88%,rgba(221,147,66,.14),transparent 34%),
+            linear-gradient(145deg,#f5e9df,#faf6ee 46%,#eaf1ed 100%);
+    }
+    body::before{
+        content:'';position:fixed;inset:0;pointer-events:none;opacity:.26;mix-blend-mode:multiply;
+        background-image:repeating-linear-gradient(0deg,rgba(88,65,51,.025) 0 1px,transparent 1px 4px);
+    }
+    header{
+        position:sticky;top:0;z-index:20;height:84px;padding:0 4vw;display:flex;align-items:center;justify-content:space-between;
+        background:rgba(255,253,248,.92);border-bottom:1px solid rgba(127,31,40,.16);backdrop-filter:blur(16px);
+    }
+    header::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:2px;background:linear-gradient(90deg,transparent,var(--red) 20%,var(--red) 80%,transparent);opacity:.7}
+    .brand{display:flex;align-items:center;gap:15px;text-decoration:none;color:var(--red-dark)}
+    .seal{width:42px;height:42px;display:grid;place-items:center;background:var(--red);color:#f7dda0;transform:rotate(45deg)}
+    .seal span{transform:rotate(-45deg);font-size:17px}
+    .brand strong{display:block;font-family:'STKaiti','KaiTi',serif;font-size:24px;letter-spacing:.18em}
+    .brand small{display:block;margin-top:4px;color:#92847a;font-size:10px;letter-spacing:.28em}
+    .back{
+        padding:10px 16px;color:var(--red-dark);text-decoration:none;border:1px solid #cfc2b1;background:#fffdf8;
+        font-size:13px;letter-spacing:.08em;transition:.25s ease;
+    }
+    .back:hover{background:var(--red);border-color:var(--red);color:#fff}
+    main{position:relative;z-index:1;width:min(1180px,92vw);margin:0 auto;padding:92px 0 80px;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:72px}
+    article{
+        position:relative;padding:58px clamp(34px,6vw,82px) 66px;background:rgba(255,253,248,.94);
+        border:1px solid var(--line);box-shadow:0 30px 90px rgba(74,44,28,.12);
+    }
+    article::before{content:'';position:absolute;inset:12px;border:1px solid rgba(127,31,40,.09);pointer-events:none}
+    .chapter-no{font-size:12px;letter-spacing:.28em;color:var(--red);text-transform:uppercase}
+    .chapter-no::before{content:'';display:inline-block;width:44px;height:2px;margin-right:13px;background:var(--red);vertical-align:middle}
+    h1{margin-top:27px;color:var(--red-dark);font-family:'STKaiti','KaiTi',serif;font-size:clamp(44px,6vw,76px);line-height:1.15;letter-spacing:.06em}
+    h1[data-lines="2"]{font-size:clamp(36px,5.15vw,66px);line-height:1.12}
+    h1 .title-line{display:block;white-space:nowrap}
+    .subtitle{margin-top:12px;color:var(--gold);font-size:15px;letter-spacing:.2em}
+    .ornament{height:1px;margin:38px 0;background:linear-gradient(90deg,var(--red),rgba(127,31,40,.12),transparent)}
+    .content-label{margin-bottom:18px;color:#8d7c70;font-size:11px;letter-spacing:.28em;text-transform:uppercase}
+    .body{position:relative;font-size:17px;line-height:2.15;letter-spacing:.025em;text-align:justify;color:#443a35}
+    .body::first-letter{float:left;margin:9px 10px 0 0;color:var(--red);font-family:'STKaiti','KaiTi',serif;font-size:58px;line-height:.72}
+    .chapter-footer{margin-top:55px;padding-top:25px;border-top:1px solid #e1d6c8;display:flex;justify-content:space-between;gap:20px}
+    .chapter-footer a{color:var(--red);text-decoration:none;font-size:13px;letter-spacing:.1em}
+    .chapter-footer a:hover{text-decoration:underline}
+    aside{align-self:start;position:sticky;top:120px;padding:26px 24px;background:rgba(255,253,248,.78);border:1px solid rgba(127,31,40,.14);backdrop-filter:blur(12px)}
+    aside h2{color:var(--red-dark);font-family:'STKaiti','KaiTi',serif;font-size:21px;letter-spacing:.14em}
+    .chapter-list{list-style:none;margin-top:20px}
+    .chapter-list li+li{border-top:1px solid rgba(127,31,40,.09)}
+    .chapter-list a{display:flex;align-items:center;gap:12px;padding:13px 4px;color:#665950;text-decoration:none;font-size:13px;line-height:1.45}
+    .chapter-list span{color:#a88b63;font-size:10px}
+    .chapter-list a:hover,.chapter-list a.on{color:var(--red)}
+    .chapter-list a.on::after{content:'→';margin-left:auto}
+    @media(max-width:850px){
+        header{height:70px;padding:0 20px}.brand small{display:none}.brand strong{font-size:21px}.seal{width:36px;height:36px}
+        main{padding:48px 0 64px;grid-template-columns:1fr;gap:28px}article{padding:45px 30px 50px}aside{position:static;order:-1}
+        .chapter-list{display:grid;grid-template-columns:repeat(2,1fr)}.chapter-list li+li{border-top:0}.chapter-list a{padding:9px 4px}
+    }
+    @media(max-width:520px){
+        .back{padding:8px 10px;font-size:12px}.chapter-list{grid-template-columns:1fr}.body{font-size:16px}h1{font-size:42px}
+        h1[data-lines="2"]{font-size:clamp(26px,8.7vw,38px);letter-spacing:.035em}
+    }
+</style>
+</head>
+<body>
+<header>
+    <a class="brand" href="index.html"><span class="seal"><span>◆</span></span><span><strong>靖西绣球</strong><small>壮族非遗数字展</small></span></a>
+    <a id="backLink" class="back" href="index.html">← 返回文化长卷</a>
+</header>
+<main>
+    <article>
+        <div id="chapterNo" class="chapter-no"></div>
+        <h1 id="title"></h1>
+        <p id="subtitle" class="subtitle"></p>
+        <div class="ornament"></div>
+        <div class="content-label">CHAPTER STORY · 章节正文</div>
+        <p id="body" class="body"></p>
+        <nav class="chapter-footer" aria-label="相邻章节">
+            <a id="previous" href="#"></a>
+            <a id="next" href="#"></a>
+        </nav>
+    </article>
+    <aside>
+        <h2>文化长卷</h2>
+        <ol id="chapterList" class="chapter-list"></ol>
+    </aside>
+</main>
+<script>
+const DATA = [
+    {title:'绣球起源',sub:'壮族民俗诞生',body:'绣球，壮族古称“飞砣”，最早源于壮族先民狩猎与作战时的投掷器具，后随岁月流转，演变为青年男女传情达意的信物。宋代文献中已见“绣球”之名。在漫长的农耕时光里，姑娘们把对丰收、平安与美满的祈愿一针一线绣进彩球——抛向心仪之人，也抛向吉祥与春天。'},
+    {title:'抛绣球 · 婚嫁习俗',sub:'一球定情',body:'歌圩三月三，壮家姑娘手持彩绣球，于人群之中看定意中人，彩球抛出、后生接住、互赠信物，一段良缘便由此结下。绣球因此成为壮族婚恋文化中最浪漫的信物：五彩绣球抛如意，一抛定终身。在婚礼上，绣球更寓意团圆和美、情比金坚。'},
+    {title:'非遗手工 · 十二瓣缝制工艺',sub:'金边不歪 · 珠串不松',body:'一枚十二瓣绣球，要经裁布、贴瓣、刺绣、合缝、镶珠、缀穗六道大工序：十二片大红缎面各自绣上花鸟纹样，以金线锁边包缝，瓣与瓣交汇处缀白珍珠与金珠，底部垂挂渐变琉璃坠与长款玫红流苏，顶部束玫红缎吊绳。全程手工，讲究针脚细密、珠串匀称。壮族绣球制作技艺已被列入非物质文化遗产代表性项目名录。'},
+    {title:'三月三 · 节庆活动',sub:'万人歌海 · 彩球起落',body:'农历三月初三，是壮族最盛大的歌圩节。村村寨寨对山歌、抛绣球、跳竹竿舞、吃五色糯米饭，山水之间皆是歌声。绣球是歌圩上最亮眼的风景：万人歌海之中，彩球起落如花雨，是壮族人民最热烈的情感表达，也是春天里最盛大的狂欢。'},
+    {title:'刺绣纹样 · 图腾寓意',sub:'穿在身上的史诗',body:'绣球上常见的凤凰、火焰、云纹与缠枝纹，皆有深意：凤凰象征吉祥与和美，火焰寓意热情与生命，青蓝如江水，玫红似木棉，金线则映照太阳的光泽。每一种颜色、每一道纹样，都不是随意为之，而是壮族先民将对自然、祖先与生活的理解织进针脚，成为“穿在身上的史诗”。'},
+    {title:'现代文创 · 绣球新生',sub:'老手艺 × 新设计',body:'今天的绣球正走出博物馆：缩小成钥匙扣与胸针，化作城市伴手礼与文创盲盒，登上大型运动会与节庆舞台。老手艺遇上新设计，传统纹样借力新材料与新工艺，让年轻人把“非遗”戴在身上、带回家中，也让千年绣球有了新的呼吸。'},
+    {title:'文旅打卡 · 绣球之乡',sub:'靖西旧州 · 绣球一条街',body:'广西靖西旧州古镇被誉为“绣球之乡”：家家户户门前挂绣球、摆绣架，鹅泉流水与青石老街之间，绣球作坊与非遗工坊吸引着八方来客。到旧州，看绣娘飞针走线，亲手挑选一枚彩球带走，是许多旅人心中最鲜活的壮乡记忆。'},
+    {title:'传承展望 · 圆满一周',sub:'从村寨到数字屏幕',body:'球转一周，四季圆满。从村寨歌圩到数字屏幕，绣球正在被更多人看见与传承：非遗进校园、青年设计师共创、3D 数字化展示……愿这一枚十二瓣彩球，把壮乡的祝福与匠心，转给世界，也转给下一个千年。'}
+];
+const accents = [
+    ['rgba(139,36,49,.16)','rgba(36,125,128,.13)'],['rgba(42,122,118,.17)','rgba(187,128,75,.13)'],
+    ['rgba(68,87,143,.16)','rgba(139,36,49,.12)'],['rgba(209,105,54,.17)','rgba(104,66,130,.12)'],
+    ['rgba(149,57,89,.16)','rgba(43,124,117,.13)'],['rgba(199,139,70,.17)','rgba(116,70,127,.12)'],
+    ['rgba(40,119,115,.16)','rgba(215,151,66,.13)'],['rgba(139,36,49,.16)','rgba(180,141,72,.14)']
+];
+const requested = Number(new URLSearchParams(location.search).get('chapter') || 1);
+const index = Math.min(DATA.length - 1, Math.max(0, Number.isFinite(requested) ? requested - 1 : 0));
+const item = DATA[index];
+document.documentElement.style.setProperty('--accent-a', accents[index][0]);
+document.documentElement.style.setProperty('--accent-b', accents[index][1]);
+document.title = `${item.title} · 靖西绣球`;
+document.getElementById('chapterNo').textContent = `CHAPTER ${String(index + 1).padStart(2,'0')} / ${String(DATA.length).padStart(2,'0')}`;
+const titleElement = document.getElementById('title');
+const titleParts = item.title.split(/\s*·\s*/).filter(Boolean);
+const titleLines = titleParts.length > 1 ? [titleParts[0], titleParts.slice(1).join(' ')] : titleParts;
+titleElement.dataset.lines = String(titleLines.length);
+titleElement.replaceChildren(...titleLines.map((line) => {
+    const span = document.createElement('span');
+    span.className = 'title-line';
+    span.textContent = line;
+    return span;
+}));
+document.getElementById('subtitle').textContent = item.sub;
+document.getElementById('body').textContent = item.body;
+document.getElementById('backLink').href = `index.html?sec=${index}`;
+const list = document.getElementById('chapterList');
+DATA.forEach((chapter, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<a class="${i === index ? 'on' : ''}" href="chapter.html?chapter=${i + 1}"><span>${String(i + 1).padStart(2,'0')}</span>${chapter.title}</a>`;
+    list.appendChild(li);
+});
+const previous = document.getElementById('previous');
+const next = document.getElementById('next');
+if(index > 0){previous.href=`chapter.html?chapter=${index}`;previous.textContent=`← ${DATA[index-1].title}`}else{previous.style.visibility='hidden'}
+if(index < DATA.length-1){next.href=`chapter.html?chapter=${index+2}`;next.textContent=`${DATA[index+1].title} →`}else{next.href='index.html';next.textContent='返回首页 →'}
+</script>
+</body>
+</html>
