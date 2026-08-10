@@ -77,7 +77,8 @@
     }
     #modelCanvas{
         width:min(560px,74vmin);height:min(560px,74vmin);
-        display:block;cursor:grab;touch-action:pan-y;
+        display:block;cursor:grab;touch-action:pan-y;pointer-events:auto;
+        transition:width .7s cubic-bezier(.2,.8,.2,1),height .7s cubic-bezier(.2,.8,.2,1),filter .7s ease;
     }
     #modelCanvas.dragging{cursor:grabbing}
     #glow{
@@ -136,6 +137,30 @@
     }
     #header .brand{pointer-events:none}
     #header .actions{display:flex;gap:10px;pointer-events:auto}
+    #petalNavigator{
+        position:absolute;left:50%;top:13px;transform:translateX(-50%);z-index:2;
+        width:min(430px,35vw);padding:8px 14px 10px;border-radius:16px;
+        background:linear-gradient(180deg,rgba(79,12,39,.88),rgba(30,10,23,.78));
+        border:1px solid rgba(255,196,49,.38);box-shadow:0 12px 30px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.06);
+        backdrop-filter:blur(14px);pointer-events:auto;transition:border-color .3s ease,box-shadow .3s ease;
+    }
+    #petalNavigator.interacting{border-color:rgba(255,208,47,.8);box-shadow:0 12px 34px rgba(0,0,0,.34),0 0 22px rgba(216,40,128,.2)}
+    .petal-nav-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;font-size:10px;letter-spacing:.18em;color:rgba(255,236,197,.58)}
+    #petalNavLabel{font-weight:400;color:#ffd75a;letter-spacing:.12em}
+    #petalTrack{position:relative;display:grid;grid-template-columns:repeat(12,1fr);gap:5px;cursor:ew-resize}
+    #petalTrack::before{content:'';position:absolute;left:2%;right:2%;top:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,208,47,.6),transparent);pointer-events:none}
+    .petal-stop{
+        position:relative;z-index:1;width:100%;height:14px;padding:0;border:0;background:transparent;cursor:ew-resize;
+    }
+    .petal-stop::before{
+        content:'';position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;
+        transform:translate(-50%,-50%);background:#391423;border:1px solid rgba(255,208,47,.78);
+        transition:transform .22s ease,background .22s ease,box-shadow .22s ease;
+    }
+    .petal-stop:hover::before,.petal-stop.on::before,.petal-stop:focus-visible::before{
+        transform:translate(-50%,-50%) scale(1.55);background:var(--stop-color,var(--rose));box-shadow:0 0 0 3px rgba(255,208,47,.15),0 0 12px rgba(255,74,144,.9);
+    }
+    .petal-stop:focus-visible{outline:1px solid #ffd75a;outline-offset:2px;border-radius:6px}
     .btn-glass{
         display:inline-flex;align-items:center;gap:8px;cursor:pointer;
         background:rgba(22,12,19,.7);border:1px solid rgba(212,175,55,.35);
@@ -178,10 +203,35 @@
         #panel{display:none}
         #mobileBar{display:block}
     }
+    @media (max-width:1180px){#petalNavigator{display:none}}
     @media (max-width:640px){
         #modelCanvas{width:84vmin;height:84vmin}
         .sec .num{left:2vw}
         .sec .label{left:calc(2vw + 62px)}
+    }
+
+    /* ---------- 沉浸赏球模式 ---------- */
+    #exitImmersion{
+        position:fixed;right:3vw;top:3vh;z-index:90;opacity:0;pointer-events:none;
+        transform:translateY(-10px);transition:opacity .35s ease,transform .35s ease;
+    }
+    #exitImmersion .btn-glass{background:rgba(12,7,13,.68);backdrop-filter:blur(12px)}
+    #header,#panel,#dots,#scrollHint,#mobileBar,#sections,#burst{transition:opacity .42s ease}
+    body.immersive{overflow:hidden}
+    body.immersive #header,
+    body.immersive #panel,
+    body.immersive #dots,
+    body.immersive #scrollHint,
+    body.immersive #mobileBar,
+    body.immersive #sections,
+    body.immersive #burst{opacity:0!important;pointer-events:none!important}
+    body.immersive #stage{z-index:70;pointer-events:auto}
+    body.immersive #modelCanvas{width:min(840px,92vmin);height:min(840px,92vmin);filter:drop-shadow(0 30px 34px rgba(0,0,0,.46))}
+    body.immersive #glow{opacity:.82!important;transform:scale(1.38);transition:transform .7s ease}
+    body.immersive #exitImmersion{opacity:1;pointer-events:auto;transform:none}
+    @media (max-width:640px){
+        #exitImmersion{right:18px;top:18px}
+        #exitImmersion .btn-glass{padding:9px 12px}
     }
 
     /* ---------- 收尾全屏特效 ---------- */
@@ -224,6 +274,130 @@
         15%{opacity:1}
         100%{transform:translate(var(--dx), var(--dy));opacity:0}
     }
+
+    /* ========== 浅色数字博物馆视觉 ========== */
+    :root{
+        --museum-red:#7f1f28;
+        --museum-red-dark:#54161c;
+        --museum-ink:#312a27;
+        --museum-muted:#7e746d;
+        --museum-paper:#f3efe7;
+        --museum-card:#fffdf8;
+        --museum-line:#d8cdbd;
+        --museum-gold:#ad8b46;
+    }
+    body{background:var(--museum-paper);color:var(--museum-ink)}
+    ::-webkit-scrollbar-track{background:#eee8de}
+    ::-webkit-scrollbar-thumb{background:rgba(127,31,40,.32)}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(127,31,40,.6)}
+    #bg .vignette{
+        background:
+            radial-gradient(ellipse at 49% 43%,rgba(255,255,255,.98),rgba(255,253,248,.82) 34%,transparent 63%),
+            radial-gradient(ellipse at 48% 112%,rgba(173,139,70,.09),transparent 52%),
+            linear-gradient(180deg,#f8f5ee,#f1ece3 58%,#eae3d9);
+    }
+    #bg .grain{opacity:.22;mix-blend-mode:multiply;background-image:repeating-linear-gradient(0deg,rgba(88,65,51,.025) 0 1px,transparent 1px 4px)}
+    .bg-pattern{opacity:.035}
+
+    #header{
+        height:84px;padding:0 3vw;background:rgba(255,253,248,.94);
+        border-bottom:1px solid rgba(127,31,40,.14);box-shadow:0 8px 28px rgba(77,50,35,.07);
+        backdrop-filter:blur(16px);
+    }
+    #header::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:2px;background:linear-gradient(90deg,transparent 3%,var(--museum-red) 18%,var(--museum-red) 82%,transparent 97%);opacity:.72}
+    #header .brand-badge{
+        width:44px;height:44px;border-radius:4px!important;background:var(--museum-red)!important;
+        color:#f5dfaa!important;box-shadow:none;transform:rotate(45deg);
+    }
+    #header .brand-badge .ic{transform:rotate(-45deg);font-size:17px}
+    .brand-title{font-size:26px;color:var(--museum-red-dark);letter-spacing:.18em;line-height:1.1}
+    .brand-sub{font-size:11px;color:#94867c;letter-spacing:.34em;margin-top:6px}
+
+    #museumNav{
+        position:absolute;left:50%;top:0;height:84px;transform:translateX(-50%);
+        display:flex;align-items:center;gap:clamp(15px,1.55vw,28px);pointer-events:auto;white-space:nowrap;
+    }
+    #museumNav a{
+        position:relative;color:#51443e;text-decoration:none;font-size:15px;letter-spacing:.08em;
+        padding:32px 0 29px;transition:color .25s ease;
+    }
+    #museumNav a::after{content:'';position:absolute;left:50%;right:50%;bottom:0;height:3px;background:var(--museum-red);transition:left .25s ease,right .25s ease}
+    #museumNav a:hover,#museumNav a.on{color:var(--museum-red)}
+    #museumNav a:hover::after,#museumNav a.on::after{left:0;right:0}
+
+    #petalNavigator{
+        position:fixed;top:98px;left:50%;width:min(640px,48vw);padding:11px 20px 13px;
+        background:rgba(255,253,248,.9);border:1px solid rgba(127,31,40,.17);border-radius:2px;
+        box-shadow:0 10px 28px rgba(83,56,40,.08);backdrop-filter:blur(12px);
+    }
+    #petalNavigator.interacting{border-color:rgba(127,31,40,.48);box-shadow:0 12px 30px rgba(83,56,40,.12)}
+    .petal-nav-meta{color:#8e8178;margin-bottom:9px;font-size:12px;letter-spacing:.13em}
+    #petalNavLabel{color:var(--museum-red);font-weight:500}
+    #petalTrack::before{background:linear-gradient(90deg,transparent,rgba(127,31,40,.4),transparent)}
+    .petal-stop{height:18px}
+    .petal-stop::before{width:9px;height:9px;background:#fffaf1;border-color:rgba(127,31,40,.65)}
+    .petal-stop:hover::before,.petal-stop.on::before,.petal-stop:focus-visible::before{box-shadow:0 0 0 3px rgba(127,31,40,.08),0 0 10px rgba(127,31,40,.28)}
+
+    .btn-glass,#exitImmersion .btn-glass{
+        background:#fffdf8;border:1px solid #cfc2b1;color:var(--museum-red-dark);
+        border-radius:2px;box-shadow:none;backdrop-filter:none;font-size:14px;padding:11px 16px;
+    }
+    .btn-glass:hover{background:var(--museum-red);border-color:var(--museum-red);color:#fffaf2}
+
+    .sec .num{-webkit-text-stroke:1px rgba(127,31,40,.12);color:transparent}
+    .sec .label{color:rgba(78,57,48,.38)}
+    #glow{background:radial-gradient(circle,rgba(255,255,255,.94),rgba(216,184,111,.18) 44%,transparent 72%);filter:blur(14px)}
+
+    #panel{width:380px;max-width:32vw;height:448px;max-height:62vh}
+    .panel-card{
+        border-radius:3px;background:rgba(255,253,248,.96);border:1px solid var(--museum-line);
+        box-shadow:0 22px 55px rgba(82,55,39,.11);padding:30px 32px;
+    }
+    .panel-card::before{content:'';position:absolute;left:10px;right:10px;top:10px;bottom:10px;border:1px solid rgba(127,31,40,.08);pointer-events:none}
+    .panel-card .chip{color:var(--museum-red);border-color:rgba(127,31,40,.24);background:rgba(127,31,40,.04);border-radius:2px}
+    .panel-card h2{color:var(--museum-red-dark);text-shadow:none;font-size:clamp(25px,2.2vw,31px)}
+    .panel-card .sub{color:#94877e}
+    .panel-card .divider{background:linear-gradient(90deg,var(--museum-red),rgba(127,31,40,.08),transparent)}
+    .panel-card .body{color:#493e38;line-height:2;font-size:14px}
+    .panel-card .hint{color:#936f36}
+
+    #dots{background:rgba(255,253,248,.92);border-color:#d4c7b5;border-radius:2px;box-shadow:0 8px 24px rgba(80,52,36,.08)}
+    .dot{border-color:var(--museum-red);opacity:.36}
+    .dot.on{background:var(--museum-red);box-shadow:0 0 0 3px rgba(127,31,40,.1);opacity:1}
+    #scrollHint{color:#675950}
+    #scrollHint .mouse{border-color:#88796f}
+    #scrollHint .mouse::after{background:var(--museum-red)}
+    #mobileBar{background:rgba(255,253,248,.96);border-top-color:#d4c7b5;color:var(--museum-red-dark)}
+
+    #burst .burst-text{color:var(--museum-red);text-shadow:0 0 30px rgba(255,255,255,.95);}
+    #burst .burst-sub{color:#695b52;text-shadow:none}
+    .ring{border-color:rgba(127,31,40,.38);box-shadow:0 0 30px rgba(127,31,40,.08),inset 0 0 40px rgba(173,139,70,.08)}
+    .spark{background:var(--museum-red);box-shadow:0 0 10px rgba(127,31,40,.35)}
+
+    @media (max-width:1280px){
+        #museumNav{gap:14px}
+        #museumNav a{font-size:13px}
+    }
+    @media (max-width:1180px){
+        #museumNav{display:none}
+        #petalNavigator{display:block;width:min(640px,64vw)}
+    }
+    @media (max-width:760px){
+        #header{height:72px}
+        #header .brand-badge{width:38px;height:38px}
+        .brand-title{font-size:21px}
+        .brand-sub{display:none}
+        #petalNavigator{top:84px;width:90vw}
+        #header .actions{gap:6px}
+        .btn-glass{padding:8px 10px}
+    }
+    @media (max-width:640px){
+        #header{padding:0 18px}
+        #petalNavigator{display:none}
+        #header .actions{display:none}
+        #dots{display:none}
+        .mobile-title{color:var(--museum-red-dark)}
+    }
 </style>
 </head>
 <body>
@@ -255,6 +429,7 @@
     <div id="glow"></div>
     <canvas id="modelCanvas"></canvas>
 </div>
+<div id="exitImmersion"><button id="btnExitImmersion" class="btn-glass" aria-label="退出赏球模式"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M21 3l-7 7M9 21H3v-6M3 21l7-7"/></svg><span>退出赏球</span></button></div>
 
 <!-- 右侧文化卡片 -->
 <aside id="panel"></aside>
@@ -269,10 +444,23 @@
             <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>
         </div>
         <div>
-            <h1 class="font-calligraphy brand-title">十二瓣绣球 · 壮族非遗文化长卷</h1>
-            <p class="brand-sub">滚动即旋转 · 十二瓣八章</p>
+            <h1 class="font-calligraphy brand-title">靖西绣球</h1>
+            <p class="brand-sub">壮族非遗数字展</p>
         </div>
     </div>
+    <nav id="museumNav" aria-label="主导航">
+        <a href="#sec=0" data-section="0">首页</a>
+        <a href="#sec=1" data-section="1">文化源流</a>
+        <a href="#sec=2" data-section="2">匠心工艺</a>
+        <a href="#sec=3" data-section="3">三月三</a>
+        <a href="#sec=4" data-section="4">纹样寓意</a>
+        <a href="#sec=6" data-section="6">绣球之乡</a>
+        <a href="3d-model.html">数字研析</a>
+    </nav>
+    <nav id="petalNavigator" aria-label="十二瓣绣球导览">
+        <div class="petal-nav-meta"><span>十二瓣导览 · 横向滑动</span><strong id="petalNavLabel">滑动观瓣</strong></div>
+        <div id="petalTrack"></div>
+    </nav>
     <div class="actions">
         <button id="btnAuto" class="btn-glass"><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>自动演示</span></button>
         <button id="btnTop" class="btn-glass"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span class="top-label">回顶</span></button>
@@ -395,18 +583,44 @@ const EDGES = [
     { a: 1, b: 3, type: 'bottom' },
     { a: 1, b: 5, type: 'bottom' }
 ];
+const FILL_FACES = [
+    [0, 4, 2], [0, 3, 4], [0, 5, 3], [0, 2, 5],
+    [1, 2, 4], [1, 4, 3], [1, 3, 5], [1, 5, 2]
+];
 const MODEL_STATE = {
-    silkColor: '#e02575',
+    silkColor: '#d82880',
     goldColor: '#ffd700',
     pattern: 'phoenix',
     extrudeDepth: 0.5,
-    widthFactor: 0.48,
-    puffFactor: 0.12,
+    widthFactor: 0.84,
+    puffFactor: 0.14,
     tasselConfig: 5
 };
+const PETAL_COLORS = ['#e83d54','#ffb51e','#0e9a75','#f293b9','#e65029','#1764be','#f5cd35','#d22f71','#1ca47d','#f06a36','#e84962','#f4a4c0'];
+const PETAL_MOTIFS = ['bird','flower','butterfly','peony','bird','orchid','flower','butterfly','peony','bird','orchid','flower'];
+const PANEL_COLORS = ['#f6b62c','#e98521','#f4c43d','#e76c2e','#f3b331','#e58c22','#f6c94a','#df7428'];
+const COLOR_THEMES = [
+    { name:'壮锦盛彩', petals:PETAL_COLORS, panels:PANEL_COLORS, accent:'#ffc62f', pearl:'#fff4dc', tassels:['#f2c72e','#d51d4e','#1c9d73'], ribbon:'#d92f4c' },
+    { name:'青瓷月白', petals:['#55b9ad','#dcefe8','#76aebe','#f5f1e7','#6cc8bb','#b9dce2','#edf6ef','#4fa49d','#d8ece7','#8cc8c0','#f7f3e9','#67b3ab'], panels:['#d8eee5','#b9ddd5','#ecf5ed','#9fcfc6','#e5f1e8','#aad7cf','#f2f5ec','#c3e2dc'], accent:'#dce9e7', pearl:'#fbffff', tassels:['#f4f5ed','#b8d9d5','#6cb5ad'], ribbon:'#d9eee8' },
+    { name:'靛蓝银辉', petals:['#274f91','#3f72ad','#173a75','#d9e3ee','#5a86ba','#244f86','#a9bfd8','#365f9c','#e8edf3','#1e427c','#7599c1','#cbd7e6'], panels:['#274b82','#587ba5','#dce5ee','#315d96','#91abc7','#1c3d72','#c9d6e4','#446d9e'], accent:'#d8e0ea', pearl:'#ffffff', tassels:['#eef2f6','#8da9c6','#345d92'], ribbon:'#e7ebf0' },
+    { name:'绛紫流霞', petals:['#77426f','#a86491','#d9b5ca','#eee1e8','#66355f','#bf7ca5','#8d597f','#e2c5d5','#9a6289','#f1e7ec','#70416a','#c98bad'], panels:['#95627e','#d1a4bb','#ead7e1','#7d4c70','#bf8ea8','#f0e4e9','#a66f8c','#d9b9c9'], accent:'#e5d9df', pearl:'#fff9fc', tassels:['#f2e7ed','#c694ad','#875477'], ribbon:'#b37297' },
+    { name:'珊瑚瑞雪', petals:['#dd5b56','#f08378','#f6b1aa','#fff2eb','#c94743','#e96d68','#f7d0c8','#d95955','#fff8f2','#ef9289','#c83d42','#f5bcb4'], panels:['#ef8673','#f5b3a2','#fff0e4','#d95d55','#f6c4b6','#e77367','#fff5eb','#e99583'], accent:'#ece5df', pearl:'#ffffff', tassels:['#fff5ef','#e77470','#d4d7db'], ribbon:'#e2605e' },
+    { name:'香槟玉粉', petals:['#c8a27d','#ead9c6','#d8b79b','#f3e7df','#b99272','#e8c7bd','#f6eee7','#d6b69e','#e7d1c0','#f1ddd5','#c4a184','#eadbd0'], panels:['#d9b993','#f0dfc8','#c9a57f','#ead2b5','#f6e8d4','#d3b18b','#e6cbaa','#f4e1cc'], accent:'#e8d7bd', pearl:'#fffdf8', tassels:['#f7eee5','#dbc5b3','#c9aa8e'], ribbon:'#e6c8c2' }
+];
+COLOR_THEMES.forEach((theme) => {
+    theme.colors = {
+        petals: theme.petals.map((color) => new THREE.Color(color)),
+        petalSides: theme.petals.map((color) => new THREE.Color(color).multiplyScalar(.58)),
+        panels: theme.panels.map((color) => new THREE.Color(color)),
+        accent: new THREE.Color(theme.accent),
+        pearl: new THREE.Color(theme.pearl),
+        tassels: theme.tassels.map((color) => new THREE.Color(color)),
+        ribbon: new THREE.Color(theme.ribbon)
+    };
+});
 let scene, camera, renderer;
-let ballGroup, petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup;
-let petalMaterials = [], goldMaterials = [], proceduralTexture, petalDirs = [];
+let ballGroup, fillPanelsGroup, petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup;
+let petalMaterials = [], petalSideMaterials = [], panelMaterials = [], goldMaterials = [], beadMaterials = [], tasselMaterials = [], ribbonMaterials = [], proceduralTexture, petalDirs = [];
 
 function adjustColorBrightness(hex, percent) {
     let num = parseInt(hex.replace('#', ''), 16);
@@ -418,29 +632,29 @@ function adjustColorBrightness(hex, percent) {
     return '#' + (0x1000000 + (R << 16) + (G << 8) + B).toString(16).slice(1);
 }
 
-function generateEmbroideryTexture(silkColor, pattern) {
+function generateEmbroideryTexture(silkColor, motif = 'flower') {
     const canvas = document.createElement('canvas');
-    canvas.width = 512; canvas.height = 512;
+    canvas.width = 768; canvas.height = 768;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = silkColor;
-    ctx.fillRect(0, 0, 512, 512);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    const silk = ctx.createLinearGradient(0, 0, 768, 768);
+    silk.addColorStop(0, '#ffffff');
+    silk.addColorStop(.34, '#f4eee8');
+    silk.addColorStop(.7, '#cdbfb5');
+    silk.addColorStop(1, '#f8f3ed');
+    ctx.fillStyle = silk;
+    ctx.fillRect(0, 0, 768, 768);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.11)';
     ctx.lineWidth = 1;
-    for (let i = 0; i < 512; i += 4) {
-        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke();
-    }
-    if (pattern === 'satin') {
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.wrapS = THREE.ClampToEdgeWrapping;
-        texture.wrapT = THREE.ClampToEdgeWrapping;
-        return texture;
+    for (let i = -768; i < 1536; i += 5) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i - 300, 768); ctx.stroke();
     }
     ctx.save();
-    ctx.translate(256, 256);
-    const drawEmbroideryCurve = (strokeColor, lineWidth, pathPoints) => {
+    ctx.translate(384, 384);
+    const drawCurve = (strokeColor, lineWidth, pathPoints) => {
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = lineWidth;
         ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
         ctx.beginPath();
         pathPoints.forEach((pt, idx) => {
             if (idx === 0) ctx.moveTo(pt[0], pt[1]);
@@ -448,34 +662,144 @@ function generateEmbroideryTexture(silkColor, pattern) {
         });
         ctx.stroke();
     };
-    const colors = pattern === 'phoenix'
-        ? ['#ffd700', '#00e5ff', '#ff66b2', '#ffffff']
-        : pattern === 'floral'
-        ? ['#ffd700', '#76ff03', '#ff4081', '#ffffff']
-        : ['#ffd700', '#ff9100', '#ff3d00', '#fff59d'];
-    for (let side = -1; side <= 1; side += 2) {
-        drawEmbroideryCurve(colors[0], 6, [
-            [0, 180 * side], [20 * side, 100 * side], [40 * side, 20 * side], [10 * side, -80 * side], [0, -160 * side]
-        ]);
-        drawEmbroideryCurve(colors[1], 4, [
-            [15 * side, 140 * side], [50 * side, 60 * side], [65 * side, -10 * side], [30 * side, -70 * side]
-        ]);
-        drawEmbroideryCurve(colors[2], 3, [
-            [5 * side, 160 * side], [30 * side, 90 * side], [45 * side, 10 * side]
-        ]);
-        drawEmbroideryCurve(colors[3], 2, [
-            [0, 175 * side], [15 * side, 105 * side], [35 * side, 25 * side]
-        ]);
+    const petal = (x, y, rx, ry, color, turn) => {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(turn);
+        ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#f9d66a'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+    };
+    const stem = () => {
+        drawCurve('#63b55f', 11, [[-12,180],[-18,78],[16,-54],[5,-176]]);
+        drawCurve('#d8f09f', 2, [[-9,170],[-12,72],[20,-50],[8,-168]]);
+        drawCurve('#63b55f', 8, [[-8,54],[-103,18],[-130,-25]]);
+        drawCurve('#63b55f', 8, [[2,-12],[105,-54],[130,-106]]);
+    };
+    stem();
+    if (motif === 'bird') {
+        ctx.fillStyle = '#1f89bd'; ctx.beginPath(); ctx.ellipse(-16,-20,72,35,-.26,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#f3d13c'; ctx.beginPath(); ctx.ellipse(-42,-19,31,22,-.45,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#ec4943'; ctx.beginPath(); ctx.ellipse(34,-31,26,20,.1,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff6dc'; ctx.beginPath(); ctx.ellipse(65,-33,14,12,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#261414'; ctx.beginPath(); ctx.arc(69,-35,3,0,Math.PI*2); ctx.fill();
+        drawCurve('#f3d13c',8,[[52,-31],[96,-44],[116,-34]]);
+        drawCurve('#e83d54',9,[[-72,-20],[-125,-74],[-144,-66]]);
+    } else if (motif === 'butterfly') {
+        ['#ffd343','#f26c98','#75c8db','#f9bb42'].forEach((c,i)=>petal((i<2?-28:28),(i%2?-32:32),34,55,c,(i%2?-.65:.65)*(i<2?1:-1)));
+        ctx.fillStyle='#40243d';ctx.fillRect(-5,-55,10,118);drawCurve('#40243d',4,[[0,-53],[-22,-80],[-34,-90]]);drawCurve('#40243d',4,[[0,-53],[22,-80],[34,-90]]);
+    } else {
+        const colors = motif === 'peony' ? ['#f9c0d0','#ee527b','#ffd543','#d83255','#f8e4a0'] : motif === 'orchid' ? ['#f5f5ff','#67b9e8','#cbd5ff','#ffffff','#f4cf45'] : ['#f4a1be','#f5d05a','#ef5a66','#8dd3a3','#fff1bb'];
+        for(let i=0;i<5;i++) petal(Math.cos(i*Math.PI*2/5)*44,Math.sin(i*Math.PI*2/5)*44,36,80,colors[i],i*Math.PI*2/5);
+        ctx.fillStyle='#f3c73c';ctx.beginPath();ctx.arc(0,0,25,0,Math.PI*2);ctx.fill();
+        for(let i=0;i<14;i++){ctx.fillStyle=i%2?'#a73a36':'#fff2a5';ctx.beginPath();ctx.arc(Math.cos(i*.45)*i*1.7,Math.sin(i*.45)*i*1.7,4,0,Math.PI*2);ctx.fill();}
     }
     ctx.restore();
     const texture = new THREE.CanvasTexture(canvas);
     texture.wrapS = THREE.ClampToEdgeWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
     return texture;
 }
 
-function createPetalMesh(A, B, radius, widthFactor, puffFactor) {
-    const uSegments = 20, vSegments = 10;
+function generatePanelTexture(baseColor, panelIndex) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createRadialGradient(210, 180, 30, 256, 256, 350);
+    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(.58, '#eee7dc');
+    gradient.addColorStop(1, '#c8b9aa');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 512, 512);
+
+    ctx.lineWidth = 1;
+    for (let y = -512; y < 1024; y += 4) {
+        ctx.strokeStyle = y % 12 === 0 ? 'rgba(255,255,255,.13)' : 'rgba(92,33,10,.07)';
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y + 190); ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.translate(256, 278);
+    ctx.rotate((panelIndex % 2 ? 1 : -1) * .08);
+    ctx.strokeStyle = 'rgba(255,239,160,.34)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(-92, 36); ctx.quadraticCurveTo(0, -76, 92, 36);
+    ctx.quadraticCurveTo(0, 108, -92, 36);
+    ctx.stroke();
+    ctx.restore();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
+    return texture;
+}
+
+function createCurvedTrianglePanel(A, B, C, panelIndex) {
+    const segments = 18;
+    const radius = MODEL_R * .995;
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+    const rows = [];
+
+    for (let i = 0; i <= segments; i++) {
+        const row = [];
+        for (let j = 0; j <= segments - i; j++) {
+            const k = segments - i - j;
+            const point = A.clone().multiplyScalar(i)
+                .add(B.clone().multiplyScalar(j))
+                .add(C.clone().multiplyScalar(k))
+                .divideScalar(segments)
+                .normalize()
+                .multiplyScalar(radius);
+            row.push(positions.length / 3);
+            positions.push(point.x, point.y, point.z);
+            uvs.push((j + k * .5) / segments, k / segments);
+        }
+        rows.push(row);
+    }
+
+    for (let i = 0; i < segments; i++) {
+        for (let j = 0; j < segments - i; j++) {
+            const a = rows[i][j];
+            const b = rows[i + 1][j];
+            const c = rows[i][j + 1];
+            indices.push(a, b, c);
+            if (j < segments - i - 1) {
+                const d = rows[i + 1][j + 1];
+                indices.push(b, d, c);
+            }
+        }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+
+    const baseColor = PANEL_COLORS[panelIndex % PANEL_COLORS.length];
+    const material = new THREE.MeshPhysicalMaterial({
+        color: baseColor,
+        map: generatePanelTexture(baseColor, panelIndex),
+        roughness: .34,
+        metalness: .04,
+        clearcoat: .3,
+        clearcoatRoughness: .2,
+        side: THREE.DoubleSide
+    });
+    material.userData.paletteSlot = panelIndex;
+    panelMaterials.push(material);
+    return new THREE.Mesh(geometry, material);
+}
+
+function buildFillPanels() {
+    fillPanelsGroup.clear();
+    FILL_FACES.forEach((face, index) => {
+        fillPanelsGroup.add(createCurvedTrianglePanel(NODES[face[0]], NODES[face[1]], NODES[face[2]], index));
+    });
+}
+
+function createPetalMesh(A, B, radius, widthFactor, puffFactor, petalIndex) {
+    const uSegments = 32, vSegments = 16;
     const outerPositions = [], innerPositions = [];
     const leftBorderOuter = [], leftBorderInner = [], rightBorderOuter = [], rightBorderInner = [];
     const midVector = new THREE.Vector3().addVectors(A, B).normalize();
@@ -487,11 +811,14 @@ function createPetalMesh(A, B, radius, widthFactor, puffFactor) {
         const tangent = chord.clone().sub(currentCenter.clone().multiplyScalar(chord.dot(currentCenter))).normalize();
         const normal = currentCenter.clone();
         const side = new THREE.Vector3().crossVectors(normal, tangent).normalize();
-        const currentWidth = widthFactor * Math.sin(Math.PI * u);
+        // 中段保持宽大，两端快速收尖，避免相邻锦瓣在串珠节点附近互相穿插。
+        const currentWidth = widthFactor * Math.pow(Math.sin(Math.PI * u), 1.16);
         const rowOuter = [], rowInner = [];
         for (let j = 0; j <= vSegments; j++) {
             const v = (j / vSegments) - 0.5;
-            const puff = puffFactor * Math.cos(Math.PI * v) * Math.sin(Math.PI * u);
+            const lengthRound = Math.pow(Math.sin(Math.PI * u), .78);
+            const widthRound = Math.pow(Math.max(0, Math.cos(Math.PI * v)), 1.35);
+            const puff = puffFactor * lengthRound * widthRound;
             const posOuter = currentCenter.clone().multiplyScalar(radius)
                 .add(side.clone().multiplyScalar(v * currentWidth * radius))
                 .add(normal.clone().multiplyScalar(puff * radius));
@@ -524,12 +851,14 @@ function createPetalMesh(A, B, radius, widthFactor, puffFactor) {
     outerGeom.setAttribute('uv', new THREE.Float32BufferAttribute(outerUvs, 2));
     outerGeom.setIndex(outerIndices);
     outerGeom.computeVertexNormals();
+    const silkColor = PETAL_COLORS[petalIndex % PETAL_COLORS.length];
     const silkMat = new THREE.MeshPhysicalMaterial({
-        map: proceduralTexture,
-        roughness: 0.35,
-        metalness: 0.05,
-        clearcoat: 0.3,
-        clearcoatRoughness: 0.2,
+        map: generateEmbroideryTexture(silkColor, PETAL_MOTIFS[petalIndex % PETAL_MOTIFS.length]),
+        color: silkColor,
+        roughness: 0.26,
+        metalness: 0.08,
+        clearcoat: 0.58,
+        clearcoatRoughness: 0.14,
         side: THREE.FrontSide
     });
     petalMaterials.push(silkMat);
@@ -561,20 +890,22 @@ function createPetalMesh(A, B, radius, widthFactor, puffFactor) {
         wallGeom.setIndex(wallIndices);
         wallGeom.computeVertexNormals();
         const wallMat = new THREE.MeshStandardMaterial({
-            color: adjustColorBrightness(MODEL_STATE.silkColor, -40),
+            color: adjustColorBrightness(silkColor, -32),
             roughness: 0.4,
             metalness: 0.1,
             side: THREE.DoubleSide
         });
+        wallMat.userData.paletteSlot = petalIndex;
+        petalSideMaterials.push(wallMat);
         wallGroup.add(new THREE.Mesh(wallGeom, wallMat));
     }
     const trimCurvePoints = [...leftBorderOuter, ...rightBorderOuter.reverse()];
     const trimCurve = new THREE.CatmullRomCurve3(trimCurvePoints, true);
     const trimGeom = new THREE.TubeGeometry(trimCurve, 32, 0.04, 6, true);
     const goldMat = new THREE.MeshStandardMaterial({
-        color: MODEL_STATE.goldColor,
-        metalness: 0.9,
-        roughness: 0.2
+        color: 0xffc62f,
+        metalness: 0.82,
+        roughness: 0.18
     });
     goldMaterials.push(goldMat);
     const petalGroup = new THREE.Group();
@@ -592,17 +923,19 @@ function buildPearlNodes() {
         const nodeGroup = new THREE.Group();
         nodeGroup.position.copy(pos);
         const pearlMat = new THREE.MeshPhysicalMaterial({
-            color: 0xfffcf5,
-            roughness: 0.1,
-            metalness: 0.1,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.05
+            color: 0xffc32b,
+            roughness: 0.16,
+            metalness: 0.78,
+            clearcoat: 0.65,
+            clearcoatRoughness: 0.08
         });
-        nodeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(0.18, 14, 12), pearlMat));
-        for (let i = 0; i < 4; i++) {
-            const angle = (i / 4) * Math.PI * 2;
-            const subPearl = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), pearlMat);
-            subPearl.position.set(Math.cos(angle) * 0.22, 0, Math.sin(angle) * 0.22);
+        pearlMat.userData.paletteRole = 'accent';
+        beadMaterials.push(pearlMat);
+        nodeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 12), pearlMat));
+        for (let i = 0; i < 7; i++) {
+            const angle = (i / 7) * Math.PI * 2;
+            const subPearl = new THREE.Mesh(new THREE.SphereGeometry(0.068, 12, 10), pearlMat);
+            subPearl.position.set(Math.cos(angle) * 0.205, 0, Math.sin(angle) * 0.205);
             nodeGroup.add(subPearl);
         }
         pearlsGroup.add(nodeGroup);
@@ -616,35 +949,50 @@ function buildTassels(configCount) {
     targetNodeIndices.forEach((nodeIdx) => {
         const nodePos = NODES[nodeIdx];
         const tasselGroup = new THREE.Group();
-        tasselGroup.position.copy(nodePos);
         const isMainBottom = (nodeIdx === 1);
         const scale = isMainBottom ? 1.0 : 0.75;
+        const outward = nodePos.clone().normalize();
+        // 四组侧流苏先离开球面，再略向外倾斜，防止珠链与下半球锦瓣穿模。
+        tasselGroup.position.copy(nodePos).multiplyScalar(isMainBottom ? 1.025 : 1.12);
+        const hangingDirection = new THREE.Vector3(0, -1, 0)
+            .add(outward.clone().multiplyScalar(isMainBottom ? 0 : .30))
+            .normalize();
+        tasselGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), hangingDirection);
         const beadMat = new THREE.MeshPhysicalMaterial({
             color: 0xfff8e7,
             roughness: 0.1,
             clearcoat: 1.0
         });
-        const amberMat = new THREE.MeshStandardMaterial({ color: 0xffa000, roughness: 0.25, metalness: 0.05 });
-        for (let b = 0; b < 3; b++) {
-            const bead = new THREE.Mesh(new THREE.SphereGeometry(0.08 * scale, 10, 8), beadMat);
-            bead.position.y = -0.3 * (b + 1) * scale;
+        const amberMat = new THREE.MeshStandardMaterial({ color: 0xe9ad21, roughness: 0.2, metalness: 0.62 });
+        beadMat.userData.paletteRole = 'pearl';
+        amberMat.userData.paletteRole = 'accent';
+        beadMaterials.push(beadMat, amberMat);
+        for (let b = 0; b < 5; b++) {
+            const bead = new THREE.Mesh(new THREE.SphereGeometry((b % 2 ? 0.075 : 0.1) * scale, 12, 10), b % 2 ? amberMat : beadMat);
+            bead.position.y = -0.22 * (b + 1) * scale;
             tasselGroup.add(bead);
         }
-        const capGeom = new THREE.ConeGeometry(0.18 * scale, 0.4 * scale, 10);
+        const capGeom = new THREE.ConeGeometry(0.24 * scale, 0.42 * scale, 16);
         const capMesh = new THREE.Mesh(capGeom, amberMat);
         capMesh.position.y = -1.2 * scale;
         capMesh.rotation.x = Math.PI;
         tasselGroup.add(capMesh);
-        const tasselSilkMat = new THREE.MeshStandardMaterial({
-            color: MODEL_STATE.silkColor,
-            roughness: 0.4,
-            metalness: 0.1
-        });
-        const skirtGeom = new THREE.CylinderGeometry(0.06 * scale, 0.14 * scale, 2.2 * scale, 10);
-        skirtGeom.translate(0, -1.1 * scale, 0);
-        const skirtMesh = new THREE.Mesh(skirtGeom, tasselSilkMat);
-        skirtMesh.position.y = -1.2 * scale;
-        tasselGroup.add(skirtMesh);
+        const tasselColors = nodeIdx % 2 ? ['#f2c72e','#f6d643','#e9ad21'] : ['#d51d4e','#f1ba2b','#1c9d73'];
+        for (let s = 0; s < 18; s++) {
+            const a = (s / 18) * Math.PI * 2;
+            const r = .09 * scale;
+            const drift = .16 + (s % 4) * .022;
+            const curve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(Math.cos(a) * r, -1.45 * scale, Math.sin(a) * r),
+                new THREE.Vector3(Math.cos(a) * drift, -2.45 * scale, Math.sin(a) * drift),
+                new THREE.Vector3(Math.cos(a) * (drift + .07), -3.90 * scale, Math.sin(a) * (drift + .07))
+            ]);
+            const strandMaterial = new THREE.MeshStandardMaterial({color:tasselColors[s % tasselColors.length],roughness:.48,metalness:.04});
+            strandMaterial.userData.paletteSlot = s % 3;
+            tasselMaterials.push(strandMaterial);
+            const strand = new THREE.Mesh(new THREE.TubeGeometry(curve, 12, .014 * scale, 5, false), strandMaterial);
+            tasselGroup.add(strand);
+        }
         tasselsGroup.add(tasselGroup);
     });
 }
@@ -652,26 +1000,40 @@ function buildTassels(configCount) {
 function buildTopRibbon() {
     ribbonGroup.clear();
     const topNode = NODES[0];
-    const ribbonMat = new THREE.MeshStandardMaterial({
-        color: MODEL_STATE.silkColor,
-        roughness: 0.3,
+    const ribbonMat = new THREE.MeshPhysicalMaterial({
+        color: 0xd92f4c,
+        roughness: 0.28,
+        clearcoat: .35,
         side: THREE.DoubleSide
     });
-    const loopGeom = new THREE.TorusGeometry(0.6, 0.05, 10, 20, Math.PI * 1.8);
-    const loopMesh = new THREE.Mesh(loopGeom, ribbonMat);
-    loopMesh.position.set(topNode.x, topNode.y + 0.6, topNode.z);
-    loopMesh.rotation.z = Math.PI / 2;
-    ribbonGroup.add(loopMesh);
+    ribbonMaterials.push(ribbonMat);
+    [-.22,.22].forEach((offset) => {
+        const loopGeom = new THREE.TorusGeometry(.48, .055, 12, 28, Math.PI * 1.66);
+        const loopMesh = new THREE.Mesh(loopGeom, ribbonMat);
+        loopMesh.position.set(topNode.x + offset, topNode.y + .56, topNode.z);
+        loopMesh.rotation.z = Math.PI / 2 + offset * .65;
+        ribbonGroup.add(loopMesh);
+    });
+    const knotMaterial = new THREE.MeshStandardMaterial({color:0xffc62f,metalness:.8,roughness:.18});
+    knotMaterial.userData.paletteRole = 'accent';
+    beadMaterials.push(knotMaterial);
+    const knot = new THREE.Mesh(new THREE.SphereGeometry(.16, 14, 12), knotMaterial);
+    knot.position.set(topNode.x, topNode.y + .24, topNode.z); ribbonGroup.add(knot);
 }
 
 function buildHomeModel() {
     petalMaterials = [];
+    petalSideMaterials = [];
+    panelMaterials = [];
     goldMaterials = [];
+    beadMaterials = [];
+    tasselMaterials = [];
+    ribbonMaterials = [];
     petalDirs = [];
+    buildFillPanels();
     petalsGroup.clear();
-    proceduralTexture = generateEmbroideryTexture(MODEL_STATE.silkColor, MODEL_STATE.pattern);
-    EDGES.forEach((edge) => {
-        petalsGroup.add(createPetalMesh(NODES[edge.a], NODES[edge.b], MODEL_R, MODEL_STATE.widthFactor, MODEL_STATE.puffFactor));
+    EDGES.forEach((edge, index) => {
+        petalsGroup.add(createPetalMesh(NODES[edge.a], NODES[edge.b], MODEL_R, MODEL_STATE.widthFactor, MODEL_STATE.puffFactor, index));
     });
     buildPearlNodes();
     buildTassels(MODEL_STATE.tasselConfig);
@@ -692,6 +1054,26 @@ function setupLights() {
 }
 
 let dragRot = 0;
+let immersiveMode = false;
+let topPetalActive = false;
+let topPetalIndex = 0;
+let activeThemeIndex = 0;
+let lastThemePetalIndex = -1;
+let themeSpin = 0;
+let themeSpinTarget = 0;
+const CAMERA_HOME_Z = 12;
+const CAMERA_IMMERSIVE_Z = 9.1;
+
+function setImmersive(next) {
+    immersiveMode = next;
+    topPetalActive = false;
+    document.body.classList.toggle('immersive', next);
+    const navigator = document.getElementById('petalNavigator');
+    if (navigator) navigator.classList.remove('interacting');
+    if (next && autoOn) stopAuto();
+    if (next) document.getElementById('btnExitImmersion').focus({preventScroll:true});
+}
+
 function initHomeModel() {
     const canvas = document.getElementById('modelCanvas');
     scene = new THREE.Scene();
@@ -704,11 +1086,12 @@ function initHomeModel() {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
     ballGroup = new THREE.Group();
+    fillPanelsGroup = new THREE.Group();
     petalsGroup = new THREE.Group();
     tasselsGroup = new THREE.Group();
     pearlsGroup = new THREE.Group();
     ribbonGroup = new THREE.Group();
-    ballGroup.add(petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup);
+    ballGroup.add(fillPanelsGroup, petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup);
     scene.add(ballGroup);
     setupLights();
     buildHomeModel();
@@ -728,8 +1111,76 @@ function initHomeModel() {
     const endDrag = () => { dragging = false; canvas.classList.remove('dragging'); };
     canvas.addEventListener('pointerup', endDrag);
     canvas.addEventListener('pointercancel', endDrag);
+    canvas.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        setImmersive(!immersiveMode);
+    });
 }
 initHomeModel();
+
+/* 顶部十二瓣导览：横向滑动，原地旋转并切换整球配色 */
+const PETAL_GUIDE_LABELS = ['锦羽','迎春','青鸾','桃华','丹凤','兰影','丰穗','蝶舞','牡丹','瑞鸟','云兰','团圆'];
+const petalNavigator = document.getElementById('petalNavigator');
+const petalTrack = document.getElementById('petalTrack');
+const petalNavLabel = document.getElementById('petalNavLabel');
+const petalStops = PETAL_GUIDE_LABELS.map((label, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'petal-stop';
+    button.setAttribute('aria-label', `第 ${index + 1} 瓣 · ${label}`);
+    button.setAttribute('aria-pressed', 'false');
+    button.style.setProperty('--stop-color', COLOR_THEMES[index % COLOR_THEMES.length].petals[0]);
+    button.addEventListener('pointerenter', () => selectTopPetal(index));
+    button.addEventListener('focus', () => {
+        topPetalActive = true;
+        petalNavigator.classList.add('interacting');
+        selectTopPetal(index);
+    });
+    petalTrack.appendChild(button);
+    return button;
+});
+
+function selectTopPetal(index) {
+    topPetalIndex = Math.min(11, Math.max(0, index));
+    const themeIndex = topPetalIndex % COLOR_THEMES.length;
+    petalNavLabel.textContent = `第 ${topPetalIndex + 1} 瓣 · ${COLOR_THEMES[themeIndex].name}`;
+    if (lastThemePetalIndex !== topPetalIndex) {
+        lastThemePetalIndex = topPetalIndex;
+        activeThemeIndex = themeIndex;
+        themeSpinTarget = themeSpin + Math.PI * 2;
+    }
+    petalStops.forEach((stop, i) => {
+        const selected = i === topPetalIndex;
+        stop.classList.toggle('on', selected);
+        stop.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
+}
+
+function leaveTopPetalGuide() {
+    topPetalActive = false;
+    lastThemePetalIndex = -1;
+    petalNavigator.classList.remove('interacting');
+    petalNavLabel.textContent = '滑动观瓣';
+    petalStops.forEach((stop) => {
+        stop.classList.remove('on');
+        stop.setAttribute('aria-pressed', 'false');
+    });
+}
+
+petalNavigator.addEventListener('pointerenter', () => {
+    topPetalActive = true;
+    petalNavigator.classList.add('interacting');
+    if (autoOn) stopAuto();
+});
+petalNavigator.addEventListener('pointermove', (event) => {
+    const rect = petalTrack.getBoundingClientRect();
+    const ratio = Math.min(.9999, Math.max(0, (event.clientX - rect.left) / rect.width));
+    selectTopPetal(Math.floor(ratio * 12));
+});
+petalNavigator.addEventListener('pointerleave', leaveTopPetalGuide);
+petalNavigator.addEventListener('focusout', (event) => {
+    if (!petalNavigator.contains(event.relatedTarget)) leaveTopPetalGuide();
+});
 
 /* 右侧卡片 */
 const panelEl = document.getElementById('panel');
@@ -760,6 +1211,12 @@ const mobileTitle = document.getElementById('mobileTitle');
 const scrollHint = document.getElementById('scrollHint');
 const burst = document.getElementById('burst');
 const btnAuto = document.getElementById('btnAuto');
+const btnExitImmersion = document.getElementById('btnExitImmersion');
+const museumNavLinks = [...document.querySelectorAll('#museumNav [data-section]')];
+btnExitImmersion.addEventListener('click', () => setImmersive(false));
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && immersiveMode) setImmersive(false);
+});
 
 /* ========== 滚动联动 ========== */
 let rot = 0;
@@ -777,12 +1234,25 @@ const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - inne
 function setPanel(idx){
     cards.forEach((c, i) => c.classList.toggle('on', i === idx));
     dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+    museumNavLinks.forEach((link) => link.classList.toggle('on', Number(link.dataset.section) === idx));
     mobileTitle.textContent = `第${NUM_CN[idx]}章 · ${DATA[idx].title}`;
     const hint = cards[idx].querySelector('.hintText');
     if (idx === 7) hint.textContent = '已转满一周 · 圆满收官';
     else hint.textContent = `继续滚动 · 切换至第 ${NUM_CN[idx + 1]} 章`;
     scrollHint.classList.toggle('show', idx === 0);
     burst.classList.toggle('show', idx === 7);
+}
+
+function updateThemeColors() {
+    const palette = COLOR_THEMES[activeThemeIndex].colors;
+    const ease = .055;
+    petalMaterials.forEach((material, index) => material.color.lerp(palette.petals[index % palette.petals.length], ease));
+    petalSideMaterials.forEach((material) => material.color.lerp(palette.petalSides[material.userData.paletteSlot % palette.petalSides.length], ease));
+    panelMaterials.forEach((material) => material.color.lerp(palette.panels[material.userData.paletteSlot % palette.panels.length], ease));
+    goldMaterials.forEach((material) => material.color.lerp(palette.accent, ease));
+    beadMaterials.forEach((material) => material.color.lerp(material.userData.paletteRole === 'pearl' ? palette.pearl : palette.accent, ease));
+    tasselMaterials.forEach((material) => material.color.lerp(palette.tassels[material.userData.paletteSlot % palette.tassels.length], ease));
+    ribbonMaterials.forEach((material) => material.color.lerp(palette.ribbon, ease));
 }
 
 function tick(now){
@@ -798,20 +1268,24 @@ function tick(now){
 
     const totalDeg = rot + dragRot;
     const rad = totalDeg * Math.PI / 180;
+    updateThemeColors();
     if (ballGroup) {
-        ballGroup.rotation.y = rad;
-        let best = -1, bestAng = 1e9;
-        for (let i = 0; i < petalDirs.length; i++) {
-            const d = petalDirs[i];
-            const x2 = d.x * Math.cos(rad) + d.z * Math.sin(rad);
-            const z2 = -d.x * Math.sin(rad) + d.z * Math.cos(rad);
-            const ang = Math.abs(Math.atan2(x2, z2));
-            if (ang < bestAng) { bestAng = ang; best = i; }
-        }
-        petalMaterials.forEach((m, i) => {
-            if (i === best) { m.emissive.setHex(0xffb020); m.emissiveIntensity = 0.3; }
-            else { m.emissive.setHex(0x000000); m.emissiveIntensity = 0; }
+        const baseQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, rad, 0));
+        ballGroup.quaternion.copy(baseQuaternion);
+        themeSpin += (themeSpinTarget - themeSpin) * .075;
+        if (Math.abs(themeSpinTarget - themeSpin) < .001) themeSpin = themeSpinTarget;
+        ballGroup.rotateY(themeSpin);
+
+        petalMaterials.forEach((material) => {
+            material.emissive.setHex(0x000000);
+            material.emissiveIntensity = 0;
         });
+    }
+
+    if (camera) {
+        const cameraTarget = immersiveMode ? CAMERA_IMMERSIVE_Z : CAMERA_HOME_Z;
+        camera.position.z += (cameraTarget - camera.position.z) * 0.08;
+        camera.lookAt(0, -1.0, 0);
     }
 
     const glow = document.getElementById('glow');
@@ -861,6 +1335,13 @@ function autoStep(now){
 }
 btnAuto.addEventListener('click', () => autoOn ? stopAuto() : (startAuto(), requestAnimationFrame(autoStep)));
 document.getElementById('btnTop').addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+museumNavLinks.forEach((link) => {
+    link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const section = Number(link.dataset.section);
+        window.scrollTo({top: (section / (DATA.length - 1)) * maxScroll(), behavior: 'smooth'});
+    });
+});
 window.addEventListener('wheel', () => { if (autoOn) stopAuto(); }, {passive: true});
 window.addEventListener('touchstart', () => { if (autoOn) stopAuto(); }, {passive: true});
 
