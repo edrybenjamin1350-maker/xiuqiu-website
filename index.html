@@ -1473,7 +1473,9 @@ function tick(now){
     rot += (target - rot) * 0.16;
     if (Math.abs(target - rot) < 0.02) rot = target;
 
-    const idx = Math.min(7, Math.floor(norm360(rot) / 45));
+    // 360° 是长卷终点，章节索引应停在第八章，不能归一化回 0°。
+    const chapterRotation = Math.min(359.999, Math.max(0, rot));
+    const idx = Math.min(7, Math.floor(chapterRotation / 45));
     if (idx !== active){ active = idx; setPanel(idx); }
 
     const totalDeg = rot + dragRot;
