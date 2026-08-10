@@ -76,11 +76,32 @@
         pointer-events:none;
     }
     #modelCanvas{
-        width:min(560px,74vmin);height:min(560px,74vmin);
+        width:min(560px,74vmin);height:min(680px,90vmin);
         display:block;cursor:grab;touch-action:pan-y;pointer-events:auto;
         transition:width .7s cubic-bezier(.2,.8,.2,1),height .7s cubic-bezier(.2,.8,.2,1),filter .7s ease;
     }
     #modelCanvas.dragging{cursor:grabbing}
+    #themeBlend{
+        --ripple-a:#8f1228;--ripple-b:#08a9d4;
+        position:absolute;left:50%;top:50%;z-index:4;pointer-events:none;
+        width:min(560px,74vmin);height:min(560px,74vmin);transform:translate(-50%,-50%);
+    }
+    .theme-ripple{
+        position:absolute;left:50%;top:50%;width:76%;aspect-ratio:1;border-radius:50%;
+        transform:translate(-50%,-50%) scale(1);opacity:0;will-change:transform,opacity;
+        border:2px solid var(--ripple-a);box-shadow:0 0 18px color-mix(in srgb,var(--ripple-a) 58%,transparent),inset 0 0 14px color-mix(in srgb,var(--ripple-a) 34%,transparent);
+    }
+    .theme-ripple.ripple-b{
+        border-color:var(--ripple-b);box-shadow:0 0 18px color-mix(in srgb,var(--ripple-b) 58%,transparent),inset 0 0 14px color-mix(in srgb,var(--ripple-b) 34%,transparent);
+    }
+    #themeBlend.playing .ripple-a{animation:themeRippleOut 1.5s cubic-bezier(.72,0,.18,1) both}
+    #themeBlend.playing .ripple-b{animation:themeRippleOut 1.28s .22s cubic-bezier(.72,0,.18,1) both}
+    @keyframes themeRippleOut{
+        0%{opacity:0;transform:translate(-50%,-50%) scale(1)}
+        13%{opacity:.72}
+        52%{opacity:.42}
+        100%{opacity:0;transform:translate(-50%,-50%) scale(1.58)}
+    }
     #glow{
         position:absolute;left:50%;top:50%;width:min(620px,82vmin);height:min(620px,82vmin);
         margin:calc(min(620px,82vmin) / -2) 0 0 calc(min(620px,82vmin) / -2);
@@ -205,7 +226,8 @@
     }
     @media (max-width:1180px){#petalNavigator{display:none}}
     @media (max-width:640px){
-        #modelCanvas{width:84vmin;height:84vmin}
+        #modelCanvas{width:84vmin;height:104vmin}
+        #themeBlend{width:84vmin;height:84vmin}
         .sec .num{left:2vw}
         .sec .label{left:calc(2vw + 62px)}
     }
@@ -227,6 +249,7 @@
     body.immersive #burst{opacity:0!important;pointer-events:none!important}
     body.immersive #stage{z-index:70;pointer-events:auto}
     body.immersive #modelCanvas{width:min(840px,92vmin);height:min(840px,92vmin);filter:drop-shadow(0 30px 34px rgba(0,0,0,.46))}
+    body.immersive #themeBlend{width:min(840px,92vmin);height:min(840px,92vmin)}
     body.immersive #glow{opacity:.82!important;transform:scale(1.38);transition:transform .7s ease}
     body.immersive #exitImmersion{opacity:1;pointer-events:auto;transform:none}
     @media (max-width:640px){
@@ -608,6 +631,7 @@
 <div id="stage">
     <div id="glow"></div>
     <canvas id="modelCanvas"></canvas>
+    <div id="themeBlend" aria-hidden="true"><i class="theme-ripple ripple-a"></i><i class="theme-ripple ripple-b"></i></div>
 </div>
 <div id="exitImmersion"><button id="btnExitImmersion" class="btn-glass" aria-label="退出赏球模式"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M21 3l-7 7M9 21H3v-6M3 21l7-7"/></svg><span>退出赏球</span></button></div>
 
@@ -776,11 +800,11 @@ const MODEL_STATE = {
     puffFactor: 0.14,
     tasselConfig: 5
 };
-const PETAL_COLORS = ['#e83d54','#ffb51e','#0e9a75','#f293b9','#e65029','#1764be','#f5cd35','#d22f71','#1ca47d','#f06a36','#e84962','#f4a4c0'];
+const PETAL_COLORS = ['#ed6fa6','#087c45','#078c6c','#eb78a8','#e54a24','#08a9d4','#efbf19','#cf286d','#119465','#c58d13','#e63b57','#ee84ae'];
 const PETAL_MOTIFS = ['bird','flower','butterfly','peony','bird','orchid','flower','butterfly','peony','bird','orchid','flower'];
 const PANEL_COLORS = ['#f6b62c','#e98521','#f4c43d','#e76c2e','#f3b331','#e58c22','#f6c94a','#df7428'];
 const COLOR_THEMES = [
-    { name:'壮锦盛彩', petals:PETAL_COLORS, panels:PANEL_COLORS, accent:'#ffc62f', pearl:'#fff4dc', tassels:['#f2c72e','#d51d4e','#1c9d73'], ribbon:'#d92f4c' },
+    { name:'壮锦盛彩', petals:PETAL_COLORS, panels:PANEL_COLORS, accent:'#ffc62f', node:'#8f1228', pearl:'#fff4dc', tassels:['#f2c72e','#d51d4e','#1c9d73'], ribbon:'#d92f4c' },
     { name:'青瓷月白', petals:['#55b9ad','#dcefe8','#76aebe','#f5f1e7','#6cc8bb','#b9dce2','#edf6ef','#4fa49d','#d8ece7','#8cc8c0','#f7f3e9','#67b3ab'], panels:['#d8eee5','#b9ddd5','#ecf5ed','#9fcfc6','#e5f1e8','#aad7cf','#f2f5ec','#c3e2dc'], accent:'#dce9e7', pearl:'#fbffff', tassels:['#f4f5ed','#b8d9d5','#6cb5ad'], ribbon:'#d9eee8' },
     { name:'靛蓝银辉', petals:['#274f91','#3f72ad','#173a75','#d9e3ee','#5a86ba','#244f86','#a9bfd8','#365f9c','#e8edf3','#1e427c','#7599c1','#cbd7e6'], panels:['#274b82','#587ba5','#dce5ee','#315d96','#91abc7','#1c3d72','#c9d6e4','#446d9e'], accent:'#d8e0ea', pearl:'#ffffff', tassels:['#eef2f6','#8da9c6','#345d92'], ribbon:'#e7ebf0' },
     { name:'绛紫流霞', petals:['#77426f','#a86491','#d9b5ca','#eee1e8','#66355f','#bf7ca5','#8d597f','#e2c5d5','#9a6289','#f1e7ec','#70416a','#c98bad'], panels:['#95627e','#d1a4bb','#ead7e1','#7d4c70','#bf8ea8','#f0e4e9','#a66f8c','#d9b9c9'], accent:'#e5d9df', pearl:'#fff9fc', tassels:['#f2e7ed','#c694ad','#875477'], ribbon:'#b37297' },
@@ -805,6 +829,7 @@ COLOR_THEMES.forEach((theme) => {
         petalSides: theme.petals.map((color) => makeVividColor(color, 1.18).multiplyScalar(.66)),
         panels: theme.panels.map((color) => makeVividColor(color, 1.3)),
         accent: makeVividColor(theme.accent, 1.22),
+        node: makeVividColor(theme.node || theme.accent, 1.25),
         pearl: makeVividColor(theme.pearl, 1.08),
         tassels: theme.tassels.map((color) => makeVividColor(color, 1.32)),
         ribbon: makeVividColor(theme.ribbon, 1.32)
@@ -813,6 +838,8 @@ COLOR_THEMES.forEach((theme) => {
 let scene, camera, renderer;
 let ballGroup, fillPanelsGroup, petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup;
 let petalMaterials = [], petalSideMaterials = [], panelMaterials = [], goldMaterials = [], beadMaterials = [], tasselMaterials = [], ribbonMaterials = [], proceduralTexture, petalDirs = [];
+let tasselDynamics = [];
+let topLoopMesh = null;
 
 function adjustColorBrightness(hex, percent) {
     let num = parseInt(hex.replace('#', ''), 16);
@@ -889,6 +916,186 @@ function generateEmbroideryTexture(silkColor, motif = 'flower') {
     texture.wrapT = THREE.ClampToEdgeWrapping;
     texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
     return texture;
+}
+
+const REFERENCE_MOTIFS = ['flower','chrysanthemum','bird','orchid','peony','tulip','bird','flower','orchid','fish','tulip','crane'];
+
+function generateReferenceEmbroideryTexture(motif = 'flower', variant = 0, baseColor = '#d34a62') {
+    const size = 512;
+    const colorCanvas = document.createElement('canvas');
+    const bumpCanvas = document.createElement('canvas');
+    colorCanvas.width = colorCanvas.height = size;
+    bumpCanvas.width = bumpCanvas.height = size;
+    const ctx = colorCanvas.getContext('2d');
+    const bump = bumpCanvas.getContext('2d');
+
+    // 预览款把缎面底色直接烘焙进贴图，避免材质颜色与彩色绣线相乘后失真。
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0,0,size,size);
+    const satin = ctx.createLinearGradient(0,0,size,size);
+    satin.addColorStop(0,'rgba(255,255,255,.34)');
+    satin.addColorStop(.24,'rgba(255,255,255,.06)');
+    satin.addColorStop(.5,'rgba(255,255,255,.24)');
+    satin.addColorStop(.76,'rgba(40,8,20,.12)');
+    satin.addColorStop(1,'rgba(255,255,255,.18)');
+    ctx.fillStyle = satin;
+    ctx.fillRect(0,0,size,size);
+    bump.fillStyle = '#777';
+    bump.fillRect(0,0,size,size);
+
+    // 细密的经纬丝线，让底布在光照下出现真实的缎面方向性。
+    for(let i=-size;i<size*2;i+=5){
+        ctx.strokeStyle = i%15===0 ? 'rgba(255,255,255,.2)' : 'rgba(77,42,31,.055)';
+        ctx.lineWidth = i%15===0 ? 1.2 : .7;
+        ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i-size*.42,size);ctx.stroke();
+        bump.strokeStyle = i%15===0 ? '#858585' : '#727272';
+        bump.lineWidth = 1;
+        bump.beginPath();bump.moveTo(i,0);bump.lineTo(i-size*.42,size);bump.stroke();
+    }
+    for(let y=0;y<size;y+=7){
+        ctx.strokeStyle='rgba(255,255,255,.045)';ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(size,y+18);ctx.stroke();
+    }
+
+    ctx.save(); bump.save();
+    ctx.translate(size/2,size/2); bump.translate(size/2,size/2);
+    ctx.rotate(-Math.PI/2); bump.rotate(-Math.PI/2);
+    const textureScale = size / 768;
+    ctx.scale(1.22 * textureScale,1.22 * textureScale);
+    bump.scale(1.22 * textureScale,1.22 * textureScale);
+
+    const threadStroke = (points,color,width=12) => {
+        const path = new Path2D();
+        points.forEach((point,index)=>index ? path.lineTo(point[0],point[1]) : path.moveTo(point[0],point[1]));
+        ctx.lineCap='round';ctx.lineJoin='round';
+        ctx.strokeStyle='rgba(55,20,20,.3)';ctx.lineWidth=width+5;ctx.stroke(path);
+        ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke(path);
+        ctx.setLineDash([4,5]);ctx.lineDashOffset=variant%4;
+        ctx.strokeStyle='rgba(255,255,255,.58)';ctx.lineWidth=Math.max(2.5,width*.2);ctx.stroke(path);
+        ctx.setLineDash([]);
+        bump.lineCap='round';bump.lineJoin='round';bump.strokeStyle='#e8e8e8';bump.lineWidth=width+3;bump.stroke(path);
+        bump.setLineDash([4,5]);bump.strokeStyle='#fff';bump.lineWidth=Math.max(3,width*.28);bump.stroke(path);bump.setLineDash([]);
+    };
+
+    const threadedEllipse = (x,y,rx,ry,rotation,color) => {
+        ctx.save();ctx.translate(x,y);ctx.rotate(rotation);
+        ctx.shadowColor='rgba(55,16,20,.3)';ctx.shadowBlur=5;ctx.shadowOffsetY=3;
+        ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';
+        ctx.save();ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.clip();
+        for(let xx=-rx-ry;xx<rx+ry;xx+=7){
+            ctx.strokeStyle=((xx+rx+ry)/7)%2<1?'rgba(255,255,255,.62)':'rgba(70,20,30,.24)';ctx.lineWidth=3.2;
+            ctx.beginPath();ctx.moveTo(xx,-ry*1.2);ctx.lineTo(xx+ry*.55,ry*1.2);ctx.stroke();
+        }
+        ctx.restore();ctx.strokeStyle='rgba(255,230,142,.72)';ctx.lineWidth=3;ctx.stroke();ctx.restore();
+        bump.save();bump.translate(x,y);bump.rotate(rotation);bump.fillStyle='#e7e7e7';bump.beginPath();bump.ellipse(0,0,rx,ry,0,0,Math.PI*2);bump.fill();
+        for(let xx=-rx;xx<rx;xx+=8){bump.strokeStyle='#fff';bump.lineWidth=3.5;bump.beginPath();bump.moveTo(xx,-ry*.85);bump.lineTo(xx+ry*.35,ry*.85);bump.stroke();}
+        bump.restore();
+    };
+
+    const threadedPolygon = (points,color) => {
+        const path = new Path2D();
+        points.forEach((point,index)=>index?path.lineTo(point[0],point[1]):path.moveTo(point[0],point[1]));path.closePath();
+        ctx.save();ctx.shadowColor='rgba(50,15,20,.3)';ctx.shadowBlur=5;ctx.shadowOffsetY=3;ctx.fillStyle=color;ctx.fill(path);ctx.shadowColor='transparent';
+        ctx.save();ctx.clip(path);for(let x=-250;x<250;x+=8){ctx.strokeStyle=((x+250)/8)%2<1?'rgba(255,255,255,.58)':'rgba(60,18,25,.22)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,-230);ctx.lineTo(x+170,230);ctx.stroke();}ctx.restore();
+        ctx.strokeStyle='rgba(255,229,143,.75)';ctx.lineWidth=3;ctx.stroke(path);ctx.restore();
+        bump.fillStyle='#e5e5e5';bump.fill(path);bump.strokeStyle='#fff';bump.lineWidth=3;bump.stroke(path);
+    };
+
+    const stem = (from=[0,175],to=[0,-105]) => threadStroke([from,[from[0]-22,42],[to[0]+16,-28],to],'#319153',9);
+    const leaf = (x,y,turn,color='#4aaa61') => threadedEllipse(x,y,22,58,turn,color);
+    const fivePetalFlower = (cx,cy,palette,scale=1) => {
+        for(let i=0;i<5;i++){
+            const angle=i*Math.PI*2/5-Math.PI/2;
+            threadedEllipse(cx+Math.cos(angle)*35*scale,cy+Math.sin(angle)*35*scale,24*scale,44*scale,angle+Math.PI/2,palette[i%palette.length]);
+        }
+        threadedEllipse(cx,cy,26*scale,26*scale,0,'#f4bf31');
+        for(let i=0;i<12;i++)threadStroke([[cx,cy],[cx+Math.cos(i*.524)*22*scale,cy+Math.sin(i*.524)*22*scale]],i%2?'#8b322e':'#fff0a2',3);
+    };
+
+    if(motif==='tulip'){
+        // 参考图青色瓣：单枝红郁金香。减少细碎轮廓，缩小后仍保持清晰。
+        ctx.save();bump.save();ctx.translate(0,78);bump.translate(0,78);
+        threadStroke([[2,182],[-3,96],[3,18],[2,-48]],'#288e4d',11);
+        threadedEllipse(-43,73,25,68,-.82,'#429c52');
+        threadedEllipse(45,43,23,62,.82,'#61ad58');
+        threadedPolygon([[-78,-61],[-52,-140],[-9,-104],[10,-158],[38,-105],[72,-142],[76,-60],[35,-18],[-34,-22]],'#dc233e');
+        threadStroke([[-50,-129],[-10,-103],[9,-151]],'#ff7c82',5);
+        threadStroke([[10,-151],[39,-104],[68,-132]],'#9e1831',5);
+        threadStroke([[-34,-22],[2,-61],[35,-18]],'#f26d78',4);
+        ctx.restore();bump.restore();
+    }else if(motif==='chrysanthemum'){
+        // 参考图绿瓣：一朵橙红色小菊，宽针脚比密集细瓣更像真实刺绣。
+        threadStroke([[1,188],[-5,98],[3,18],[0,-42]],'#2c8b4c',10);
+        threadedEllipse(-46,78,24,61,-.86,'#4b9f51');
+        threadedEllipse(48,43,22,56,.84,'#69ad58');
+        for(let i=0;i<12;i++){
+            const a=i*Math.PI*2/12-Math.PI/2;
+            const distance=i%2 ? 45 : 51;
+            threadedEllipse(Math.cos(a)*distance,-66+Math.sin(a)*distance,18,39,a+Math.PI/2,i%2?'#e2482e':'#f28b28');
+        }
+        threadedEllipse(0,-66,31,31,0,'#9f2923');
+        for(let i=0;i<10;i++){
+            const a=i*Math.PI*2/10;
+            threadStroke([[0,-66],[Math.cos(a)*25,-66+Math.sin(a)*25]],i%2?'#ffcf43':'#f17b2e',3.5);
+        }
+    }else if(motif==='fish'){
+        // 参考图金色瓣：双鱼相向，主体稍向两侧避开中央流苏。
+        const drawFish=(cx,cy,flip,color,finColor)=>{
+            ctx.save();bump.save();ctx.translate(cx,cy);bump.translate(cx,cy);ctx.scale(flip,1);bump.scale(flip,1);
+            threadedEllipse(0,0,72,31,-.08,color);
+            threadedPolygon([[58,0],[108,-43],[101,38]],finColor);
+            threadedPolygon([[-2,-24],[30,-53],[42,-18]],finColor);
+            threadStroke([[-52,-7],[-22,-21],[18,-18],[52,-4]],'#722b35',4.5);
+            threadStroke([[-48,9],[-18,21],[20,18],[48,6]],'#f1b34b',3.5);
+            threadedEllipse(-39,-4,10,10,0,'#fff0b5');
+            threadedEllipse(-42,-6,4.5,4.5,0,'#27212b');
+            for(let s=-1;s<=2;s++) threadStroke([[s*20,-20],[s*8,0],[s*20,20]],'#8f4a28',3.5);
+            ctx.restore();bump.restore();
+        };
+        drawFish(-55,-60,1,'#d9512d','#8f2533');
+        drawFish(55,48,-1,'#b9492c','#753249');
+        threadStroke([[-116,80],[-70,110],[-18,99],[35,118],[108,84]],'#3f8f4d',5);
+    }else if(motif==='bird' || motif==='crane'){
+        const crane=motif==='crane';
+        threadedEllipse(-18,-8,crane?80:92,crane?31:42,-.12,crane?'#f2f0e8':'#276fa8');
+        threadedEllipse(-34,-12,crane?48:54,crane?23:30,-.28,crane?'#e7e8e5':'#f0b833');
+        threadedEllipse(72,-54,23,21,0,crane?'#f6f2e8':'#d84343');
+        threadStroke([[58,-54],[112,-62],[142,-45]],crane?'#d99d39':'#f4c436',7);
+        threadStroke([[-90,-6],[-145,-80],[-172,-95]],crane?'#202d40':'#d53b4d',10);
+        threadStroke([[-84,8],[-148,56],[-176,80]],crane?'#d7d7d0':'#39a0b4',8);
+        threadedEllipse(77,-58,4,4,0,'#1d1720');
+        if(crane){threadStroke([[12,18],[46,122]],'#a83732',6);threadStroke([[-4,18],[-30,126]],'#a83732',6);}
+    }else{
+        // 参考图粉色瓣：白紫花配青绿枝叶，使用大面积长短针表现花瓣层次。
+        stem([0,190],[2,-62]);leaf(-51,80,-.9);leaf(55,38,.9);
+        const palette=motif==='orchid'?['#f7f4f2','#78aee0','#d9d4f1','#ffffff','#f1c841']:motif==='peony'?['#e3436c','#f28dab','#f8c0cf','#d92f59','#f8d66c']:['#fffdf5','#7857b8','#f1edff','#ffffff','#4d86cc'];
+        fivePetalFlower(4,-72,palette,motif==='peony'?1.08:motif==='flower'?1.3:1.12);
+        if(motif==='flower'){
+            for(let i=0;i<5;i++){
+                const a=i*Math.PI*2/5-Math.PI/2;
+                threadStroke([[4+Math.cos(a)*14,-72+Math.sin(a)*14],[4+Math.cos(a)*66,-72+Math.sin(a)*66]],i%2?'#583993':'#3378bd',5.5);
+            }
+            threadStroke([[2,-34],[72,7],[110,53]],'#318b51',6);
+            threadedEllipse(93,35,14,34,.72,'#55a55a');
+        }
+        if(motif==='orchid')threadStroke([[20,-30],[112,30],[142,72]],'#3d9a58',6);
+    }
+
+    // 零散短针脚使图案边缘不再像平面印刷。
+    for(let i=0;i<28;i++){
+        const a=(i*2.399)+(variant*.37),r=105+(i%5)*18,x=Math.cos(a)*r,y=Math.sin(a)*r*.88;
+        ctx.strokeStyle='rgba(255,235,167,.5)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*8,y+Math.sin(a)*8);ctx.stroke();
+        bump.strokeStyle='#aaa';bump.lineWidth=1.5;bump.beginPath();bump.moveTo(x,y);bump.lineTo(x+Math.cos(a)*8,y+Math.sin(a)*8);bump.stroke();
+    }
+    ctx.restore();bump.restore();
+
+    const map = new THREE.CanvasTexture(colorCanvas);
+    const bumpMap = new THREE.CanvasTexture(bumpCanvas);
+    [map,bumpMap].forEach((texture)=>{
+        texture.wrapS=THREE.ClampToEdgeWrapping;texture.wrapT=THREE.ClampToEdgeWrapping;
+        texture.anisotropy=renderer?renderer.capabilities.getMaxAnisotropy():1;
+    });
+    if('colorSpace' in map && THREE.SRGBColorSpace) map.colorSpace=THREE.SRGBColorSpace;
+    return {map,bumpMap};
 }
 
 function generatePanelTexture(baseColor, panelIndex) {
@@ -1044,15 +1251,25 @@ function createPetalMesh(A, B, radius, widthFactor, puffFactor, petalIndex) {
     outerGeom.setIndex(outerIndices);
     outerGeom.computeVertexNormals();
     const silkColor = PETAL_COLORS[petalIndex % PETAL_COLORS.length];
+    const previewBaseColor = makeVividColor(silkColor,1.34).getStyle();
+    const embroideryPreview = generateReferenceEmbroideryTexture(REFERENCE_MOTIFS[petalIndex % REFERENCE_MOTIFS.length],petalIndex,previewBaseColor);
     const silkMat = new THREE.MeshPhysicalMaterial({
-        map: generateEmbroideryTexture(silkColor, PETAL_MOTIFS[petalIndex % PETAL_MOTIFS.length]),
-        color: silkColor,
-        roughness: 0.26,
-        metalness: 0.08,
-        clearcoat: 0.58,
-        clearcoatRoughness: 0.14,
+        map: embroideryPreview.map,
+        bumpMap: embroideryPreview.bumpMap,
+        bumpScale: .075,
+        color: '#ffffff',
+        roughness: 0.58,
+        metalness: 0.01,
+        clearcoat: 0.08,
+        clearcoatRoughness: 0.62,
         side: THREE.FrontSide
     });
+    silkMat.userData.embroideryThemeIndex = 0;
+    silkMat.userData.embroideryMap = embroideryPreview.map;
+    silkMat.userData.embroideryBumpMap = embroideryPreview.bumpMap;
+    silkMat.userData.motif = REFERENCE_MOTIFS[petalIndex % REFERENCE_MOTIFS.length];
+    silkMat.userData.petalIndex = petalIndex;
+    silkMat.userData.previewColor = new THREE.Color('#ffffff');
     petalMaterials.push(silkMat);
     const outerMesh = new THREE.Mesh(outerGeom, silkMat);
     const wallGroup = new THREE.Group();
@@ -1121,7 +1338,7 @@ function buildPearlNodes() {
             clearcoat: 0.65,
             clearcoatRoughness: 0.08
         });
-        pearlMat.userData.paletteRole = 'accent';
+        pearlMat.userData.paletteRole = 'node';
         beadMaterials.push(pearlMat);
         nodeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 12), pearlMat));
         for (let i = 0; i < 7; i++) {
@@ -1136,6 +1353,7 @@ function buildPearlNodes() {
 
 function buildTassels(configCount) {
     tasselsGroup.clear();
+    tasselDynamics = [];
     if (configCount === 0) return;
     const targetNodeIndices = configCount === 5 ? [1, 2, 3, 4, 5] : [1];
     targetNodeIndices.forEach((nodeIdx) => {
@@ -1169,22 +1387,34 @@ function buildTassels(configCount) {
         capMesh.position.y = -1.2 * scale;
         capMesh.rotation.x = Math.PI;
         tasselGroup.add(capMesh);
+        // 以尖帽尖端作为整束流苏的唯一铰接点，丝线从这里汇拢后再自然散开。
+        const strandRoot = new THREE.Group();
+        strandRoot.position.y = -1.40 * scale;
+        tasselGroup.add(strandRoot);
         const tasselColors = nodeIdx % 2 ? ['#f2c72e','#f6d643','#e9ad21'] : ['#d51d4e','#f1ba2b','#1c9d73'];
         for (let s = 0; s < 18; s++) {
             const a = (s / 18) * Math.PI * 2;
-            const r = .09 * scale;
             const drift = .16 + (s % 4) * .022;
             const curve = new THREE.CatmullRomCurve3([
-                new THREE.Vector3(Math.cos(a) * r, -1.45 * scale, Math.sin(a) * r),
-                new THREE.Vector3(Math.cos(a) * drift, -2.45 * scale, Math.sin(a) * drift),
-                new THREE.Vector3(Math.cos(a) * (drift + .07), -3.90 * scale, Math.sin(a) * (drift + .07))
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(Math.cos(a) * .025 * scale, -.18 * scale, Math.sin(a) * .025 * scale),
+                new THREE.Vector3(Math.cos(a) * drift * .42 * scale, -.76 * scale, Math.sin(a) * drift * .42 * scale),
+                new THREE.Vector3(Math.cos(a) * drift * .78 * scale, -1.58 * scale, Math.sin(a) * drift * .78 * scale),
+                new THREE.Vector3(Math.cos(a) * (drift + .07) * scale, -2.50 * scale, Math.sin(a) * (drift + .07) * scale)
             ]);
             const strandMaterial = new THREE.MeshStandardMaterial({color:tasselColors[s % tasselColors.length],roughness:.48,metalness:.04});
             strandMaterial.userData.paletteSlot = s % 3;
             tasselMaterials.push(strandMaterial);
-            const strand = new THREE.Mesh(new THREE.TubeGeometry(curve, 12, .014 * scale, 5, false), strandMaterial);
-            tasselGroup.add(strand);
+            const strand = new THREE.Mesh(new THREE.TubeGeometry(curve, 20, .014 * scale, 5, false), strandMaterial);
+            strandRoot.add(strand);
         }
+        tasselDynamics.push({
+            root: strandRoot,
+            phase: nodeIdx * 1.37,
+            angle: 0,
+            velocity: 0,
+            weight: isMainBottom ? 1 : .82
+        });
         tasselsGroup.add(tasselGroup);
     });
 }
@@ -1199,18 +1429,63 @@ function buildTopRibbon() {
         side: THREE.DoubleSide
     });
     ribbonMaterials.push(ribbonMat);
-    [-.22,.22].forEach((offset) => {
-        const loopGeom = new THREE.TorusGeometry(.48, .055, 12, 28, Math.PI * 1.66);
-        const loopMesh = new THREE.Mesh(loopGeom, ribbonMat);
-        loopMesh.position.set(topNode.x + offset, topNode.y + .56, topNode.z);
-        loopMesh.rotation.z = Math.PI / 2 + offset * .65;
-        ribbonGroup.add(loopMesh);
-    });
+    const loopCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0,-.38,0),
+        new THREE.Vector3(-.30,0,0),
+        new THREE.Vector3(0,.38,0),
+        new THREE.Vector3(.30,0,0)
+    ],true,'centripetal');
+    const loopGeom = new THREE.TubeGeometry(loopCurve,48,.052,8,true);
+    topLoopMesh = new THREE.Mesh(loopGeom, ribbonMat);
+    topLoopMesh.position.set(topNode.x, topNode.y + 1.72, topNode.z);
+    ribbonGroup.add(topLoopMesh);
     const knotMaterial = new THREE.MeshStandardMaterial({color:0xffc62f,metalness:.8,roughness:.18});
     knotMaterial.userData.paletteRole = 'accent';
     beadMaterials.push(knotMaterial);
     const knot = new THREE.Mesh(new THREE.SphereGeometry(.16, 14, 12), knotMaterial);
     knot.position.set(topNode.x, topNode.y + .24, topNode.z); ribbonGroup.add(knot);
+
+    // 球顶挂绳：两股红金丝线交织，并从连接珠中贯穿，避免珠子或挂环悬空。
+    const goldThreadMat = new THREE.MeshStandardMaterial({color:0xffc62f,metalness:.28,roughness:.38});
+    goldMaterials.push(goldThreadMat);
+    const addBraidedThread = (phase, material) => {
+        const points = [];
+        const segments = 34;
+        for (let i = 0; i <= segments; i++) {
+            const t = i / segments;
+            const helix = t * Math.PI * 6 + phase;
+            const braidRadius = Math.sin(Math.PI * t);
+            points.push(new THREE.Vector3(
+                topNode.x + Math.cos(helix) * .027 * braidRadius,
+                topNode.y + .035 + t * 1.30,
+                topNode.z + Math.sin(helix) * .022 * braidRadius
+            ));
+        }
+        const curve = new THREE.CatmullRomCurve3(points);
+        const strand = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, .018, 5, false), material);
+        ribbonGroup.add(strand);
+    };
+    addBraidedThread(0, ribbonMat);
+    addBraidedThread(Math.PI, goldThreadMat);
+
+    const upperNodeMat = new THREE.MeshPhysicalMaterial({color:0x8f1228,roughness:.2,clearcoat:.72,clearcoatRoughness:.16});
+    const upperPearlMat = new THREE.MeshPhysicalMaterial({color:0xfff4dc,roughness:.18,clearcoat:.65});
+    upperNodeMat.userData.paletteRole = 'node';
+    upperPearlMat.userData.paletteRole = 'pearl';
+    beadMaterials.push(upperNodeMat, upperPearlMat);
+    const upperBeads = [
+        {y:.47,r:.085,mat:upperNodeMat},
+        {y:.67,r:.066,mat:knotMaterial},
+        {y:.86,r:.09,mat:upperPearlMat},
+        {y:1.05,r:.068,mat:knotMaterial},
+        {y:1.22,r:.082,mat:upperNodeMat},
+        {y:1.34,r:.055,mat:knotMaterial}
+    ];
+    upperBeads.forEach(({y,r,mat}) => {
+        const bead = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 12), mat);
+        bead.position.set(topNode.x, topNode.y + y, topNode.z);
+        ribbonGroup.add(bead);
+    });
 }
 
 function buildHomeModel() {
@@ -1268,7 +1543,13 @@ let activeThemeIndex = 0;
 let lastThemePetalIndex = -1;
 let themeSpin = 0;
 let themeSpinTarget = 0;
-const CAMERA_HOME_Z = 12;
+let themeSpinStart = 0;
+let themeTransitionStart = 0;
+let themeTransitionActive = false;
+let themeMidpointApplied = true;
+let pendingThemeIndex = 0;
+const THEME_TRANSITION_DURATION = 1500;
+const CAMERA_HOME_Z = 14.55;
 const CAMERA_IMMERSIVE_Z = 9.1;
 
 function setImmersive(next) {
@@ -1284,12 +1565,14 @@ function setImmersive(next) {
 function initHomeModel() {
     const canvas = document.getElementById('modelCanvas');
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    camera.position.set(0, 0.2, 12);
+    const initialCanvasWidth = canvas.clientWidth || 560;
+    const initialCanvasHeight = canvas.clientHeight || 680;
+    camera = new THREE.PerspectiveCamera(42, initialCanvasWidth / initialCanvasHeight, 0.1, 100);
+    camera.position.set(0, 0.2, CAMERA_HOME_Z);
     camera.lookAt(0, -1.2, 0);
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(canvas.clientWidth || 560, canvas.clientHeight || 560, false);
+    renderer.setSize(initialCanvasWidth, initialCanvasHeight, false);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1337,6 +1620,7 @@ const PETAL_GUIDE_LABELS = COLOR_THEMES.map((theme) => theme.name);
 const petalNavigator = document.getElementById('petalNavigator');
 const petalTrack = document.getElementById('petalTrack');
 const petalNavLabel = document.getElementById('petalNavLabel');
+const themeBlend = document.getElementById('themeBlend');
 const petalStops = PETAL_GUIDE_LABELS.map((label, index) => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -1360,8 +1644,19 @@ function selectTopPetal(index) {
     petalNavLabel.textContent = `第 ${topPetalIndex + 1} 款 · ${COLOR_THEMES[themeIndex].name}`;
     if (lastThemePetalIndex !== topPetalIndex) {
         lastThemePetalIndex = topPetalIndex;
-        activeThemeIndex = themeIndex;
+        pendingThemeIndex = themeIndex;
+        themeSpinStart = themeSpin;
         themeSpinTarget = themeSpin + Math.PI * 2;
+        themeTransitionStart = performance.now();
+        themeTransitionActive = true;
+        themeMidpointApplied = false;
+        if(themeBlend){
+            themeBlend.style.setProperty('--ripple-a',COLOR_THEMES[themeIndex].petals[0]);
+            themeBlend.style.setProperty('--ripple-b',COLOR_THEMES[themeIndex].accent);
+            themeBlend.classList.remove('playing');
+            void themeBlend.offsetWidth;
+            themeBlend.classList.add('playing');
+        }
     }
     petalStops.forEach((stop, i) => {
         const selected = i === topPetalIndex;
@@ -1455,12 +1750,34 @@ function setPanel(idx){
 
 function updateThemeColors() {
     const palette = COLOR_THEMES[activeThemeIndex].colors;
-    const ease = .055;
-    petalMaterials.forEach((material, index) => material.color.lerp(palette.petals[index % palette.petals.length], ease));
+    const ease = themeTransitionActive ? .22 : .055;
+    petalMaterials.forEach((material, index) => {
+        if(material.userData.embroideryThemeIndex !== activeThemeIndex){
+            const themePetalColor = COLOR_THEMES[activeThemeIndex].petals[index % COLOR_THEMES[activeThemeIndex].petals.length];
+            const themeBaseColor = makeVividColor(themePetalColor,1.34).getStyle();
+            const embroidery = generateReferenceEmbroideryTexture(material.userData.motif,material.userData.petalIndex,themeBaseColor);
+            if(material.userData.embroideryMap) material.userData.embroideryMap.dispose();
+            if(material.userData.embroideryBumpMap) material.userData.embroideryBumpMap.dispose();
+            material.userData.embroideryThemeIndex = activeThemeIndex;
+            material.userData.embroideryMap = embroidery.map;
+            material.userData.embroideryBumpMap = embroidery.bumpMap;
+            material.map = embroidery.map;
+            material.bumpMap = embroidery.bumpMap;
+            material.needsUpdate = true;
+        }
+        material.color.lerp(material.userData.previewColor, ease);
+        material.bumpScale += (.075 - material.bumpScale) * .12;
+        material.roughness += (.58 - material.roughness) * .1;
+        material.clearcoat += (.08 - material.clearcoat) * .1;
+        material.clearcoatRoughness += (.62 - material.clearcoatRoughness) * .1;
+    });
     petalSideMaterials.forEach((material) => material.color.lerp(palette.petalSides[material.userData.paletteSlot % palette.petalSides.length], ease));
     panelMaterials.forEach((material) => material.color.lerp(palette.panels[material.userData.paletteSlot % palette.panels.length], ease));
     goldMaterials.forEach((material) => material.color.lerp(palette.accent, ease));
-    beadMaterials.forEach((material) => material.color.lerp(material.userData.paletteRole === 'pearl' ? palette.pearl : palette.accent, ease));
+    beadMaterials.forEach((material) => {
+        const target = material.userData.paletteRole === 'pearl' ? palette.pearl : material.userData.paletteRole === 'node' ? palette.node : palette.accent;
+        material.color.lerp(target,ease);
+    });
     tasselMaterials.forEach((material) => material.color.lerp(palette.tassels[material.userData.paletteSlot % palette.tassels.length], ease));
     ribbonMaterials.forEach((material) => material.color.lerp(palette.ribbon, ease));
 }
@@ -1480,12 +1797,28 @@ function tick(now){
 
     const totalDeg = rot + dragRot;
     const rad = totalDeg * Math.PI / 180;
+    if(themeTransitionActive){
+        const transitionProgress = Math.min(1,Math.max(0,(now-themeTransitionStart)/THEME_TRANSITION_DURATION));
+        if(!themeMidpointApplied && transitionProgress >= .5){
+            activeThemeIndex = pendingThemeIndex;
+            themeMidpointApplied = true;
+        }
+        // 五次缓入缓出制造明显的“慢—快—慢”顿挫节奏。
+        const easedSpin = transitionProgress < .5
+            ? 16 * Math.pow(transitionProgress,5)
+            : 1 - Math.pow(-2 * transitionProgress + 2,5) / 2;
+        themeSpin = themeSpinStart + (themeSpinTarget-themeSpinStart) * easedSpin;
+        if(transitionProgress >= 1){
+            activeThemeIndex = pendingThemeIndex;
+            themeMidpointApplied = true;
+            themeTransitionActive = false;
+            themeSpin = themeSpinTarget;
+        }
+    }
     updateThemeColors();
     if (ballGroup) {
         const baseQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, rad, 0));
         ballGroup.quaternion.copy(baseQuaternion);
-        themeSpin += (themeSpinTarget - themeSpin) * .075;
-        if (Math.abs(themeSpinTarget - themeSpin) < .001) themeSpin = themeSpinTarget;
         ballGroup.rotateY(themeSpin);
 
         petalMaterials.forEach((material) => {
@@ -1508,10 +1841,19 @@ function tick(now){
     velS += (v - velS) * 0.08;
     lastY = window.scrollY; lastT = now;
 
-    const amp = Math.min(24, Math.max(2, Math.abs(velS) * 0.45 + 1.5));
-    const speed = 1.8 + amp * 0.055;
-    const swing = amp * Math.sin(now * 0.001 * speed);
-    if (tasselsGroup) tasselsGroup.rotation.z = swing * Math.PI / 180;
+    // 每束丝线以尖帽为固定根点作阻尼摆动：滚动带来惯性，停止后在重力下回到垂直方向。
+    const frameScale = Math.min(2, dt / 16.67);
+    const inertialLean = THREE.MathUtils.clamp(-velS * .055, -.18, .18);
+    tasselDynamics.forEach((dynamic) => {
+        const breeze = Math.sin(now * .00135 + dynamic.phase) * .012;
+        const targetLean = inertialLean * dynamic.weight + breeze;
+        dynamic.velocity += (targetLean - dynamic.angle) * .052 * frameScale;
+        dynamic.velocity *= Math.pow(.87, frameScale);
+        dynamic.angle += dynamic.velocity * frameScale;
+        dynamic.root.rotation.z = dynamic.angle;
+        dynamic.root.rotation.x = Math.sin(now * .0011 + dynamic.phase * 1.7) * .008;
+    });
+    if (tasselsGroup) tasselsGroup.rotation.z = 0;
 
     if (renderer) {
         const canvas = renderer.domElement;
