@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>靖西壮族绣球 · 十二瓣文化长卷</title>
+<meta name="description" content="以十二瓣立体绣球为视觉主体，滚动即旋转，讲述壮族绣球起源、婚嫁习俗、非遗工艺、三月三节庆、刺绣纹样、现代文创与文旅传承的文化长卷。">
+<meta name="keywords" content="靖西绣球,壮族绣球,非物质文化遗产,三月三,壮族文化,十二瓣绣球">
+<meta name="theme-color" content="#120a10">
+<style>
+    :root{
+        --rose:#D82880;
+        --gold:#D4AF37;
+        --red:#FF3A3A;
+        --yellow:#FFD02F;
+        --cyan:#00C2D1;
+        --tassel:#C41E70;
+        --blue:#00A8BB;
+        --pearl:#FFF8F8;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:auto}
+    body{
+        font-family:'Noto Serif SC','PingFang SC','Microsoft YaHei','STKaiti',serif;
+        background:#120a10;
+        color:#f3e9e6;
+        overflow-x:hidden;
+    }
+    .font-calligraphy{font-family:'STKaiti','KaiTi','Kaiti SC','KaiTi_GB2312',serif}
+    .ic{width:1em;height:1em;display:inline-block;vertical-align:-0.125em}
+    .bg-pattern{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;opacity:.10}
+    .brand-row{display:flex;align-items:center;gap:12px}
+    .brand-badge{width:40px;height:40px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;box-shadow:0 8px 18px rgba(0,0,0,.45)}
+    .brand-title{font-size:clamp(18px,1.6vw,24px);color:#fdeecb;letter-spacing:.08em}
+    .brand-sub{font-size:11px;color:rgba(243,224,160,.5);letter-spacing:.3em;margin-top:2px}
+    .mobile-title{font-size:18px;color:#fdeecb}
+    @media (min-width:768px){.top-label{display:inline}}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:#160b12}
+    ::-webkit-scrollbar-thumb{background:rgba(212,175,55,.35);border-radius:4px}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(212,175,55,.7)}
+
+    /* ---------- 背景 ---------- */
+    #bg{position:fixed;top:0;right:0;bottom:0;left:0;z-index:0;pointer-events:none}
+    #bg .vignette{
+        position:absolute;top:0;right:0;bottom:0;left:0;
+        background:
+            radial-gradient(ellipse at 50% 40%, rgba(216,40,128,.14), transparent 58%),
+            radial-gradient(ellipse at 50% 115%, rgba(0,168,187,.12), transparent 52%),
+            linear-gradient(180deg,#190c14,#120a10 50%,#0d070c);
+    }
+    #bg .grain{
+        position:absolute;top:0;right:0;bottom:0;left:0;opacity:.55;mix-blend-mode:overlay;
+        background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px),
+            repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 3px);
+    }
+
+    /* ---------- 长卷章节 ---------- */
+    #sections{position:relative;z-index:10}
+    .sec{position:relative;height:100vh;pointer-events:none}
+    .sec .num{
+        position:absolute;left:4vw;top:50%;transform:translateY(-50%);
+        font-size:clamp(130px,24vh,280px);font-weight:700;line-height:1;
+        color:transparent;-webkit-text-stroke:1px rgba(212,175,55,.16);
+        font-family:'Ma Shan Zheng',cursive;user-select:none;
+    }
+    .sec .label{
+        position:absolute;left:calc(4vw + 96px);top:50%;transform:translateY(-50%);
+        writing-mode:vertical-rl;letter-spacing:.45em;color:rgba(243,233,230,.3);
+        font-size:13px;text-transform:uppercase;user-select:none;
+    }
+
+    /* ---------- 3D 舞台 ---------- */
+    #stage{
+        position:fixed;top:0;right:0;bottom:0;left:0;z-index:20;display:flex;align-items:center;justify-content:center;
+        pointer-events:none;
+    }
+    #modelCanvas{
+        width:min(560px,74vmin);height:min(680px,90vmin);
+        display:block;cursor:grab;touch-action:pan-y;pointer-events:auto;
+        transition:width .7s cubic-bezier(.2,.8,.2,1),height .7s cubic-bezier(.2,.8,.2,1),filter .7s ease;
+    }
+    #modelCanvas.dragging{cursor:grabbing}
+    #themeBlend{
+        --ripple-a:#8f1228;--ripple-b:#08a9d4;
+        position:absolute;left:50%;top:50%;z-index:4;pointer-events:none;
+        width:min(560px,74vmin);height:min(560px,74vmin);transform:translate(-50%,-50%);
+    }
+    .theme-ripple{
+        position:absolute;left:50%;top:50%;width:76%;aspect-ratio:1;border-radius:50%;
+        transform:translate(-50%,-50%) scale(1);opacity:0;will-change:transform,opacity;
+        border:2px solid var(--ripple-a);box-shadow:0 0 18px color-mix(in srgb,var(--ripple-a) 58%,transparent),inset 0 0 14px color-mix(in srgb,var(--ripple-a) 34%,transparent);
+    }
+    .theme-ripple.ripple-b{
+        border-color:var(--ripple-b);box-shadow:0 0 18px color-mix(in srgb,var(--ripple-b) 58%,transparent),inset 0 0 14px color-mix(in srgb,var(--ripple-b) 34%,transparent);
+    }
+    #themeBlend.playing .ripple-a{animation:themeRippleOut 1.5s cubic-bezier(.72,0,.18,1) both}
+    #themeBlend.playing .ripple-b{animation:themeRippleOut 1.28s .22s cubic-bezier(.72,0,.18,1) both}
+    @keyframes themeRippleOut{
+        0%{opacity:0;transform:translate(-50%,-50%) scale(1)}
+        13%{opacity:.72}
+        52%{opacity:.42}
+        100%{opacity:0;transform:translate(-50%,-50%) scale(1.58)}
+    }
+    #glow{
+        position:absolute;left:50%;top:50%;width:min(620px,82vmin);height:min(620px,82vmin);
+        margin:calc(min(620px,82vmin) / -2) 0 0 calc(min(620px,82vmin) / -2);
+        border-radius:50%;pointer-events:none;opacity:0;transition:opacity .6s ease;
+        background:radial-gradient(circle, rgba(255,208,47,.38), rgba(216,40,128,.22) 45%, transparent 70%);
+        filter:blur(10px);
+    }
+
+    /* ---------- 右侧文化卡片 ---------- */
+    #panel{
+        position:fixed;right:3vw;top:50%;transform:translateY(-50%);z-index:40;
+        width:410px;max-width:38vw;height:470px;max-height:64vh;pointer-events:none;
+    }
+    .panel-card{
+        position:absolute;top:0;right:0;bottom:0;left:0;border-radius:18px;
+        background:rgba(28,14,24,.86);
+        border:1px solid rgba(212,175,55,.38);
+        box-shadow:0 18px 50px rgba(0,0,0,.55), inset 0 0 40px rgba(216,40,128,.05);
+        padding:26px 28px;opacity:0;transform:translateX(34px);
+        transition:none;
+        display:flex;flex-direction:column;pointer-events:none;
+    }
+    body.anim .panel-card{transition:opacity .55s ease, transform .55s ease}
+    .panel-card.on{opacity:1;transform:none;pointer-events:auto}
+    .panel-card .chip{
+        display:inline-flex;align-items:center;gap:8px;
+        font-size:12px;letter-spacing:.2em;color:var(--yellow);
+        border:1px solid rgba(255,208,47,.35);background:rgba(255,208,47,.08);
+        padding:5px 12px;border-radius:999px;align-self:flex-start;
+    }
+    .panel-card h2{
+        font-size:clamp(24px,2.2vw,30px);color:#ffe9c2;margin-top:14px;
+        text-shadow:0 0 18px rgba(216,40,128,.35);
+    }
+    .panel-card .sub{font-size:12px;color:rgba(243,233,230,.5);margin-top:4px;letter-spacing:.12em}
+    .panel-card .divider{height:1px;margin:16px 0;background:linear-gradient(90deg,var(--gold),transparent)}
+    .panel-card .body{
+        flex:1;overflow-y:auto;font-size:14.5px;line-height:1.95;color:rgba(243,233,230,.88);
+        text-align:justify;padding-right:4px;
+    }
+    .panel-card .body::-webkit-scrollbar{width:3px}
+    .panel-card .hint{
+        margin-top:14px;font-size:12.5px;color:rgba(212,175,55,.8);
+        display:flex;align-items:center;gap:8px;letter-spacing:.08em;
+    }
+    .panel-card .hint i{animation:bob 1.6s ease-in-out infinite}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+    /* ---------- 顶部与底部指示 ---------- */
+    #header{
+        position:fixed;top:0;left:0;right:0;z-index:50;
+        display:flex;justify-content:space-between;align-items:center;
+        padding:18px 3vw;pointer-events:none;
+    }
+    #header .brand{pointer-events:none}
+    #header .actions{display:flex;gap:10px;pointer-events:auto}
+    #petalNavigator{
+        position:absolute;left:50%;top:13px;transform:translateX(-50%);z-index:2;
+        width:min(430px,35vw);padding:8px 14px 10px;border-radius:16px;
+        background:linear-gradient(180deg,rgba(79,12,39,.88),rgba(30,10,23,.78));
+        border:1px solid rgba(255,196,49,.38);box-shadow:0 12px 30px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.06);
+        backdrop-filter:blur(14px);pointer-events:auto;transition:border-color .3s ease,box-shadow .3s ease;
+    }
+    #petalNavigator.interacting{border-color:rgba(255,208,47,.8);box-shadow:0 12px 34px rgba(0,0,0,.34),0 0 22px rgba(216,40,128,.2)}
+    .petal-nav-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;font-size:10px;letter-spacing:.18em;color:rgba(255,236,197,.58)}
+    #petalNavLabel{font-weight:400;color:#ffd75a;letter-spacing:.12em}
+    #petalTrack{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;cursor:ew-resize}
+    #petalTrack::before{content:'';position:absolute;left:2%;right:2%;top:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,208,47,.6),transparent);pointer-events:none}
+    .petal-stop{
+        position:relative;z-index:1;width:100%;height:14px;padding:0;border:0;background:transparent;cursor:ew-resize;
+    }
+    .petal-stop::before{
+        content:'';position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;
+        transform:translate(-50%,-50%);background:#391423;border:1px solid rgba(255,208,47,.78);
+        transition:transform .22s ease,background .22s ease,box-shadow .22s ease;
+    }
+    .petal-stop:hover::before,.petal-stop.on::before,.petal-stop:focus-visible::before{
+        transform:translate(-50%,-50%) scale(1.55);background:var(--stop-color,var(--rose));box-shadow:0 0 0 3px rgba(255,208,47,.15),0 0 12px rgba(255,74,144,.9);
+    }
+    .petal-stop:focus-visible{outline:1px solid #ffd75a;outline-offset:2px;border-radius:6px}
+    .btn-glass{
+        display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+        background:rgba(22,12,19,.7);border:1px solid rgba(212,175,55,.35);
+        color:#f0d9a8;border-radius:12px;padding:9px 14px;font-size:13px;
+        transition:all .25s ease;
+    }
+    .btn-glass:hover{background:rgba(216,40,128,.22);border-color:var(--gold);color:#fff}
+    a.btn-glass{text-decoration:none}
+
+    #dots{
+        position:fixed;left:50%;bottom:4vh;transform:translateX(-50%);z-index:40;
+        display:flex;gap:11px;align-items:center;
+        background:rgba(22,12,19,.55);padding:9px 16px;border-radius:999px;
+        border:1px solid rgba(212,175,55,.18);
+    }
+    .dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--gold);opacity:.45;transition:all .35s ease}
+    .dot.on{background:var(--rose);opacity:1;transform:scale(1.4);box-shadow:0 0 10px rgba(216,40,128,.9)}
+    #scrollHint{
+        position:fixed;left:50%;bottom:12vh;transform:translateX(-50%);z-index:40;
+        color:rgba(255,248,248,.75);font-size:13px;letter-spacing:.3em;text-align:center;
+        opacity:0;transition:opacity .6s ease;pointer-events:none;
+    }
+    #scrollHint.show{opacity:1}
+    #scrollHint .mouse{
+        width:22px;height:34px;margin:0 auto 8px;border:1.5px solid rgba(255,248,248,.7);
+        border-radius:12px;position:relative;
+    }
+    #scrollHint .mouse::after{
+        content:'';position:absolute;left:50%;top:6px;width:3px;height:7px;border-radius:3px;
+        background:var(--gold);transform:translateX(-50%);animation:wheel 1.6s ease-in-out infinite;
+    }
+    @keyframes wheel{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,10px)}}
+
+    #mobileBar{
+        position:fixed;left:0;right:0;bottom:0;z-index:45;display:none;
+        background:rgba(22,12,19,.9);border-top:1px solid rgba(212,175,55,.3);
+        padding:14px 18px;text-align:center;
+    }
+    @media (max-width:1023px){
+        #panel{display:none}
+        #mobileBar{display:block}
+    }
+    @media (max-width:1180px){#petalNavigator{display:none}}
+    @media (max-width:640px){
+        #modelCanvas{width:84vmin;height:104vmin}
+        #themeBlend{width:84vmin;height:84vmin}
+        .sec .num{left:2vw}
+        .sec .label{left:calc(2vw + 62px)}
+    }
+
+    /* ---------- 沉浸赏球模式 ---------- */
+    #exitImmersion{
+        position:fixed;right:3vw;top:3vh;z-index:90;opacity:0;pointer-events:none;
+        transform:translateY(-10px);transition:opacity .35s ease,transform .35s ease;
+    }
+    #exitImmersion .btn-glass{background:rgba(12,7,13,.68);backdrop-filter:blur(12px)}
+    #header,#panel,#dots,#scrollHint,#mobileBar,#sections,#burst{transition:opacity .42s ease}
+    body.immersive{overflow:hidden}
+    body.immersive #header,
+    body.immersive #panel,
+    body.immersive #dots,
+    body.immersive #scrollHint,
+    body.immersive #mobileBar,
+    body.immersive #sections,
+    body.immersive #burst{opacity:0!important;pointer-events:none!important}
+    body.immersive #stage{z-index:70;pointer-events:auto}
+    body.immersive #modelCanvas{width:min(840px,92vmin);height:min(840px,92vmin);filter:drop-shadow(0 30px 34px rgba(0,0,0,.46))}
+    body.immersive #themeBlend{width:min(840px,92vmin);height:min(840px,92vmin)}
+    body.immersive #glow{opacity:.82!important;transform:scale(1.38);transition:transform .7s ease}
+    body.immersive #exitImmersion{opacity:1;pointer-events:auto;transform:none}
+    @media (max-width:640px){
+        #exitImmersion{right:18px;top:18px}
+        #exitImmersion .btn-glass{padding:9px 12px}
+    }
+
+    /* ---------- 收尾全屏特效 ---------- */
+    #burst{position:fixed;top:0;right:0;bottom:0;left:0;z-index:60;pointer-events:none;opacity:0;transition:none}
+    body.anim #burst{transition:opacity .7s ease}
+    #burst.show{opacity:1}
+    .ring{
+        position:absolute;left:50%;top:50%;width:78vmin;height:78vmin;
+        margin:-39vmin 0 0 -39vmin;border-radius:50%;
+        border:2px solid rgba(212,175,55,.75);
+        box-shadow:0 0 30px rgba(212,175,55,.35), inset 0 0 40px rgba(216,40,128,.25);
+        animation:ringPulse 2.6s ease-out infinite;
+    }
+    .ring.r2{animation-delay:.85s}.ring.r3{animation-delay:1.7s}
+    @keyframes ringPulse{
+        0%{transform:scale(.32);opacity:.95}
+        100%{transform:scale(1.22);opacity:0}
+    }
+    #burst .burst-text{
+        position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+        text-align:center;font-family:'Ma Shan Zheng',cursive;
+        color:var(--yellow);text-shadow:0 0 24px rgba(255,208,47,.75),0 0 60px rgba(216,40,128,.6);
+        font-size:clamp(34px,5vw,58px);letter-spacing:.18em;animation:burstIn 1.4s ease both;
+    }
+    #burst .burst-sub{
+        position:absolute;left:50%;top:calc(52% + 58px);transform:translateX(-50%);
+        font-size:14px;letter-spacing:.5em;color:rgba(243,233,230,.8);
+        text-shadow:0 0 12px rgba(0,0,0,.6);animation:burstIn 1.4s .35s ease both;
+    }
+    @keyframes burstIn{0%{opacity:0;transform:translate(-50%,16px) scale(.9)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+    @keyframes burstInSub{0%{opacity:0;transform:translateX(-50%) translateY(12px)}100%{opacity:1;transform:translateX(-50%) translateY(0)}}
+    #burst .burst-sub{animation:burstInSub 1.4s .35s ease both}
+    .spark{
+        position:absolute;width:5px;height:5px;border-radius:50%;background:var(--yellow);
+        box-shadow:0 0 10px var(--yellow),0 0 22px var(--rose);
+        animation:sparkFloat 3.2s ease-in-out infinite;
+    }
+    @keyframes sparkFloat{
+        0%{transform:translate(0,0);opacity:0}
+        15%{opacity:1}
+        100%{transform:translate(var(--dx), var(--dy));opacity:0}
+    }
+
+    /* ========== 浅色数字博物馆视觉 ========== */
+    :root{
+        --museum-red:#7f1f28;
+        --museum-red-dark:#54161c;
+        --museum-ink:#312a27;
+        --museum-muted:#7e746d;
+        --museum-paper:#f3efe7;
+        --museum-card:#fffdf8;
+        --museum-line:#d8cdbd;
+        --museum-gold:#ad8b46;
+    }
+    body{background:var(--museum-paper);color:var(--museum-ink)}
+    ::-webkit-scrollbar-track{background:#eee8de}
+    ::-webkit-scrollbar-thumb{background:rgba(127,31,40,.32)}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(127,31,40,.6)}
+    #bg .vignette{
+        background:
+            radial-gradient(ellipse at 49% 43%,rgba(255,255,255,.98),rgba(255,253,248,.82) 34%,transparent 63%),
+            radial-gradient(ellipse at 48% 112%,rgba(173,139,70,.09),transparent 52%),
+            linear-gradient(180deg,#f8f5ee,#f1ece3 58%,#eae3d9);
+    }
+    #bg .grain{opacity:.22;mix-blend-mode:multiply;background-image:repeating-linear-gradient(0deg,rgba(88,65,51,.025) 0 1px,transparent 1px 4px)}
+    .bg-pattern{opacity:.035}
+
+    #header{
+        height:84px;padding:0 3vw;background:rgba(255,253,248,.94);
+        border-bottom:1px solid rgba(127,31,40,.14);box-shadow:0 8px 28px rgba(77,50,35,.07);
+        backdrop-filter:blur(16px);
+    }
+    #header::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:2px;background:linear-gradient(90deg,transparent 3%,var(--museum-red) 18%,var(--museum-red) 82%,transparent 97%);opacity:.72}
+    #header .brand-badge{
+        width:44px;height:44px;border-radius:4px!important;background:var(--museum-red)!important;
+        color:#f5dfaa!important;box-shadow:none;transform:rotate(45deg);
+    }
+    #header .brand-badge .ic{transform:rotate(-45deg);font-size:17px}
+    .brand-title{font-size:26px;color:var(--museum-red-dark);letter-spacing:.18em;line-height:1.1}
+    .brand-sub{font-size:11px;color:#94867c;letter-spacing:.34em;margin-top:6px}
+
+    #museumNav{
+        position:absolute;left:50%;top:0;height:84px;transform:translateX(-50%);
+        display:flex;align-items:center;gap:clamp(15px,1.55vw,28px);pointer-events:auto;white-space:nowrap;
+    }
+    #museumNav a{
+        position:relative;color:#51443e;text-decoration:none;font-size:15px;letter-spacing:.08em;
+        padding:32px 0 29px;transition:color .25s ease;
+    }
+    #museumNav a::after{content:'';position:absolute;left:50%;right:50%;bottom:0;height:3px;background:var(--museum-red);transition:left .25s ease,right .25s ease}
+    #museumNav a:hover,#museumNav a.on{color:var(--museum-red)}
+    #museumNav a:hover::after,#museumNav a.on::after{left:0;right:0}
+
+    #petalNavigator{
+        position:fixed;top:98px;left:50%;width:min(640px,48vw);padding:11px 20px 13px;
+        background:rgba(255,253,248,.9);border:1px solid rgba(127,31,40,.17);border-radius:2px;
+        box-shadow:0 10px 28px rgba(83,56,40,.08);backdrop-filter:blur(12px);
+    }
+    #petalNavigator.interacting{border-color:rgba(127,31,40,.48);box-shadow:0 12px 30px rgba(83,56,40,.12)}
+    .petal-nav-meta{color:#8e8178;margin-bottom:9px;font-size:12px;letter-spacing:.13em}
+    #petalNavLabel{color:var(--museum-red);font-weight:500}
+    #petalTrack::before{background:linear-gradient(90deg,transparent,rgba(127,31,40,.4),transparent)}
+    .petal-stop{height:18px}
+    .petal-stop::before{width:9px;height:9px;background:#fffaf1;border-color:rgba(127,31,40,.65)}
+    .petal-stop:hover::before,.petal-stop.on::before,.petal-stop:focus-visible::before{box-shadow:0 0 0 3px rgba(127,31,40,.08),0 0 10px rgba(127,31,40,.28)}
+
+    .btn-glass,#exitImmersion .btn-glass{
+        background:#fffdf8;border:1px solid #cfc2b1;color:var(--museum-red-dark);
+        border-radius:2px;box-shadow:none;backdrop-filter:none;font-size:14px;padding:11px 16px;
+    }
+    .btn-glass:hover{background:var(--museum-red);border-color:var(--museum-red);color:#fffaf2}
+
+    .sec .num{-webkit-text-stroke:1px rgba(127,31,40,.12);color:transparent}
+    .sec .label{color:rgba(78,57,48,.38)}
+    #glow{background:radial-gradient(circle,rgba(255,255,255,.94),rgba(216,184,111,.18) 44%,transparent 72%);filter:blur(14px)}
+
+    #panel{width:380px;max-width:32vw;height:448px;max-height:62vh}
+    .panel-card{
+        border-radius:3px;background:rgba(255,253,248,.96);border:1px solid var(--museum-line);
+        box-shadow:0 22px 55px rgba(82,55,39,.11);padding:30px 32px;
+    }
+    .panel-card::before{content:'';position:absolute;left:10px;right:10px;top:10px;bottom:10px;border:1px solid rgba(127,31,40,.08);pointer-events:none}
+    .panel-card .chip{color:var(--museum-red);border-color:rgba(127,31,40,.24);background:rgba(127,31,40,.04);border-radius:2px}
+    .panel-card h2{color:var(--museum-red-dark);text-shadow:none;font-size:clamp(25px,2.2vw,31px)}
+    .panel-card .sub{color:#94877e}
+    .panel-card .divider{background:linear-gradient(90deg,var(--museum-red),rgba(127,31,40,.08),transparent)}
+    .panel-card .body{color:#493e38;line-height:2;font-size:14px}
+    .panel-card .hint{color:#936f36}
+
+    #dots{background:rgba(255,253,248,.92);border-color:#d4c7b5;border-radius:2px;box-shadow:0 8px 24px rgba(80,52,36,.08)}
+    .dot{border-color:var(--museum-red);opacity:.36}
+    .dot.on{background:var(--museum-red);box-shadow:0 0 0 3px rgba(127,31,40,.1);opacity:1}
+    #scrollHint{color:#675950}
+    #scrollHint .mouse{border-color:#88796f}
+    #scrollHint .mouse::after{background:var(--museum-red)}
+    #mobileBar{background:rgba(255,253,248,.96);border-top-color:#d4c7b5;color:var(--museum-red-dark)}
+
+    #burst .burst-text{color:var(--museum-red);text-shadow:0 0 30px rgba(255,255,255,.95);}
+    #burst .burst-sub{color:#695b52;text-shadow:none}
+    .ring{border-color:rgba(127,31,40,.38);box-shadow:0 0 30px rgba(127,31,40,.08),inset 0 0 40px rgba(173,139,70,.08)}
+    .spark{background:var(--museum-red);box-shadow:0 0 10px rgba(127,31,40,.35)}
+
+    @media (max-width:1280px){
+        #museumNav{gap:14px}
+        #museumNav a{font-size:13px}
+    }
+    @media (max-width:1180px){
+        #museumNav{display:none}
+        #petalNavigator{display:block;width:min(640px,64vw)}
+    }
+    @media (max-width:760px){
+        #header{height:72px}
+        #header .brand-badge{width:38px;height:38px}
+        .brand-title{font-size:21px}
+        .brand-sub{display:none}
+        #petalNavigator{top:84px;width:90vw}
+        #header .actions{gap:6px}
+        .btn-glass{padding:8px 10px}
+    }
+    @media (max-width:640px){
+        #header{padding:0 18px}
+        #petalNavigator{display:none}
+        #header .actions{display:none}
+        #dots{display:none}
+        .mobile-title{color:var(--museum-red-dark)}
+    }
+
+    /* ========== 主页 2.0：彩色光影与极简章节入口 ========== */
+    #bg .vignette{
+        background:
+            radial-gradient(circle at 12% 22%,rgba(139,36,49,.16),transparent 28%),
+            radial-gradient(circle at 88% 26%,rgba(36,125,128,.13),transparent 30%),
+            radial-gradient(circle at 73% 84%,rgba(221,147,66,.15),transparent 32%),
+            radial-gradient(circle at 26% 80%,rgba(117,77,139,.10),transparent 30%),
+            radial-gradient(ellipse at 50% 43%,rgba(255,255,255,.98),rgba(255,252,243,.76) 37%,transparent 68%),
+            linear-gradient(145deg,#f4e9df 0%,#f7f2e9 36%,#e9f0eb 69%,#f3e7dc 100%);
+    }
+    #bg .grain{opacity:.28}
+    .bg-pattern{opacity:.052;filter:saturate(.8)}
+    #stage{isolation:isolate}
+    #stage::before{
+        content:'';position:absolute;left:50%;top:50%;width:min(720px,88vmin);height:min(720px,88vmin);
+        transform:translate(-50%,-50%);border-radius:50%;z-index:0;pointer-events:none;
+        background:
+            radial-gradient(circle at 39% 30%,rgba(255,255,255,.98),rgba(255,249,229,.72) 23%,transparent 49%),
+            conic-gradient(from 215deg,rgba(136,38,49,.10),rgba(220,165,74,.16),rgba(43,128,127,.10),rgba(136,38,49,.10));
+        filter:blur(8px);box-shadow:0 0 0 1px rgba(255,255,255,.5),0 34px 90px rgba(88,59,39,.12);
+    }
+    #stage::after{
+        content:'';position:absolute;left:50%;top:70%;width:min(420px,52vmin);height:70px;
+        transform:translateX(-50%);border-radius:50%;z-index:1;pointer-events:none;
+        background:radial-gradient(ellipse,rgba(78,47,32,.2),rgba(127,31,40,.08) 38%,transparent 72%);filter:blur(14px);
+    }
+    #glow{z-index:1;background:radial-gradient(circle,rgba(255,255,255,.92),rgba(243,197,101,.26) 34%,rgba(58,143,138,.11) 54%,transparent 72%)}
+    #modelCanvas{position:relative;z-index:3;filter:drop-shadow(0 26px 24px rgba(67,42,30,.2)) drop-shadow(0 4px 8px rgba(127,31,40,.12))}
+    body.immersive #modelCanvas{filter:drop-shadow(0 34px 32px rgba(67,42,30,.26))}
+
+    #panel{width:360px;max-width:30vw;height:250px;max-height:none}
+    .panel-card{
+        padding:0;border-radius:4px;overflow:hidden;
+        background:linear-gradient(145deg,rgba(255,254,250,.97),rgba(251,246,237,.94));
+        border:1px solid rgba(127,31,40,.2);box-shadow:0 28px 70px rgba(72,43,29,.15),0 4px 12px rgba(127,31,40,.06);
+    }
+    .panel-card::before{left:9px;right:9px;top:9px;bottom:9px;border-color:rgba(127,31,40,.1)}
+    .chapter-link{
+        position:relative;z-index:1;width:100%;height:100%;padding:34px;
+        display:flex;align-items:center;justify-content:space-between;gap:24px;
+        color:var(--museum-red-dark);text-decoration:none;
+        background:
+            radial-gradient(circle at 96% 8%,rgba(173,139,70,.16),transparent 38%),
+            linear-gradient(135deg,transparent 52%,rgba(127,31,40,.035));
+        transition:background .35s ease,color .35s ease;
+    }
+    .chapter-link::before{content:'';position:absolute;left:34px;top:29px;width:38px;height:2px;background:var(--museum-red);opacity:.75}
+    .chapter-link h2{
+        max-width:250px;margin:0!important;color:inherit!important;font-size:clamp(36px,3.3vw,48px)!important;
+        line-height:1.24;letter-spacing:.06em;text-shadow:none!important;
+    }
+    .chapter-arrow{
+        flex:none;width:46px;height:46px;border:1px solid rgba(127,31,40,.32);border-radius:50%;
+        display:flex;align-items:center;justify-content:center;font-size:23px;transition:transform .35s ease,background .35s ease,color .35s ease;
+    }
+    .chapter-link:hover{color:#fffaf2;background:linear-gradient(135deg,var(--museum-red),#9d3c40)}
+    .chapter-link:hover::before{background:#e7c984}
+    .chapter-link:hover .chapter-arrow{transform:translate(4px,-4px);background:#fffaf2;color:var(--museum-red);border-color:#fffaf2}
+    .chapter-link:focus-visible{outline:3px solid rgba(127,31,40,.25);outline-offset:-5px}
+
+    @media (max-width:1180px){#panel{max-width:34vw}}
+
+    /* ========== 暗色五彩展厅 ========== */
+    body{background:#08090d;color:#f4eadf}
+    #bg .vignette{
+        background:
+            radial-gradient(circle at 8% 18%,rgba(192,43,75,.38),transparent 30%),
+            radial-gradient(circle at 92% 20%,rgba(24,139,142,.32),transparent 31%),
+            radial-gradient(circle at 76% 86%,rgba(213,125,40,.3),transparent 34%),
+            radial-gradient(circle at 22% 82%,rgba(104,57,151,.34),transparent 34%),
+            radial-gradient(circle at 54% 18%,rgba(41,77,152,.25),transparent 27%),
+            radial-gradient(ellipse at 50% 47%,rgba(28,24,31,.28),rgba(9,10,14,.76) 62%,rgba(5,6,9,.96) 100%),
+            linear-gradient(145deg,#160b12,#080b10 50%,#110b13);
+        background-size:118% 118%;animation:auroraDrift 16s ease-in-out infinite alternate;
+    }
+    @keyframes auroraDrift{
+        0%{background-position:0% 0%,100% 0%,100% 100%,0% 100%,50% 0%,50% 50%,50% 50%}
+        100%{background-position:5% 4%,95% 6%,93% 94%,7% 92%,58% 6%,50% 50%,50% 50%}
+    }
+    #bg .grain{opacity:.48;mix-blend-mode:overlay;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,rgba(255,255,255,.014) 0 1px,transparent 1px 5px)}
+    .bg-pattern{opacity:.075;filter:saturate(1.2)}
+    #stage::before{
+        background:
+            radial-gradient(circle at 42% 34%,rgba(255,250,228,.27),rgba(226,176,82,.13) 24%,transparent 51%),
+            conic-gradient(from 210deg,rgba(185,43,75,.2),rgba(225,157,62,.18),rgba(34,148,145,.18),rgba(72,80,164,.16),rgba(185,43,75,.2));
+        box-shadow:0 0 0 1px rgba(255,255,255,.05),0 40px 110px rgba(0,0,0,.38);filter:blur(10px);
+    }
+    #stage::after{background:radial-gradient(ellipse,rgba(0,0,0,.48),rgba(138,41,57,.12) 42%,transparent 72%)}
+    #glow{background:radial-gradient(circle,rgba(255,248,218,.34),rgba(231,171,66,.2) 34%,rgba(27,139,139,.13) 54%,transparent 73%)}
+    #modelCanvas{filter:drop-shadow(0 32px 30px rgba(0,0,0,.46)) drop-shadow(0 0 18px rgba(243,190,88,.13))}
+
+    #header{background:rgba(10,10,14,.78);border-bottom-color:rgba(229,194,124,.18);box-shadow:0 10px 34px rgba(0,0,0,.25)}
+    #header::after{background:linear-gradient(90deg,transparent 3%,#8e2634 18%,#c79b4a 50%,#257f83 82%,transparent 97%);opacity:.72}
+    .brand-title{color:#fff1da}.brand-sub{color:rgba(245,225,199,.5)}
+    #museumNav a{color:rgba(244,232,217,.76)}
+    #museumNav a:hover,#museumNav a.on{color:#ffe4aa}
+    #museumNav a::after{background:linear-gradient(90deg,#a52f47,#d6a957,#3a9998)}
+    .btn-glass,#exitImmersion .btn-glass{background:rgba(19,17,23,.72);border-color:rgba(229,194,124,.32);color:#f6e7ce;backdrop-filter:blur(12px)}
+    .btn-glass:hover{background:rgba(127,31,40,.82);border-color:#d9b66b;color:#fff}
+    #petalNavigator{background:rgba(12,12,17,.66);border-color:rgba(229,194,124,.2);box-shadow:0 16px 40px rgba(0,0,0,.27);backdrop-filter:blur(18px) saturate(1.15)}
+    #petalNavigator.interacting{border-color:rgba(229,194,124,.5);box-shadow:0 16px 44px rgba(0,0,0,.34),0 0 28px rgba(40,134,135,.08)}
+    .petal-nav-meta{color:rgba(244,231,212,.54)}#petalNavLabel{color:#f1cc7d}
+    #petalTrack::before{background:linear-gradient(90deg,transparent,rgba(229,194,124,.5),transparent)}
+    .petal-stop::before{background:#17131a;border-color:rgba(229,194,124,.72)}
+
+    .sec .num{-webkit-text-stroke:1px rgba(242,199,119,.13)}
+    .sec .label{color:rgba(247,230,205,.35)}
+    #scrollHint{color:rgba(244,229,208,.58)}
+    #scrollHint .mouse{border-color:rgba(244,229,208,.58)}
+    #scrollHint .mouse::after{background:#d7ad61}
+    #dots{background:rgba(12,12,17,.64);border-color:rgba(229,194,124,.2);box-shadow:0 12px 32px rgba(0,0,0,.28);backdrop-filter:blur(12px)}
+    .dot{border-color:#d9b261}.dot.on{background:#a92e49;box-shadow:0 0 0 3px rgba(226,176,82,.14),0 0 12px rgba(180,44,76,.52)}
+    #mobileBar{background:rgba(10,10,14,.92);border-top-color:rgba(229,194,124,.2)}
+    .mobile-title{color:#f4dcae}
+
+    .panel-card{
+        background:
+            radial-gradient(circle at 90% 18%,rgba(216,145,55,.1),transparent 42%),
+            radial-gradient(circle at 8% 92%,rgba(35,137,139,.08),transparent 48%),
+            linear-gradient(145deg,rgba(17,15,22,.38),rgba(11,14,19,.14));
+        border-color:rgba(241,211,151,.035);
+        box-shadow:0 30px 80px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.025);
+        backdrop-filter:blur(18px) saturate(1.14);
+    }
+    .panel-card::before{border-color:rgba(241,211,151,.025)}
+    .chapter-link{
+        color:#fff0d5;background:
+            radial-gradient(circle at 96% 8%,rgba(227,164,67,.16),transparent 37%),
+            radial-gradient(circle at 12% 92%,rgba(37,139,139,.13),transparent 42%),
+            linear-gradient(135deg,rgba(150,39,61,.055),rgba(14,13,19,.06));
+        text-shadow:0 6px 24px rgba(0,0,0,.32);
+    }
+    .chapter-link::before{background:linear-gradient(90deg,#c43e55,#dda74d,#3d9998)}
+    .chapter-arrow{border-color:rgba(244,216,157,.34);color:#f1d395;background:rgba(255,255,255,.025)}
+    .chapter-link:hover{color:#fff8e8;background:linear-gradient(135deg,rgba(136,33,53,.78),rgba(19,82,84,.62))}
+    .chapter-link:hover::before{background:#f2cd7d}
+    .chapter-link:hover .chapter-arrow{background:#f6e3b6;color:#6b2028;border-color:#f6e3b6}
+
+    #burst .burst-text{color:#f1c86d;text-shadow:0 0 24px rgba(225,157,62,.42),0 0 70px rgba(164,37,68,.3)}
+    #burst .burst-sub{color:rgba(245,229,207,.72)}
+    .ring{border-color:rgba(225,173,78,.42);box-shadow:0 0 30px rgba(225,173,78,.15),inset 0 0 45px rgba(41,139,139,.11)}
+
+    /* 章节信息直接融入展厅背景 */
+    #panel{width:400px;max-width:32vw;height:210px}
+    .panel-card{
+        overflow:visible;padding:0;border:0;border-radius:0;
+        background:none;box-shadow:none;backdrop-filter:none;
+    }
+    .panel-card::before{display:none}
+    .chapter-link{
+        justify-content:flex-end;gap:10px;padding:18px 0;background:none;
+        text-shadow:0 7px 28px rgba(0,0,0,.46);
+    }
+    .chapter-link::before{display:none}
+    .chapter-link h2{max-width:300px;text-align:right}
+    .chapter-link h2 span{display:block}
+    .chapter-link:hover{background:none;color:#fff8e8}
+    .chapter-link:hover h2{text-shadow:0 0 28px rgba(229,176,91,.22)!important}
+    .chapter-link:focus-visible{outline:1px solid rgba(242,205,125,.55);outline-offset:10px}
+
+    /* 左侧章序：小字置于大字下方 */
+    .section-mark{
+        position:absolute;left:4vw;top:50%;transform:translateY(-50%);
+        display:flex;flex-direction:column;align-items:flex-start;user-select:none;
+    }
+    .sec .num{
+        position:relative;left:auto;top:auto;transform:none;
+        font-size:clamp(130px,24vh,280px);
+    }
+    .sec .label{
+        position:relative;left:auto;top:auto;transform:none;margin-top:12px;
+        writing-mode:horizontal-tb;letter-spacing:.22em;font-size:13px;white-space:nowrap;
+    }
+    @media (max-width:640px){
+        .section-mark{left:2vw}
+        .sec .num{left:auto}
+        .sec .label{left:auto;font-size:11px;letter-spacing:.12em}
+    }
+    @media(prefers-reduced-motion:reduce){#bg .vignette{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- 底层：壮族织锦暗纹背景 -->
+<div id="bg">
+    <svg class="bg-pattern" aria-hidden="true">
+        <defs>
+            <pattern id="brocade" width="96" height="96" patternUnits="userSpaceOnUse">
+                <rect width="96" height="96" fill="none"/>
+                <path d="M48 6 L90 48 L48 90 L6 48 Z" fill="none" stroke="#D4AF37" stroke-width="1.2"/>
+                <path d="M48 24 L72 48 L48 72 L24 48 Z" fill="none" stroke="#D82880" stroke-width="1"/>
+                <circle cx="48" cy="48" r="3.5" fill="#00A8BB"/>
+                <path d="M48 0 L54 10 L48 20 L42 10 Z" fill="#C41E70"/>
+                <path d="M0 96 L6 86 L12 96 Z" fill="#FFD02F"/>
+            </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#brocade)"/>
+    </svg>
+    <div class="grain"></div>
+    <div class="vignette"></div>
+</div>
+
+<!-- 长卷章节（由 JS 生成） -->
+<main id="sections"></main>
+
+<!-- 3D 绣球舞台 -->
+<div id="stage">
+    <div id="glow"></div>
+    <canvas id="modelCanvas"></canvas>
+    <div id="themeBlend" aria-hidden="true"><i class="theme-ripple ripple-a"></i><i class="theme-ripple ripple-b"></i></div>
+</div>
+<div id="exitImmersion"><button id="btnExitImmersion" class="btn-glass" aria-label="退出赏球模式"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M21 3l-7 7M9 21H3v-6M3 21l7-7"/></svg><span>退出赏球</span></button></div>
+
+<!-- 右侧文化卡片 -->
+<aside id="panel"></aside>
+
+<!-- 移动端底部条 -->
+<div id="mobileBar"><span id="mobileTitle" class="font-calligraphy mobile-title"></span></div>
+
+<!-- 顶部 -->
+<header id="header">
+    <div class="brand brand-row">
+        <div class="brand-badge" style="background:linear-gradient(135deg,#D4AF37,#aa7c11);color:#2b1a08">
+            <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>
+        </div>
+        <div>
+            <h1 class="font-calligraphy brand-title">靖西绣球</h1>
+            <p class="brand-sub">壮族非遗数字展</p>
+        </div>
+    </div>
+    <nav id="museumNav" aria-label="主导航">
+        <a href="#sec=0" data-section="0">首页</a>
+        <a href="#sec=1" data-section="1">文化源流</a>
+        <a href="#sec=2" data-section="2">匠心工艺</a>
+        <a href="#sec=3" data-section="3">三月三</a>
+        <a href="#sec=4" data-section="4">纹样寓意</a>
+        <a href="#sec=6" data-section="6">绣球之乡</a>
+        <a href="3d-model.html">数字研析</a>
+    </nav>
+    <nav id="petalNavigator" aria-label="多样绣球导览">
+        <div class="petal-nav-meta"><span>多样绣球 · 横向滑动</span><strong id="petalNavLabel">滑动换球</strong></div>
+        <div id="petalTrack"></div>
+    </nav>
+    <div class="actions">
+        <button id="btnAuto" class="btn-glass"><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>自动演示</span></button>
+        <button id="btnTop" class="btn-glass"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span class="top-label">回顶</span></button>
+    </div>
+</header>
+
+<!-- 底部进度点 -->
+<div id="dots"></div>
+
+<!-- 滚动提示 -->
+<div id="scrollHint">
+    <div class="mouse"></div>
+    向下滚动 · 绣球随页旋转
+</div>
+
+<!-- 收尾特效 -->
+<div id="burst">
+    <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div>
+    <div class="spark" style="left:18%;top:22%;--dx:36px;--dy:52px"></div>
+    <div class="spark" style="left:82%;top:18%;--dx:-42px;--dy:60px"></div>
+    <div class="spark" style="left:12%;top:70%;--dx:48px;--dy:-44px"></div>
+    <div class="spark" style="left:88%;top:66%;--dx:-40px;--dy:-50px"></div>
+    <div class="spark" style="left:50%;top:12%;--dx:8px;--dy:46px"></div>
+    <div class="spark" style="left:30%;top:86%;--dx:30px;--dy:-30px"></div>
+    <div class="spark" style="left:70%;top:88%;--dx:-28px;--dy:-34px"></div>
+    <div class="burst-text">圆满一周 · 传承不息</div>
+    <div class="burst-sub">愿壮乡祝福，转给世界，也转给下一个千年</div>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script>
+/* ========== 数据：八瓣 × 八章 ========== */
+const DATA = [
+    {
+        n:'壹', title:'绣球起源', sub:'壮族民俗诞生',
+        icon:'star',
+        body:'绣球，壮族古称“飞砣”，最早源于壮族先民狩猎与作战时的投掷器具，后随岁月流转，演变为青年男女传情达意的信物。宋代文献中已见“绣球”之名。在漫长的农耕时光里，姑娘们把对丰收、平安与美满的祈愿一针一线绣进彩球——抛向心仪之人，也抛向吉祥与春天。'
+    },
+    {
+        n:'贰', title:'抛绣球 · 婚嫁习俗', sub:'一球定情',
+        icon:'heart',
+        body:'歌圩三月三，壮家姑娘手持彩绣球，于人群之中看定意中人，彩球抛出、后生接住、互赠信物，一段良缘便由此结下。绣球因此成为壮族婚恋文化中最浪漫的信物：五彩绣球抛如意，一抛定终身。在婚礼上，绣球更寓意团圆和美、情比金坚。'
+    },
+    {
+        n:'叁', title:'非遗手工 · 十二瓣缝制工艺', sub:'金边不歪 · 珠串不松',
+        icon:'craft',
+        body:'一枚十二瓣绣球，要经裁布、贴瓣、刺绣、合缝、镶珠、缀穗六道大工序：十二片大红缎面各自绣上花鸟纹样，以金线锁边包缝，瓣与瓣交汇处缀白珍珠与金珠，底部垂挂渐变琉璃坠与长款玫红流苏，顶部束玫红缎吊绳。全程手工，讲究针脚细密、珠串匀称。壮族绣球制作技艺已被列入非物质文化遗产代表性项目名录。'
+    },
+    {
+        n:'肆', title:'三月三 · 节庆活动', sub:'万人歌海 · 彩球起落',
+        icon:'drum',
+        body:'农历三月初三，是壮族最盛大的歌圩节。村村寨寨对山歌、抛绣球、跳竹竿舞、吃五色糯米饭，山水之间皆是歌声。绣球是歌圩上最亮眼的风景：万人歌海之中，彩球起落如花雨，是壮族人民最热烈的情感表达，也是春天里最盛大的狂欢。'
+    },
+    {
+        n:'伍', title:'刺绣纹样 · 图腾寓意', sub:'穿在身上的史诗',
+        icon:'feather',
+        body:'绣球上常见的凤凰、火焰、云纹与缠枝纹，皆有深意：凤凰象征吉祥与和美，火焰寓意热情与生命，青蓝如江水，玫红似木棉，金线则映照太阳的光泽。每一种颜色、每一道纹样，都不是随意为之，而是壮族先民将对自然、祖先与生活的理解织进针脚，成为“穿在身上的史诗”。'
+    },
+    {
+        n:'陆', title:'现代文创 · 绣球新生', sub:'老手艺 × 新设计',
+        icon:'gift',
+        body:'今天的绣球正走出博物馆：缩小成钥匙扣与胸针，化作城市伴手礼与文创盲盒，登上大型运动会与节庆舞台。老手艺遇上新设计，传统纹样借力新材料与新工艺，让年轻人把“非遗”戴在身上、带回家中，也让千年绣球有了新的呼吸。'
+    },
+    {
+        n:'柒', title:'文旅打卡 · 绣球之乡', sub:'靖西旧州 · 绣球一条街',
+        icon:'location',
+        body:'广西靖西旧州古镇被誉为“绣球之乡”：家家户户门前挂绣球、摆绣架，鹅泉流水与青石老街之间，绣球作坊与非遗工坊吸引着八方来客。到旧州，看绣娘飞针走线，亲手挑选一枚彩球带走，是许多旅人心中最鲜活的壮乡记忆。'
+    },
+    {
+        n:'捌', title:'传承展望 · 圆满一周', sub:'从村寨到数字屏幕',
+        icon:'circle',
+        body:'球转一周，四季圆满。从村寨歌圩到数字屏幕，绣球正在被更多人看见与传承：非遗进校园、青年设计师共创、3D 数字化展示……愿这一枚十二瓣彩球，把壮乡的祝福与匠心，转给世界，也转给下一个千年。'
+    }
+];
+
+const ICONS = {
+    star:'<path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/>',
+    heart:'<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-3 4.5 4.5 0 0 1 8 3c0 5.8-8 11-8 11z"/>',
+    craft:'<path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/>',
+    drum:'<path d="M4 10a8 4 0 0 1 16 0v4a8 4 0 0 1-16 0z"/><path d="M12 14v7M8 21h8"/>',
+    feather:'<path d="M20 4C14 4 9 7 6 14l-3 6 6-3c7-3 10-8 10-13z"/><path d="M11 13l3-3" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+    gift:'<path d="M4 11h16v9H4z"/><path d="M12 11v9"/><path d="M12 11c-3-3-8-2.5-7 .5 1 2 6 1 7-.5zM12 11c3-3 8-2.5 7 .5-1 2-6 1-7-.5z"/>',
+    location:'<path d="M12 21s-7-6.4-7-11a7 7 0 0 1 14 0c0 4.6-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+    circle:'<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+const iconSvg = (name) => `<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+
+/* ========== 生成章节 / 十二瓣模型 / 卡片 / 进度点 ========== */
+const NUM_CN = ['一','二','三','四','五','六','七','八'];
+
+const sectionsEl = document.getElementById('sections');
+DATA.forEach((d, i) => {
+    const sec = document.createElement('section');
+    sec.className = 'sec';
+    sec.innerHTML = `<div class="section-mark"><div class="num">${d.n}</div><div class="label">第${NUM_CN[i]}章 · ${d.title}</div></div>`;
+    sectionsEl.appendChild(sec);
+});
+
+/* ---------- 十二瓣绣球模型（移植自 绣球模型.html） ---------- */
+const MODEL_R = 2.2;
+const NODES = [
+    new THREE.Vector3(0, MODEL_R, 0),
+    new THREE.Vector3(0, -MODEL_R, 0),
+    new THREE.Vector3(MODEL_R, 0, 0),
+    new THREE.Vector3(-MODEL_R, 0, 0),
+    new THREE.Vector3(0, 0, MODEL_R),
+    new THREE.Vector3(0, 0, -MODEL_R)
+];
+const EDGES = [
+    { a: 2, b: 4, type: 'equator' },
+    { a: 4, b: 3, type: 'equator' },
+    { a: 3, b: 5, type: 'equator' },
+    { a: 5, b: 2, type: 'equator' },
+    { a: 0, b: 2, type: 'top' },
+    { a: 0, b: 4, type: 'top' },
+    { a: 0, b: 3, type: 'top' },
+    { a: 0, b: 5, type: 'top' },
+    { a: 1, b: 2, type: 'bottom' },
+    { a: 1, b: 4, type: 'bottom' },
+    { a: 1, b: 3, type: 'bottom' },
+    { a: 1, b: 5, type: 'bottom' }
+];
+const FILL_FACES = [
+    [0, 4, 2], [0, 3, 4], [0, 5, 3], [0, 2, 5],
+    [1, 2, 4], [1, 4, 3], [1, 3, 5], [1, 5, 2]
+];
+const MODEL_STATE = {
+    silkColor: '#d82880',
+    goldColor: '#ffd700',
+    pattern: 'phoenix',
+    extrudeDepth: 0.5,
+    widthFactor: 0.84,
+    puffFactor: 0.14,
+    tasselConfig: 5
+};
+const PETAL_COLORS = ['#ed6fa6','#087c45','#078c6c','#eb78a8','#e54a24','#08a9d4','#efbf19','#cf286d','#119465','#c58d13','#e63b57','#ee84ae'];
+const PETAL_MOTIFS = ['bird','flower','butterfly','peony','bird','orchid','flower','butterfly','peony','bird','orchid','flower'];
+const PANEL_COLORS = ['#f6b62c','#e98521','#f4c43d','#e76c2e','#f3b331','#e58c22','#f6c94a','#df7428'];
+const COLOR_THEMES = [
+    { name:'壮锦盛彩', petals:PETAL_COLORS, panels:PANEL_COLORS, accent:'#ffc62f', node:'#8f1228', pearl:'#fff4dc', tassels:['#f2c72e','#d51d4e','#1c9d73'], ribbon:'#d92f4c' },
+    { name:'青瓷月白', petals:['#55b9ad','#dcefe8','#76aebe','#f5f1e7','#6cc8bb','#b9dce2','#edf6ef','#4fa49d','#d8ece7','#8cc8c0','#f7f3e9','#67b3ab'], panels:['#d8eee5','#b9ddd5','#ecf5ed','#9fcfc6','#e5f1e8','#aad7cf','#f2f5ec','#c3e2dc'], accent:'#dce9e7', pearl:'#fbffff', tassels:['#f4f5ed','#b8d9d5','#6cb5ad'], ribbon:'#d9eee8' },
+    { name:'靛蓝银辉', petals:['#274f91','#3f72ad','#173a75','#d9e3ee','#5a86ba','#244f86','#a9bfd8','#365f9c','#e8edf3','#1e427c','#7599c1','#cbd7e6'], panels:['#274b82','#587ba5','#dce5ee','#315d96','#91abc7','#1c3d72','#c9d6e4','#446d9e'], accent:'#d8e0ea', pearl:'#ffffff', tassels:['#eef2f6','#8da9c6','#345d92'], ribbon:'#e7ebf0' },
+    { name:'绛紫流霞', petals:['#77426f','#a86491','#d9b5ca','#eee1e8','#66355f','#bf7ca5','#8d597f','#e2c5d5','#9a6289','#f1e7ec','#70416a','#c98bad'], panels:['#95627e','#d1a4bb','#ead7e1','#7d4c70','#bf8ea8','#f0e4e9','#a66f8c','#d9b9c9'], accent:'#e5d9df', pearl:'#fff9fc', tassels:['#f2e7ed','#c694ad','#875477'], ribbon:'#b37297' },
+    { name:'珊瑚瑞雪', petals:['#dd5b56','#f08378','#f6b1aa','#fff2eb','#c94743','#e96d68','#f7d0c8','#d95955','#fff8f2','#ef9289','#c83d42','#f5bcb4'], panels:['#ef8673','#f5b3a2','#fff0e4','#d95d55','#f6c4b6','#e77367','#fff5eb','#e99583'], accent:'#ece5df', pearl:'#ffffff', tassels:['#fff5ef','#e77470','#d4d7db'], ribbon:'#e2605e' },
+    { name:'香槟玉粉', petals:['#c8a27d','#ead9c6','#d8b79b','#f3e7df','#b99272','#e8c7bd','#f6eee7','#d6b69e','#e7d1c0','#f1ddd5','#c4a184','#eadbd0'], panels:['#d9b993','#f0dfc8','#c9a57f','#ead2b5','#f6e8d4','#d3b18b','#e6cbaa','#f4e1cc'], accent:'#e8d7bd', pearl:'#fffdf8', tassels:['#f7eee5','#dbc5b3','#c9aa8e'], ribbon:'#e6c8c2' }
+];
+function makeVividColor(color, saturationScale = 1.26) {
+    const result = new THREE.Color(color);
+    const hsl = {};
+    result.getHSL(hsl);
+    result.setHSL(
+        hsl.h,
+        Math.min(1, hsl.s * saturationScale + .035),
+        Math.min(.82, hsl.l * 1.035 + .008)
+    );
+    return result;
+}
+
+COLOR_THEMES.forEach((theme) => {
+    theme.colors = {
+        petals: theme.petals.map((color) => makeVividColor(color, 1.34)),
+        petalSides: theme.petals.map((color) => makeVividColor(color, 1.18).multiplyScalar(.66)),
+        panels: theme.panels.map((color) => makeVividColor(color, 1.3)),
+        accent: makeVividColor(theme.accent, 1.22),
+        node: makeVividColor(theme.node || theme.accent, 1.25),
+        pearl: makeVividColor(theme.pearl, 1.08),
+        tassels: theme.tassels.map((color) => makeVividColor(color, 1.32)),
+        ribbon: makeVividColor(theme.ribbon, 1.32)
+    };
+});
+let scene, camera, renderer;
+let ballGroup, fillPanelsGroup, petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup;
+let petalMaterials = [], petalSideMaterials = [], panelMaterials = [], goldMaterials = [], beadMaterials = [], tasselMaterials = [], ribbonMaterials = [], proceduralTexture, petalDirs = [];
+let tasselDynamics = [];
+let topLoopMesh = null;
+
+function adjustColorBrightness(hex, percent) {
+    let num = parseInt(hex.replace('#', ''), 16);
+    let amt = Math.round(2.55 * percent);
+    let R = (num >> 16) + amt, G = (num >> 8 & 0x00FF) + amt, B = (num & 0x0000FF) + amt;
+    R = Math.min(255, Math.max(0, R));
+    G = Math.min(255, Math.max(0, G));
+    B = Math.min(255, Math.max(0, B));
+    return '#' + (0x1000000 + (R << 16) + (G << 8) + B).toString(16).slice(1);
+}
+
+function generateEmbroideryTexture(silkColor, motif = 'flower') {
+    const canvas = document.createElement('canvas');
+    canvas.width = 768; canvas.height = 768;
+    const ctx = canvas.getContext('2d');
+    const silk = ctx.createLinearGradient(0, 0, 768, 768);
+    silk.addColorStop(0, '#ffffff');
+    silk.addColorStop(.34, '#f4eee8');
+    silk.addColorStop(.7, '#cdbfb5');
+    silk.addColorStop(1, '#f8f3ed');
+    ctx.fillStyle = silk;
+    ctx.fillRect(0, 0, 768, 768);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.11)';
+    ctx.lineWidth = 1;
+    for (let i = -768; i < 1536; i += 5) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i - 300, 768); ctx.stroke();
+    }
+    ctx.save();
+    ctx.translate(384, 384);
+    const drawCurve = (strokeColor, lineWidth, pathPoints) => {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        pathPoints.forEach((pt, idx) => {
+            if (idx === 0) ctx.moveTo(pt[0], pt[1]);
+            else ctx.lineTo(pt[0], pt[1]);
+        });
+        ctx.stroke();
+    };
+    const petal = (x, y, rx, ry, color, turn) => {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(turn);
+        ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#f9d66a'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+    };
+    const stem = () => {
+        drawCurve('#63b55f', 11, [[-12,180],[-18,78],[16,-54],[5,-176]]);
+        drawCurve('#d8f09f', 2, [[-9,170],[-12,72],[20,-50],[8,-168]]);
+        drawCurve('#63b55f', 8, [[-8,54],[-103,18],[-130,-25]]);
+        drawCurve('#63b55f', 8, [[2,-12],[105,-54],[130,-106]]);
+    };
+    stem();
+    if (motif === 'bird') {
+        ctx.fillStyle = '#1f89bd'; ctx.beginPath(); ctx.ellipse(-16,-20,72,35,-.26,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#f3d13c'; ctx.beginPath(); ctx.ellipse(-42,-19,31,22,-.45,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#ec4943'; ctx.beginPath(); ctx.ellipse(34,-31,26,20,.1,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff6dc'; ctx.beginPath(); ctx.ellipse(65,-33,14,12,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#261414'; ctx.beginPath(); ctx.arc(69,-35,3,0,Math.PI*2); ctx.fill();
+        drawCurve('#f3d13c',8,[[52,-31],[96,-44],[116,-34]]);
+        drawCurve('#e83d54',9,[[-72,-20],[-125,-74],[-144,-66]]);
+    } else if (motif === 'butterfly') {
+        ['#ffd343','#f26c98','#75c8db','#f9bb42'].forEach((c,i)=>petal((i<2?-28:28),(i%2?-32:32),34,55,c,(i%2?-.65:.65)*(i<2?1:-1)));
+        ctx.fillStyle='#40243d';ctx.fillRect(-5,-55,10,118);drawCurve('#40243d',4,[[0,-53],[-22,-80],[-34,-90]]);drawCurve('#40243d',4,[[0,-53],[22,-80],[34,-90]]);
+    } else {
+        const colors = motif === 'peony' ? ['#f9c0d0','#ee527b','#ffd543','#d83255','#f8e4a0'] : motif === 'orchid' ? ['#f5f5ff','#67b9e8','#cbd5ff','#ffffff','#f4cf45'] : ['#f4a1be','#f5d05a','#ef5a66','#8dd3a3','#fff1bb'];
+        for(let i=0;i<5;i++) petal(Math.cos(i*Math.PI*2/5)*44,Math.sin(i*Math.PI*2/5)*44,36,80,colors[i],i*Math.PI*2/5);
+        ctx.fillStyle='#f3c73c';ctx.beginPath();ctx.arc(0,0,25,0,Math.PI*2);ctx.fill();
+        for(let i=0;i<14;i++){ctx.fillStyle=i%2?'#a73a36':'#fff2a5';ctx.beginPath();ctx.arc(Math.cos(i*.45)*i*1.7,Math.sin(i*.45)*i*1.7,4,0,Math.PI*2);ctx.fill();}
+    }
+    ctx.restore();
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
+    return texture;
+}
+
+const REFERENCE_MOTIFS = ['flower','chrysanthemum','bird','orchid','peony','tulip','bird','flower','orchid','fish','tulip','crane'];
+
+function generateReferenceEmbroideryTexture(motif = 'flower', variant = 0, baseColor = '#d34a62') {
+    const size = 512;
+    const colorCanvas = document.createElement('canvas');
+    const bumpCanvas = document.createElement('canvas');
+    colorCanvas.width = colorCanvas.height = size;
+    bumpCanvas.width = bumpCanvas.height = size;
+    const ctx = colorCanvas.getContext('2d');
+    const bump = bumpCanvas.getContext('2d');
+
+    // 预览款把缎面底色直接烘焙进贴图，避免材质颜色与彩色绣线相乘后失真。
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0,0,size,size);
+    const satin = ctx.createLinearGradient(0,0,size,size);
+    satin.addColorStop(0,'rgba(255,255,255,.34)');
+    satin.addColorStop(.24,'rgba(255,255,255,.06)');
+    satin.addColorStop(.5,'rgba(255,255,255,.24)');
+    satin.addColorStop(.76,'rgba(40,8,20,.12)');
+    satin.addColorStop(1,'rgba(255,255,255,.18)');
+    ctx.fillStyle = satin;
+    ctx.fillRect(0,0,size,size);
+    bump.fillStyle = '#777';
+    bump.fillRect(0,0,size,size);
+
+    // 细密的经纬丝线，让底布在光照下出现真实的缎面方向性。
+    for(let i=-size;i<size*2;i+=5){
+        ctx.strokeStyle = i%15===0 ? 'rgba(255,255,255,.2)' : 'rgba(77,42,31,.055)';
+        ctx.lineWidth = i%15===0 ? 1.2 : .7;
+        ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i-size*.42,size);ctx.stroke();
+        bump.strokeStyle = i%15===0 ? '#858585' : '#727272';
+        bump.lineWidth = 1;
+        bump.beginPath();bump.moveTo(i,0);bump.lineTo(i-size*.42,size);bump.stroke();
+    }
+    for(let y=0;y<size;y+=7){
+        ctx.strokeStyle='rgba(255,255,255,.045)';ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(size,y+18);ctx.stroke();
+    }
+
+    ctx.save(); bump.save();
+    ctx.translate(size/2,size/2); bump.translate(size/2,size/2);
+    ctx.rotate(-Math.PI/2); bump.rotate(-Math.PI/2);
+    const textureScale = size / 768;
+    ctx.scale(1.22 * textureScale,1.22 * textureScale);
+    bump.scale(1.22 * textureScale,1.22 * textureScale);
+
+    const threadStroke = (points,color,width=12) => {
+        const path = new Path2D();
+        points.forEach((point,index)=>index ? path.lineTo(point[0],point[1]) : path.moveTo(point[0],point[1]));
+        ctx.lineCap='round';ctx.lineJoin='round';
+        ctx.strokeStyle='rgba(55,20,20,.3)';ctx.lineWidth=width+5;ctx.stroke(path);
+        ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke(path);
+        ctx.setLineDash([4,5]);ctx.lineDashOffset=variant%4;
+        ctx.strokeStyle='rgba(255,255,255,.58)';ctx.lineWidth=Math.max(2.5,width*.2);ctx.stroke(path);
+        ctx.setLineDash([]);
+        bump.lineCap='round';bump.lineJoin='round';bump.strokeStyle='#e8e8e8';bump.lineWidth=width+3;bump.stroke(path);
+        bump.setLineDash([4,5]);bump.strokeStyle='#fff';bump.lineWidth=Math.max(3,width*.28);bump.stroke(path);bump.setLineDash([]);
+    };
+
+    const threadedEllipse = (x,y,rx,ry,rotation,color) => {
+        ctx.save();ctx.translate(x,y);ctx.rotate(rotation);
+        ctx.shadowColor='rgba(55,16,20,.3)';ctx.shadowBlur=5;ctx.shadowOffsetY=3;
+        ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';
+        ctx.save();ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.clip();
+        for(let xx=-rx-ry;xx<rx+ry;xx+=7){
+            ctx.strokeStyle=((xx+rx+ry)/7)%2<1?'rgba(255,255,255,.62)':'rgba(70,20,30,.24)';ctx.lineWidth=3.2;
+            ctx.beginPath();ctx.moveTo(xx,-ry*1.2);ctx.lineTo(xx+ry*.55,ry*1.2);ctx.stroke();
+        }
+        ctx.restore();ctx.strokeStyle='rgba(255,230,142,.72)';ctx.lineWidth=3;ctx.stroke();ctx.restore();
+        bump.save();bump.translate(x,y);bump.rotate(rotation);bump.fillStyle='#e7e7e7';bump.beginPath();bump.ellipse(0,0,rx,ry,0,0,Math.PI*2);bump.fill();
+        for(let xx=-rx;xx<rx;xx+=8){bump.strokeStyle='#fff';bump.lineWidth=3.5;bump.beginPath();bump.moveTo(xx,-ry*.85);bump.lineTo(xx+ry*.35,ry*.85);bump.stroke();}
+        bump.restore();
+    };
+
+    const threadedPolygon = (points,color) => {
+        const path = new Path2D();
+        points.forEach((point,index)=>index?path.lineTo(point[0],point[1]):path.moveTo(point[0],point[1]));path.closePath();
+        ctx.save();ctx.shadowColor='rgba(50,15,20,.3)';ctx.shadowBlur=5;ctx.shadowOffsetY=3;ctx.fillStyle=color;ctx.fill(path);ctx.shadowColor='transparent';
+        ctx.save();ctx.clip(path);for(let x=-250;x<250;x+=8){ctx.strokeStyle=((x+250)/8)%2<1?'rgba(255,255,255,.58)':'rgba(60,18,25,.22)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,-230);ctx.lineTo(x+170,230);ctx.stroke();}ctx.restore();
+        ctx.strokeStyle='rgba(255,229,143,.75)';ctx.lineWidth=3;ctx.stroke(path);ctx.restore();
+        bump.fillStyle='#e5e5e5';bump.fill(path);bump.strokeStyle='#fff';bump.lineWidth=3;bump.stroke(path);
+    };
+
+    const stem = (from=[0,175],to=[0,-105]) => threadStroke([from,[from[0]-22,42],[to[0]+16,-28],to],'#319153',9);
+    const leaf = (x,y,turn,color='#4aaa61') => threadedEllipse(x,y,22,58,turn,color);
+    const fivePetalFlower = (cx,cy,palette,scale=1) => {
+        for(let i=0;i<5;i++){
+            const angle=i*Math.PI*2/5-Math.PI/2;
+            threadedEllipse(cx+Math.cos(angle)*35*scale,cy+Math.sin(angle)*35*scale,24*scale,44*scale,angle+Math.PI/2,palette[i%palette.length]);
+        }
+        threadedEllipse(cx,cy,26*scale,26*scale,0,'#f4bf31');
+        for(let i=0;i<12;i++)threadStroke([[cx,cy],[cx+Math.cos(i*.524)*22*scale,cy+Math.sin(i*.524)*22*scale]],i%2?'#8b322e':'#fff0a2',3);
+    };
+
+    if(motif==='tulip'){
+        // 参考图青色瓣：单枝红郁金香。减少细碎轮廓，缩小后仍保持清晰。
+        ctx.save();bump.save();ctx.translate(0,78);bump.translate(0,78);
+        threadStroke([[2,182],[-3,96],[3,18],[2,-48]],'#288e4d',11);
+        threadedEllipse(-43,73,25,68,-.82,'#429c52');
+        threadedEllipse(45,43,23,62,.82,'#61ad58');
+        threadedPolygon([[-78,-61],[-52,-140],[-9,-104],[10,-158],[38,-105],[72,-142],[76,-60],[35,-18],[-34,-22]],'#dc233e');
+        threadStroke([[-50,-129],[-10,-103],[9,-151]],'#ff7c82',5);
+        threadStroke([[10,-151],[39,-104],[68,-132]],'#9e1831',5);
+        threadStroke([[-34,-22],[2,-61],[35,-18]],'#f26d78',4);
+        ctx.restore();bump.restore();
+    }else if(motif==='chrysanthemum'){
+        // 参考图绿瓣：一朵橙红色小菊，宽针脚比密集细瓣更像真实刺绣。
+        threadStroke([[1,188],[-5,98],[3,18],[0,-42]],'#2c8b4c',10);
+        threadedEllipse(-46,78,24,61,-.86,'#4b9f51');
+        threadedEllipse(48,43,22,56,.84,'#69ad58');
+        for(let i=0;i<12;i++){
+            const a=i*Math.PI*2/12-Math.PI/2;
+            const distance=i%2 ? 45 : 51;
+            threadedEllipse(Math.cos(a)*distance,-66+Math.sin(a)*distance,18,39,a+Math.PI/2,i%2?'#e2482e':'#f28b28');
+        }
+        threadedEllipse(0,-66,31,31,0,'#9f2923');
+        for(let i=0;i<10;i++){
+            const a=i*Math.PI*2/10;
+            threadStroke([[0,-66],[Math.cos(a)*25,-66+Math.sin(a)*25]],i%2?'#ffcf43':'#f17b2e',3.5);
+        }
+    }else if(motif==='fish'){
+        // 参考图金色瓣：双鱼相向，主体稍向两侧避开中央流苏。
+        const drawFish=(cx,cy,flip,color,finColor)=>{
+            ctx.save();bump.save();ctx.translate(cx,cy);bump.translate(cx,cy);ctx.scale(flip,1);bump.scale(flip,1);
+            threadedEllipse(0,0,72,31,-.08,color);
+            threadedPolygon([[58,0],[108,-43],[101,38]],finColor);
+            threadedPolygon([[-2,-24],[30,-53],[42,-18]],finColor);
+            threadStroke([[-52,-7],[-22,-21],[18,-18],[52,-4]],'#722b35',4.5);
+            threadStroke([[-48,9],[-18,21],[20,18],[48,6]],'#f1b34b',3.5);
+            threadedEllipse(-39,-4,10,10,0,'#fff0b5');
+            threadedEllipse(-42,-6,4.5,4.5,0,'#27212b');
+            for(let s=-1;s<=2;s++) threadStroke([[s*20,-20],[s*8,0],[s*20,20]],'#8f4a28',3.5);
+            ctx.restore();bump.restore();
+        };
+        drawFish(-55,-60,1,'#d9512d','#8f2533');
+        drawFish(55,48,-1,'#b9492c','#753249');
+        threadStroke([[-116,80],[-70,110],[-18,99],[35,118],[108,84]],'#3f8f4d',5);
+    }else if(motif==='bird' || motif==='crane'){
+        const crane=motif==='crane';
+        threadedEllipse(-18,-8,crane?80:92,crane?31:42,-.12,crane?'#f2f0e8':'#276fa8');
+        threadedEllipse(-34,-12,crane?48:54,crane?23:30,-.28,crane?'#e7e8e5':'#f0b833');
+        threadedEllipse(72,-54,23,21,0,crane?'#f6f2e8':'#d84343');
+        threadStroke([[58,-54],[112,-62],[142,-45]],crane?'#d99d39':'#f4c436',7);
+        threadStroke([[-90,-6],[-145,-80],[-172,-95]],crane?'#202d40':'#d53b4d',10);
+        threadStroke([[-84,8],[-148,56],[-176,80]],crane?'#d7d7d0':'#39a0b4',8);
+        threadedEllipse(77,-58,4,4,0,'#1d1720');
+        if(crane){threadStroke([[12,18],[46,122]],'#a83732',6);threadStroke([[-4,18],[-30,126]],'#a83732',6);}
+    }else{
+        // 参考图粉色瓣：白紫花配青绿枝叶，使用大面积长短针表现花瓣层次。
+        stem([0,190],[2,-62]);leaf(-51,80,-.9);leaf(55,38,.9);
+        const palette=motif==='orchid'?['#f7f4f2','#78aee0','#d9d4f1','#ffffff','#f1c841']:motif==='peony'?['#e3436c','#f28dab','#f8c0cf','#d92f59','#f8d66c']:['#fffdf5','#7857b8','#f1edff','#ffffff','#4d86cc'];
+        fivePetalFlower(4,-72,palette,motif==='peony'?1.08:motif==='flower'?1.3:1.12);
+        if(motif==='flower'){
+            for(let i=0;i<5;i++){
+                const a=i*Math.PI*2/5-Math.PI/2;
+                threadStroke([[4+Math.cos(a)*14,-72+Math.sin(a)*14],[4+Math.cos(a)*66,-72+Math.sin(a)*66]],i%2?'#583993':'#3378bd',5.5);
+            }
+            threadStroke([[2,-34],[72,7],[110,53]],'#318b51',6);
+            threadedEllipse(93,35,14,34,.72,'#55a55a');
+        }
+        if(motif==='orchid')threadStroke([[20,-30],[112,30],[142,72]],'#3d9a58',6);
+    }
+
+    // 零散短针脚使图案边缘不再像平面印刷。
+    for(let i=0;i<28;i++){
+        const a=(i*2.399)+(variant*.37),r=105+(i%5)*18,x=Math.cos(a)*r,y=Math.sin(a)*r*.88;
+        ctx.strokeStyle='rgba(255,235,167,.5)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*8,y+Math.sin(a)*8);ctx.stroke();
+        bump.strokeStyle='#aaa';bump.lineWidth=1.5;bump.beginPath();bump.moveTo(x,y);bump.lineTo(x+Math.cos(a)*8,y+Math.sin(a)*8);bump.stroke();
+    }
+    ctx.restore();bump.restore();
+
+    const map = new THREE.CanvasTexture(colorCanvas);
+    const bumpMap = new THREE.CanvasTexture(bumpCanvas);
+    [map,bumpMap].forEach((texture)=>{
+        texture.wrapS=THREE.ClampToEdgeWrapping;texture.wrapT=THREE.ClampToEdgeWrapping;
+        texture.anisotropy=renderer?renderer.capabilities.getMaxAnisotropy():1;
+    });
+    if('colorSpace' in map && THREE.SRGBColorSpace) map.colorSpace=THREE.SRGBColorSpace;
+    return {map,bumpMap};
+}
+
+function generatePanelTexture(baseColor, panelIndex) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createRadialGradient(210, 180, 30, 256, 256, 350);
+    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(.58, '#eee7dc');
+    gradient.addColorStop(1, '#c8b9aa');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 512, 512);
+
+    ctx.lineWidth = 1;
+    for (let y = -512; y < 1024; y += 4) {
+        ctx.strokeStyle = y % 12 === 0 ? 'rgba(255,255,255,.13)' : 'rgba(92,33,10,.07)';
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y + 190); ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.translate(256, 278);
+    ctx.rotate((panelIndex % 2 ? 1 : -1) * .08);
+    ctx.strokeStyle = 'rgba(255,239,160,.34)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(-92, 36); ctx.quadraticCurveTo(0, -76, 92, 36);
+    ctx.quadraticCurveTo(0, 108, -92, 36);
+    ctx.stroke();
+    ctx.restore();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
+    return texture;
+}
+
+function createCurvedTrianglePanel(A, B, C, panelIndex) {
+    const segments = 18;
+    const radius = MODEL_R * .995;
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+    const rows = [];
+
+    for (let i = 0; i <= segments; i++) {
+        const row = [];
+        for (let j = 0; j <= segments - i; j++) {
+            const k = segments - i - j;
+            const point = A.clone().multiplyScalar(i)
+                .add(B.clone().multiplyScalar(j))
+                .add(C.clone().multiplyScalar(k))
+                .divideScalar(segments)
+                .normalize()
+                .multiplyScalar(radius);
+            row.push(positions.length / 3);
+            positions.push(point.x, point.y, point.z);
+            uvs.push((j + k * .5) / segments, k / segments);
+        }
+        rows.push(row);
+    }
+
+    for (let i = 0; i < segments; i++) {
+        for (let j = 0; j < segments - i; j++) {
+            const a = rows[i][j];
+            const b = rows[i + 1][j];
+            const c = rows[i][j + 1];
+            indices.push(a, b, c);
+            if (j < segments - i - 1) {
+                const d = rows[i + 1][j + 1];
+                indices.push(b, d, c);
+            }
+        }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+
+    const baseColor = PANEL_COLORS[panelIndex % PANEL_COLORS.length];
+    const material = new THREE.MeshPhysicalMaterial({
+        color: baseColor,
+        map: generatePanelTexture(baseColor, panelIndex),
+        roughness: .34,
+        metalness: .04,
+        clearcoat: .3,
+        clearcoatRoughness: .2,
+        side: THREE.DoubleSide
+    });
+    material.userData.paletteSlot = panelIndex;
+    panelMaterials.push(material);
+    return new THREE.Mesh(geometry, material);
+}
+
+function buildFillPanels() {
+    fillPanelsGroup.clear();
+    FILL_FACES.forEach((face, index) => {
+        fillPanelsGroup.add(createCurvedTrianglePanel(NODES[face[0]], NODES[face[1]], NODES[face[2]], index));
+    });
+}
+
+function createPetalMesh(A, B, radius, widthFactor, puffFactor, petalIndex) {
+    const uSegments = 32, vSegments = 16;
+    const outerPositions = [], innerPositions = [];
+    const leftBorderOuter = [], leftBorderInner = [], rightBorderOuter = [], rightBorderInner = [];
+    const midVector = new THREE.Vector3().addVectors(A, B).normalize();
+    const depthRatio = Math.max(0, Math.min(0.85, MODEL_STATE.extrudeDepth));
+    for (let i = 0; i <= uSegments; i++) {
+        const u = i / uSegments;
+        const currentCenter = new THREE.Vector3().subVectors(B, A).multiplyScalar(u).add(A).normalize();
+        const chord = new THREE.Vector3().subVectors(B, A);
+        const tangent = chord.clone().sub(currentCenter.clone().multiplyScalar(chord.dot(currentCenter))).normalize();
+        const normal = currentCenter.clone();
+        const side = new THREE.Vector3().crossVectors(normal, tangent).normalize();
+        // 中段保持宽大，两端快速收尖，避免相邻锦瓣在串珠节点附近互相穿插。
+        const currentWidth = widthFactor * Math.pow(Math.sin(Math.PI * u), 1.16);
+        const rowOuter = [], rowInner = [];
+        for (let j = 0; j <= vSegments; j++) {
+            const v = (j / vSegments) - 0.5;
+            const lengthRound = Math.pow(Math.sin(Math.PI * u), .78);
+            const widthRound = Math.pow(Math.max(0, Math.cos(Math.PI * v)), 1.35);
+            const puff = puffFactor * lengthRound * widthRound;
+            const posOuter = currentCenter.clone().multiplyScalar(radius)
+                .add(side.clone().multiplyScalar(v * currentWidth * radius))
+                .add(normal.clone().multiplyScalar(puff * radius));
+            const posInner = posOuter.clone().multiplyScalar(1 - depthRatio);
+            rowOuter.push(posOuter);
+            rowInner.push(posInner);
+            if (j === 0) { leftBorderOuter.push(posOuter.clone()); leftBorderInner.push(posInner.clone()); }
+            if (j === vSegments) { rightBorderOuter.push(posOuter.clone()); rightBorderInner.push(posInner.clone()); }
+        }
+        outerPositions.push(rowOuter);
+        innerPositions.push(rowInner);
+    }
+    const outerGeom = new THREE.BufferGeometry();
+    const outerPosArr = [], outerUvs = [], outerIndices = [];
+    const stride = vSegments + 1;
+    for (let i = 0; i <= uSegments; i++) {
+        for (let j = 0; j <= vSegments; j++) {
+            const p = outerPositions[i][j];
+            outerPosArr.push(p.x, p.y, p.z);
+            outerUvs.push(i / uSegments, j / vSegments);
+        }
+    }
+    for (let i = 0; i < uSegments; i++) {
+        for (let j = 0; j < vSegments; j++) {
+            const a = i * stride + j, b = a + stride, c = b + 1, d = a + 1;
+            outerIndices.push(a, b, d, b, c, d);
+        }
+    }
+    outerGeom.setAttribute('position', new THREE.Float32BufferAttribute(outerPosArr, 3));
+    outerGeom.setAttribute('uv', new THREE.Float32BufferAttribute(outerUvs, 2));
+    outerGeom.setIndex(outerIndices);
+    outerGeom.computeVertexNormals();
+    const silkColor = PETAL_COLORS[petalIndex % PETAL_COLORS.length];
+    const previewBaseColor = makeVividColor(silkColor,1.34).getStyle();
+    const embroideryPreview = generateReferenceEmbroideryTexture(REFERENCE_MOTIFS[petalIndex % REFERENCE_MOTIFS.length],petalIndex,previewBaseColor);
+    const silkMat = new THREE.MeshPhysicalMaterial({
+        map: embroideryPreview.map,
+        bumpMap: embroideryPreview.bumpMap,
+        bumpScale: .075,
+        color: '#ffffff',
+        roughness: 0.58,
+        metalness: 0.01,
+        clearcoat: 0.08,
+        clearcoatRoughness: 0.62,
+        side: THREE.FrontSide
+    });
+    silkMat.userData.embroideryThemeIndex = 0;
+    silkMat.userData.embroideryMap = embroideryPreview.map;
+    silkMat.userData.embroideryBumpMap = embroideryPreview.bumpMap;
+    silkMat.userData.motif = REFERENCE_MOTIFS[petalIndex % REFERENCE_MOTIFS.length];
+    silkMat.userData.petalIndex = petalIndex;
+    silkMat.userData.previewColor = new THREE.Color('#ffffff');
+    petalMaterials.push(silkMat);
+    const outerMesh = new THREE.Mesh(outerGeom, silkMat);
+    const wallGroup = new THREE.Group();
+    if (depthRatio > 0.01) {
+        const wallGeom = new THREE.BufferGeometry();
+        const wallPosArr = [], wallIndices = [];
+        const addWallStrip = (outerPts, innerPts, reverse) => {
+            const startIndex = wallPosArr.length / 3;
+            for (let k = 0; k < outerPts.length; k++) {
+                const po = outerPts[k], pi = innerPts[k];
+                wallPosArr.push(po.x, po.y, po.z);
+                wallPosArr.push(pi.x, pi.y, pi.z);
+            }
+            for (let k = 0; k < outerPts.length - 1; k++) {
+                const o1 = startIndex + k * 2, i1 = startIndex + k * 2 + 1;
+                const o2 = startIndex + (k + 1) * 2, i2 = startIndex + (k + 1) * 2 + 1;
+                if (!reverse) {
+                    wallIndices.push(o1, i1, o2, i1, i2, o2);
+                } else {
+                    wallIndices.push(o1, o2, i1, i1, o2, i2);
+                }
+            }
+        };
+        addWallStrip(leftBorderOuter, leftBorderInner, false);
+        addWallStrip(rightBorderOuter, rightBorderInner, true);
+        wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wallPosArr, 3));
+        wallGeom.setIndex(wallIndices);
+        wallGeom.computeVertexNormals();
+        const wallMat = new THREE.MeshStandardMaterial({
+            color: adjustColorBrightness(silkColor, -32),
+            roughness: 0.4,
+            metalness: 0.1,
+            side: THREE.DoubleSide
+        });
+        wallMat.userData.paletteSlot = petalIndex;
+        petalSideMaterials.push(wallMat);
+        wallGroup.add(new THREE.Mesh(wallGeom, wallMat));
+    }
+    const trimCurvePoints = [...leftBorderOuter, ...rightBorderOuter.reverse()];
+    const trimCurve = new THREE.CatmullRomCurve3(trimCurvePoints, true);
+    const trimGeom = new THREE.TubeGeometry(trimCurve, 32, 0.04, 6, true);
+    const goldMat = new THREE.MeshStandardMaterial({
+        color: 0xffc62f,
+        metalness: 0.82,
+        roughness: 0.18
+    });
+    goldMaterials.push(goldMat);
+    const petalGroup = new THREE.Group();
+    petalGroup.add(outerMesh);
+    petalGroup.add(wallGroup);
+    petalGroup.add(new THREE.Mesh(trimGeom, goldMat));
+    petalGroup.userData = { petalIndex, centerDir: midVector.clone(), nodeA: A, nodeB: B };
+    petalGroup.traverse((child) => { child.userData.petalIndex = petalIndex; });
+    petalDirs.push(midVector.clone());
+    return petalGroup;
+}
+
+function buildPearlNodes() {
+    pearlsGroup.clear();
+    NODES.forEach((pos) => {
+        const nodeGroup = new THREE.Group();
+        nodeGroup.position.copy(pos);
+        const pearlMat = new THREE.MeshPhysicalMaterial({
+            color: 0xffc32b,
+            roughness: 0.16,
+            metalness: 0.78,
+            clearcoat: 0.65,
+            clearcoatRoughness: 0.08
+        });
+        pearlMat.userData.paletteRole = 'node';
+        beadMaterials.push(pearlMat);
+        nodeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 12), pearlMat));
+        for (let i = 0; i < 7; i++) {
+            const angle = (i / 7) * Math.PI * 2;
+            const subPearl = new THREE.Mesh(new THREE.SphereGeometry(0.068, 12, 10), pearlMat);
+            subPearl.position.set(Math.cos(angle) * 0.205, 0, Math.sin(angle) * 0.205);
+            nodeGroup.add(subPearl);
+        }
+        pearlsGroup.add(nodeGroup);
+    });
+}
+
+function buildTassels(configCount) {
+    tasselsGroup.clear();
+    tasselDynamics = [];
+    if (configCount === 0) return;
+    const targetNodeIndices = configCount === 5 ? [1, 2, 3, 4, 5] : [1];
+    targetNodeIndices.forEach((nodeIdx) => {
+        const nodePos = NODES[nodeIdx];
+        const tasselGroup = new THREE.Group();
+        const isMainBottom = (nodeIdx === 1);
+        const scale = isMainBottom ? 1.0 : 0.75;
+        const outward = nodePos.clone().normalize();
+        // 四组侧流苏先离开球面，再略向外倾斜，防止珠链与下半球锦瓣穿模。
+        tasselGroup.position.copy(nodePos).multiplyScalar(isMainBottom ? 1.025 : 1.12);
+        const hangingDirection = new THREE.Vector3(0, -1, 0)
+            .add(outward.clone().multiplyScalar(isMainBottom ? 0 : .30))
+            .normalize();
+        tasselGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), hangingDirection);
+        const beadMat = new THREE.MeshPhysicalMaterial({
+            color: 0xfff8e7,
+            roughness: 0.1,
+            clearcoat: 1.0
+        });
+        const amberMat = new THREE.MeshStandardMaterial({ color: 0xe9ad21, roughness: 0.2, metalness: 0.62 });
+        beadMat.userData.paletteRole = 'pearl';
+        amberMat.userData.paletteRole = 'accent';
+        beadMaterials.push(beadMat, amberMat);
+        for (let b = 0; b < 5; b++) {
+            const bead = new THREE.Mesh(new THREE.SphereGeometry((b % 2 ? 0.075 : 0.1) * scale, 12, 10), b % 2 ? amberMat : beadMat);
+            bead.position.y = -0.22 * (b + 1) * scale;
+            tasselGroup.add(bead);
+        }
+        const capGeom = new THREE.ConeGeometry(0.24 * scale, 0.42 * scale, 16);
+        const capMesh = new THREE.Mesh(capGeom, amberMat);
+        capMesh.position.y = -1.2 * scale;
+        capMesh.rotation.x = Math.PI;
+        tasselGroup.add(capMesh);
+        // 以尖帽尖端作为整束流苏的唯一铰接点，丝线从这里汇拢后再自然散开。
+        const strandRoot = new THREE.Group();
+        strandRoot.position.y = -1.40 * scale;
+        tasselGroup.add(strandRoot);
+        const tasselColors = nodeIdx % 2 ? ['#f2c72e','#f6d643','#e9ad21'] : ['#d51d4e','#f1ba2b','#1c9d73'];
+        for (let s = 0; s < 18; s++) {
+            const a = (s / 18) * Math.PI * 2;
+            const drift = .16 + (s % 4) * .022;
+            const curve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(Math.cos(a) * .025 * scale, -.18 * scale, Math.sin(a) * .025 * scale),
+                new THREE.Vector3(Math.cos(a) * drift * .42 * scale, -.76 * scale, Math.sin(a) * drift * .42 * scale),
+                new THREE.Vector3(Math.cos(a) * drift * .78 * scale, -1.58 * scale, Math.sin(a) * drift * .78 * scale),
+                new THREE.Vector3(Math.cos(a) * (drift + .07) * scale, -2.50 * scale, Math.sin(a) * (drift + .07) * scale)
+            ]);
+            const strandMaterial = new THREE.MeshStandardMaterial({color:tasselColors[s % tasselColors.length],roughness:.48,metalness:.04});
+            strandMaterial.userData.paletteSlot = s % 3;
+            tasselMaterials.push(strandMaterial);
+            const strand = new THREE.Mesh(new THREE.TubeGeometry(curve, 20, .014 * scale, 5, false), strandMaterial);
+            strandRoot.add(strand);
+        }
+        tasselDynamics.push({
+            root: strandRoot,
+            phase: nodeIdx * 1.37,
+            angle: 0,
+            velocity: 0,
+            weight: isMainBottom ? 1 : .82
+        });
+        tasselsGroup.add(tasselGroup);
+    });
+}
+
+function buildTopRibbon() {
+    ribbonGroup.clear();
+    const topNode = NODES[0];
+    const ribbonMat = new THREE.MeshPhysicalMaterial({
+        color: 0xd92f4c,
+        roughness: 0.28,
+        clearcoat: .35,
+        side: THREE.DoubleSide
+    });
+    ribbonMaterials.push(ribbonMat);
+    const loopCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0,-.38,0),
+        new THREE.Vector3(-.30,0,0),
+        new THREE.Vector3(0,.38,0),
+        new THREE.Vector3(.30,0,0)
+    ],true,'centripetal');
+    const loopGeom = new THREE.TubeGeometry(loopCurve,48,.052,8,true);
+    topLoopMesh = new THREE.Mesh(loopGeom, ribbonMat);
+    topLoopMesh.position.set(topNode.x, topNode.y + 1.72, topNode.z);
+    ribbonGroup.add(topLoopMesh);
+    const knotMaterial = new THREE.MeshStandardMaterial({color:0xffc62f,metalness:.8,roughness:.18});
+    knotMaterial.userData.paletteRole = 'accent';
+    beadMaterials.push(knotMaterial);
+    const knot = new THREE.Mesh(new THREE.SphereGeometry(.16, 14, 12), knotMaterial);
+    knot.position.set(topNode.x, topNode.y + .24, topNode.z); ribbonGroup.add(knot);
+
+    // 球顶挂绳：两股红金丝线交织，并从连接珠中贯穿，避免珠子或挂环悬空。
+    const goldThreadMat = new THREE.MeshStandardMaterial({color:0xffc62f,metalness:.28,roughness:.38});
+    goldMaterials.push(goldThreadMat);
+    const addBraidedThread = (phase, material) => {
+        const points = [];
+        const segments = 34;
+        for (let i = 0; i <= segments; i++) {
+            const t = i / segments;
+            const helix = t * Math.PI * 6 + phase;
+            const braidRadius = Math.sin(Math.PI * t);
+            points.push(new THREE.Vector3(
+                topNode.x + Math.cos(helix) * .027 * braidRadius,
+                topNode.y + .035 + t * 1.30,
+                topNode.z + Math.sin(helix) * .022 * braidRadius
+            ));
+        }
+        const curve = new THREE.CatmullRomCurve3(points);
+        const strand = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, .018, 5, false), material);
+        ribbonGroup.add(strand);
+    };
+    addBraidedThread(0, ribbonMat);
+    addBraidedThread(Math.PI, goldThreadMat);
+
+    const upperNodeMat = new THREE.MeshPhysicalMaterial({color:0x8f1228,roughness:.2,clearcoat:.72,clearcoatRoughness:.16});
+    const upperPearlMat = new THREE.MeshPhysicalMaterial({color:0xfff4dc,roughness:.18,clearcoat:.65});
+    upperNodeMat.userData.paletteRole = 'node';
+    upperPearlMat.userData.paletteRole = 'pearl';
+    beadMaterials.push(upperNodeMat, upperPearlMat);
+    const upperBeads = [
+        {y:.47,r:.085,mat:upperNodeMat},
+        {y:.67,r:.066,mat:knotMaterial},
+        {y:.86,r:.09,mat:upperPearlMat},
+        {y:1.05,r:.068,mat:knotMaterial},
+        {y:1.22,r:.082,mat:upperNodeMat},
+        {y:1.34,r:.055,mat:knotMaterial}
+    ];
+    upperBeads.forEach(({y,r,mat}) => {
+        const bead = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 12), mat);
+        bead.position.set(topNode.x, topNode.y + y, topNode.z);
+        ribbonGroup.add(bead);
+    });
+}
+
+function buildHomeModel() {
+    petalMaterials = [];
+    petalSideMaterials = [];
+    panelMaterials = [];
+    goldMaterials = [];
+    beadMaterials = [];
+    tasselMaterials = [];
+    ribbonMaterials = [];
+    petalDirs = [];
+    buildFillPanels();
+    petalsGroup.clear();
+    EDGES.forEach((edge, index) => {
+        petalsGroup.add(createPetalMesh(NODES[edge.a], NODES[edge.b], MODEL_R, MODEL_STATE.widthFactor, MODEL_STATE.puffFactor, index));
+    });
+    buildPearlNodes();
+    buildTassels(MODEL_STATE.tasselConfig);
+    buildTopRibbon();
+}
+
+function setupLights() {
+    // 屏幕前方的柔和主光负责塑造瓣面，自阴影由环境光与侧后补光托住。
+    scene.add(new THREE.AmbientLight(0xfff7ed, 0.86));
+    const keyLight = new THREE.DirectionalLight(0xfff7ee, 1.82);
+    keyLight.position.set(0.8, 3.8, 8);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    keyLight.shadow.camera.near = .5;
+    keyLight.shadow.camera.far = 20;
+    keyLight.shadow.camera.left = -6;
+    keyLight.shadow.camera.right = 6;
+    keyLight.shadow.camera.top = 6;
+    keyLight.shadow.camera.bottom = -7;
+    keyLight.shadow.bias = -.00035;
+    keyLight.shadow.normalBias = .035;
+    keyLight.shadow.radius = 4;
+    scene.add(keyLight);
+    const fillLight = new THREE.DirectionalLight(0x8cd8d1, 0.64);
+    fillLight.position.set(-5, -2, -5);
+    scene.add(fillLight);
+    const rimLight = new THREE.DirectionalLight(0xffc75c, 0.92);
+    rimLight.position.set(0, 5, -8);
+    scene.add(rimLight);
+    const frontGlow = new THREE.PointLight(0xffe3b2, 0.42, 18);
+    frontGlow.position.set(-1.8, 0.8, 6.5);
+    scene.add(frontGlow);
+}
+
+let dragRot = 0;
+let immersiveMode = false;
+let topPetalActive = false;
+let topPetalIndex = 0;
+let activeThemeIndex = 0;
+let lastThemePetalIndex = -1;
+let themeSpin = 0;
+let themeSpinTarget = 0;
+let themeSpinStart = 0;
+let themeTransitionStart = 0;
+let themeTransitionActive = false;
+let themeMidpointApplied = true;
+let pendingThemeIndex = 0;
+const THEME_TRANSITION_DURATION = 1500;
+const CAMERA_HOME_Z = 14.55;
+const CAMERA_IMMERSIVE_Z = 9.1;
+
+function setImmersive(next) {
+    immersiveMode = next;
+    topPetalActive = false;
+    document.body.classList.toggle('immersive', next);
+    const navigator = document.getElementById('petalNavigator');
+    if (navigator) navigator.classList.remove('interacting');
+    if (next && autoOn) stopAuto();
+    if (next) document.getElementById('btnExitImmersion').focus({preventScroll:true});
+}
+
+function initHomeModel() {
+    const canvas = document.getElementById('modelCanvas');
+    scene = new THREE.Scene();
+    const initialCanvasWidth = canvas.clientWidth || 560;
+    const initialCanvasHeight = canvas.clientHeight || 680;
+    camera = new THREE.PerspectiveCamera(42, initialCanvasWidth / initialCanvasHeight, 0.1, 100);
+    camera.position.set(0, 0.2, CAMERA_HOME_Z);
+    camera.lookAt(0, -1.2, 0);
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(initialCanvasWidth, initialCanvasHeight, false);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.24;
+    ballGroup = new THREE.Group();
+    fillPanelsGroup = new THREE.Group();
+    petalsGroup = new THREE.Group();
+    tasselsGroup = new THREE.Group();
+    pearlsGroup = new THREE.Group();
+    ribbonGroup = new THREE.Group();
+    ballGroup.add(fillPanelsGroup, petalsGroup, tasselsGroup, pearlsGroup, ribbonGroup);
+    scene.add(ballGroup);
+    setupLights();
+    buildHomeModel();
+    ballGroup.traverse((object) => {
+        if (!object.isMesh) return;
+        object.castShadow = true;
+        object.receiveShadow = true;
+    });
+    let dragging = false, dragLast = 0, pointerMoved = false;
+    let pointerDownAt = { x: 0, y: 0 };
+    let pendingChapter = null, pendingPetalTimer = null;
+    const raycaster = new THREE.Raycaster();
+    const pointerNdc = new THREE.Vector2();
+    const petalIndexAt = (event) => {
+        const rect = canvas.getBoundingClientRect();
+        pointerNdc.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointerNdc.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointerNdc, camera);
+        const hits = raycaster.intersectObjects(petalsGroup.children, true);
+        for (const hit of hits) {
+            let object = hit.object;
+            while (object) {
+                if (object.userData && object.userData.petalIndex !== undefined) {
+                    return object.userData.petalIndex;
+                }
+                object = object.parent;
+            }
+        }
+        return null;
+    };
+    const updatePetalCursor = (event) => {
+        canvas.style.cursor = petalIndexAt(event) === null ? 'grab' : 'pointer';
+    };
+    const openPetalChapter = (chapter) => {
+        if (autoOn) stopAuto();
+        window.location.href = `chapter.html?chapter=${chapter}`;
+    };
+    canvas.addEventListener('pointerdown', (e) => {
+        pointerDownAt = { x: e.clientX, y: e.clientY };
+        pointerMoved = false;
+        if (e.pointerType !== 'mouse') return;
+        dragging = true;
+        dragLast = e.clientX;
+        canvas.classList.add('dragging');
+        canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+        if (dragging && (Math.abs(e.clientX - pointerDownAt.x) > 6 || Math.abs(e.clientY - pointerDownAt.y) > 6)) {
+            pointerMoved = true;
+            if (pendingPetalTimer !== null) {
+                clearTimeout(pendingPetalTimer);
+                pendingPetalTimer = null;
+                pendingChapter = null;
+            }
+        }
+        if (!dragging) {
+            if (e.pointerType === 'mouse') updatePetalCursor(e);
+            return;
+        }
+        dragRot += (e.clientX - dragLast) * 0.4;
+        dragLast = e.clientX;
+    });
+    const endDrag = () => { dragging = false; canvas.classList.remove('dragging'); };
+    canvas.addEventListener('pointerup', endDrag);
+    canvas.addEventListener('pointercancel', endDrag);
+    canvas.addEventListener('click', (e) => {
+        if (pointerMoved) return;
+        const petalIndex = petalIndexAt(e);
+        if (petalIndex === null) return;
+        if (pendingPetalTimer !== null) {
+            clearTimeout(pendingPetalTimer);
+            pendingPetalTimer = null;
+            pendingChapter = null;
+            return;
+        }
+        pendingChapter = active + 1;
+        pendingPetalTimer = setTimeout(() => {
+            const target = pendingChapter;
+            pendingChapter = null;
+            pendingPetalTimer = null;
+            if (target !== null) openPetalChapter(target);
+        }, 280);
+    });
+    canvas.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        if (pendingPetalTimer !== null) {
+            clearTimeout(pendingPetalTimer);
+            pendingPetalTimer = null;
+            pendingChapter = null;
+        }
+        setImmersive(!immersiveMode);
+    });
+}
+initHomeModel();
+
+/* 顶部多样绣球导览：六种唯一配色，原地旋转并切换整球配色 */
+const PETAL_GUIDE_LABELS = COLOR_THEMES.map((theme) => theme.name);
+const petalNavigator = document.getElementById('petalNavigator');
+const petalTrack = document.getElementById('petalTrack');
+const petalNavLabel = document.getElementById('petalNavLabel');
+const themeBlend = document.getElementById('themeBlend');
+const petalStops = PETAL_GUIDE_LABELS.map((label, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'petal-stop';
+    button.setAttribute('aria-label', `第 ${index + 1} 款绣球 · ${label}`);
+    button.setAttribute('aria-pressed', 'false');
+    button.style.setProperty('--stop-color', COLOR_THEMES[index % COLOR_THEMES.length].petals[0]);
+    button.addEventListener('pointerenter', () => selectTopPetal(index));
+    button.addEventListener('focus', () => {
+        topPetalActive = true;
+        petalNavigator.classList.add('interacting');
+        selectTopPetal(index);
+    });
+    petalTrack.appendChild(button);
+    return button;
+});
+
+function selectTopPetal(index) {
+    topPetalIndex = Math.min(PETAL_GUIDE_LABELS.length - 1, Math.max(0, index));
+    const themeIndex = topPetalIndex;
+    petalNavLabel.textContent = `第 ${topPetalIndex + 1} 款 · ${COLOR_THEMES[themeIndex].name}`;
+    if (lastThemePetalIndex !== topPetalIndex) {
+        lastThemePetalIndex = topPetalIndex;
+        pendingThemeIndex = themeIndex;
+        themeSpinStart = themeSpin;
+        themeSpinTarget = themeSpin + Math.PI * 2;
+        themeTransitionStart = performance.now();
+        themeTransitionActive = true;
+        themeMidpointApplied = false;
+        if(themeBlend){
+            themeBlend.style.setProperty('--ripple-a',COLOR_THEMES[themeIndex].petals[0]);
+            themeBlend.style.setProperty('--ripple-b',COLOR_THEMES[themeIndex].accent);
+            themeBlend.classList.remove('playing');
+            void themeBlend.offsetWidth;
+            themeBlend.classList.add('playing');
+        }
+    }
+    petalStops.forEach((stop, i) => {
+        const selected = i === topPetalIndex;
+        stop.classList.toggle('on', selected);
+        stop.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
+}
+
+function leaveTopPetalGuide() {
+    topPetalActive = false;
+    lastThemePetalIndex = -1;
+    petalNavigator.classList.remove('interacting');
+    petalNavLabel.textContent = '滑动换球';
+    petalStops.forEach((stop) => {
+        stop.classList.remove('on');
+        stop.setAttribute('aria-pressed', 'false');
+    });
+}
+
+petalNavigator.addEventListener('pointerenter', () => {
+    topPetalActive = true;
+    petalNavigator.classList.add('interacting');
+    if (autoOn) stopAuto();
+});
+petalNavigator.addEventListener('pointermove', (event) => {
+    const rect = petalTrack.getBoundingClientRect();
+    const ratio = Math.min(.9999, Math.max(0, (event.clientX - rect.left) / rect.width));
+    selectTopPetal(Math.floor(ratio * PETAL_GUIDE_LABELS.length));
+});
+petalNavigator.addEventListener('pointerleave', leaveTopPetalGuide);
+petalNavigator.addEventListener('focusout', (event) => {
+    if (!petalNavigator.contains(event.relatedTarget)) leaveTopPetalGuide();
+});
+
+/* 右侧卡片 */
+const panelEl = document.getElementById('panel');
+DATA.forEach((d, i) => {
+    const card = document.createElement('div');
+    card.className = 'panel-card';
+    const titleLines = d.title.split(/\s*·\s*/).filter(Boolean);
+    card.innerHTML = `
+        <a class="chapter-link" href="chapter.html?chapter=${i + 1}" aria-label="阅读第${NUM_CN[i]}章：${d.title}">
+            <h2 class="font-calligraphy">${titleLines.map(line => `<span>${line}</span>`).join('')}</h2>
+            <span class="chapter-arrow" aria-hidden="true">↗</span>
+        </a>`;
+    panelEl.appendChild(card);
+});
+
+/* 进度点 */
+const dotsEl = document.getElementById('dots');
+DATA.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' on' : '');
+    dotsEl.appendChild(dot);
+});
+
+const cards = [...document.querySelectorAll('.panel-card')];
+const dots = [...document.querySelectorAll('.dot')];
+const mobileTitle = document.getElementById('mobileTitle');
+const scrollHint = document.getElementById('scrollHint');
+const burst = document.getElementById('burst');
+const btnAuto = document.getElementById('btnAuto');
+const btnExitImmersion = document.getElementById('btnExitImmersion');
+const museumNavLinks = [...document.querySelectorAll('#museumNav [data-section]')];
+btnExitImmersion.addEventListener('click', () => setImmersive(false));
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && immersiveMode) setImmersive(false);
+});
+
+/* ========== 滚动联动 ========== */
+let rot = 0;
+let active = 0;
+let velS = 0;
+let lastY = window.scrollY;
+let lastT = performance.now();
+let autoOn = false;
+let autoStart = 0;
+let autoDir = 1;
+
+const norm360 = (a) => { a = a % 360; return a < 0 ? a + 360 : a; };
+const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - innerHeight);
+
+function setPanel(idx){
+    cards.forEach((c, i) => c.classList.toggle('on', i === idx));
+    dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+    museumNavLinks.forEach((link) => link.classList.toggle('on', Number(link.dataset.section) === idx));
+    mobileTitle.textContent = `第${NUM_CN[idx]}章 · ${DATA[idx].title}`;
+    scrollHint.classList.toggle('show', idx === 0);
+    burst.classList.toggle('show', idx === 7);
+}
+
+function updateThemeColors() {
+    const palette = COLOR_THEMES[activeThemeIndex].colors;
+    const ease = themeTransitionActive ? .22 : .055;
+    petalMaterials.forEach((material, index) => {
+        if(material.userData.embroideryThemeIndex !== activeThemeIndex){
+            const themePetalColor = COLOR_THEMES[activeThemeIndex].petals[index % COLOR_THEMES[activeThemeIndex].petals.length];
+            const themeBaseColor = makeVividColor(themePetalColor,1.34).getStyle();
+            const embroidery = generateReferenceEmbroideryTexture(material.userData.motif,material.userData.petalIndex,themeBaseColor);
+            if(material.userData.embroideryMap) material.userData.embroideryMap.dispose();
+            if(material.userData.embroideryBumpMap) material.userData.embroideryBumpMap.dispose();
+            material.userData.embroideryThemeIndex = activeThemeIndex;
+            material.userData.embroideryMap = embroidery.map;
+            material.userData.embroideryBumpMap = embroidery.bumpMap;
+            material.map = embroidery.map;
+            material.bumpMap = embroidery.bumpMap;
+            material.needsUpdate = true;
+        }
+        material.color.lerp(material.userData.previewColor, ease);
+        material.bumpScale += (.075 - material.bumpScale) * .12;
+        material.roughness += (.58 - material.roughness) * .1;
+        material.clearcoat += (.08 - material.clearcoat) * .1;
+        material.clearcoatRoughness += (.62 - material.clearcoatRoughness) * .1;
+    });
+    petalSideMaterials.forEach((material) => material.color.lerp(palette.petalSides[material.userData.paletteSlot % palette.petalSides.length], ease));
+    panelMaterials.forEach((material) => material.color.lerp(palette.panels[material.userData.paletteSlot % palette.panels.length], ease));
+    goldMaterials.forEach((material) => material.color.lerp(palette.accent, ease));
+    beadMaterials.forEach((material) => {
+        const target = material.userData.paletteRole === 'pearl' ? palette.pearl : material.userData.paletteRole === 'node' ? palette.node : palette.accent;
+        material.color.lerp(target,ease);
+    });
+    tasselMaterials.forEach((material) => material.color.lerp(palette.tassels[material.userData.paletteSlot % palette.tassels.length], ease));
+    ribbonMaterials.forEach((material) => material.color.lerp(palette.ribbon, ease));
+}
+
+function tick(now){
+    requestAnimationFrame(tick);
+    const max = maxScroll();
+    const p = Math.min(1, Math.max(0, window.scrollY / max));
+    const target = p * 360;
+    rot += (target - rot) * 0.16;
+    if (Math.abs(target - rot) < 0.02) rot = target;
+
+    // 360° 是长卷终点，章节索引应停在第八章，不能归一化回 0°。
+    const chapterRotation = Math.min(359.999, Math.max(0, rot));
+    const idx = Math.min(7, Math.floor(chapterRotation / 45));
+    if (idx !== active){ active = idx; setPanel(idx); }
+
+    const totalDeg = rot + dragRot;
+    const rad = totalDeg * Math.PI / 180;
+    if(themeTransitionActive){
+        const transitionProgress = Math.min(1,Math.max(0,(now-themeTransitionStart)/THEME_TRANSITION_DURATION));
+        if(!themeMidpointApplied && transitionProgress >= .5){
+            activeThemeIndex = pendingThemeIndex;
+            themeMidpointApplied = true;
+        }
+        // 五次缓入缓出制造明显的“慢—快—慢”顿挫节奏。
+        const easedSpin = transitionProgress < .5
+            ? 16 * Math.pow(transitionProgress,5)
+            : 1 - Math.pow(-2 * transitionProgress + 2,5) / 2;
+        themeSpin = themeSpinStart + (themeSpinTarget-themeSpinStart) * easedSpin;
+        if(transitionProgress >= 1){
+            activeThemeIndex = pendingThemeIndex;
+            themeMidpointApplied = true;
+            themeTransitionActive = false;
+            themeSpin = themeSpinTarget;
+        }
+    }
+    updateThemeColors();
+    if (ballGroup) {
+        const baseQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, rad, 0));
+        ballGroup.quaternion.copy(baseQuaternion);
+        ballGroup.rotateY(themeSpin);
+
+        petalMaterials.forEach((material) => {
+            material.emissive.setHex(0x000000);
+            material.emissiveIntensity = 0;
+        });
+    }
+
+    if (camera) {
+        const cameraTarget = immersiveMode ? CAMERA_IMMERSIVE_Z : CAMERA_HOME_Z;
+        camera.position.z += (cameraTarget - camera.position.z) * 0.08;
+        camera.lookAt(0, -1.0, 0);
+    }
+
+    const glow = document.getElementById('glow');
+    if (glow) glow.style.opacity = (0.55 + 0.22 * Math.sin(now * 0.0022)).toFixed(2);
+
+    const dt = Math.max(16, now - lastT);
+    const v = (window.scrollY - lastY) / dt;
+    velS += (v - velS) * 0.08;
+    lastY = window.scrollY; lastT = now;
+
+    // 每束丝线以尖帽为固定根点作阻尼摆动：滚动带来惯性，停止后在重力下回到垂直方向。
+    const frameScale = Math.min(2, dt / 16.67);
+    const inertialLean = THREE.MathUtils.clamp(-velS * .055, -.18, .18);
+    tasselDynamics.forEach((dynamic) => {
+        const breeze = Math.sin(now * .00135 + dynamic.phase) * .012;
+        const targetLean = inertialLean * dynamic.weight + breeze;
+        dynamic.velocity += (targetLean - dynamic.angle) * .052 * frameScale;
+        dynamic.velocity *= Math.pow(.87, frameScale);
+        dynamic.angle += dynamic.velocity * frameScale;
+        dynamic.root.rotation.z = dynamic.angle;
+        dynamic.root.rotation.x = Math.sin(now * .0011 + dynamic.phase * 1.7) * .008;
+    });
+    if (tasselsGroup) tasselsGroup.rotation.z = 0;
+
+    if (renderer) {
+        const canvas = renderer.domElement;
+        const cw = canvas.clientWidth || 560, ch = canvas.clientHeight || 560;
+        const pr = renderer.getPixelRatio();
+        if (canvas.width !== Math.floor(cw * pr) || canvas.height !== Math.floor(ch * pr)) {
+            renderer.setSize(cw, ch, false);
+            camera.aspect = cw / ch;
+            camera.updateProjectionMatrix();
+        }
+        renderer.render(scene, camera);
+    }
+}
+
+/* 自动演示（26s 上行 + 26s 下行，用户滚动即停） */
+function startAuto(){
+    autoOn = true; autoStart = performance.now(); autoDir = 1;
+    btnAuto.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg><span>停止</span>';
+}
+function stopAuto(){
+    autoOn = false;
+    btnAuto.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>自动演示</span>';
+}
+function autoStep(now){
+    if (!autoOn) return;
+    const t = (now - autoStart) / 1000;
+    const period = 26;
+    let e = (t % (period * 2)) / period;
+    if (e > 1) e = 2 - e;
+    e = e * e * (3 - 2 * e);
+    window.scrollTo(0, e * maxScroll());
+    requestAnimationFrame(autoStep);
+}
+btnAuto.addEventListener('click', () => autoOn ? stopAuto() : (startAuto(), requestAnimationFrame(autoStep)));
+document.getElementById('btnTop').addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+museumNavLinks.forEach((link) => {
+    link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const section = Number(link.dataset.section);
+        window.scrollTo({top: (section / (DATA.length - 1)) * maxScroll(), behavior: 'smooth'});
+    });
+});
+window.addEventListener('wheel', () => { if (autoOn) stopAuto(); }, {passive: true});
+window.addEventListener('touchstart', () => { if (autoOn) stopAuto(); }, {passive: true});
+
+/* 截图 / 直达参数：?sec=3 */
+window.addEventListener('load', () => {
+    requestAnimationFrame(tick);
+    setPanel(0);
+    requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('anim')));
+    const secQ = parseInt(new URLSearchParams(location.search).get('sec') || '', 10);
+    const secH = parseInt((location.hash.match(/sec=(\d+)/) || [])[1] || '', 10);
+    const sec = !isNaN(secQ) ? secQ : secH;
+    if (!isNaN(sec)) setTimeout(() => window.scrollTo(0, (Math.min(7, Math.max(0, sec)) / 8) * maxScroll()), 80);
+});
+</script>
+</body>
+</html>
