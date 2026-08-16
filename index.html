@@ -7,6 +7,7 @@
 <meta name="description" content="以十二瓣立体绣球为视觉主体，滚动即旋转，讲述壮族绣球起源、婚嫁习俗、非遗工艺、三月三节庆、刺绣纹样、现代文创与文旅传承的文化长卷。">
 <meta name="keywords" content="靖西绣球,壮族绣球,非物质文化遗产,三月三,壮族文化,十二瓣绣球">
 <meta name="theme-color" content="#120a10">
+<link rel="stylesheet" href="throw-game.css">
 <style>
     :root{
         --rose:#D82880;
@@ -666,6 +667,7 @@
         <div id="petalTrack"></div>
     </nav>
     <div class="actions">
+        <button id="btnGame" class="btn-glass" aria-label="打开抛绣球小游戏"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="15" r="5"/><path d="M13 12l7-7M16 5h4v4"/></svg><span>抛绣球</span></button>
         <button id="btnAuto" class="btn-glass"><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>自动演示</span></button>
         <button id="btnTop" class="btn-glass"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span class="top-label">回顶</span></button>
     </div>
@@ -694,7 +696,40 @@
     <div class="burst-sub">愿壮乡祝福，转给世界，也转给下一个千年</div>
 </div>
 
+<!-- 抛绣球小游戏 -->
+<section id="xiuqiuGame" aria-hidden="true" aria-label="抛绣球小游戏">
+    <div class="game-shell">
+        <header class="game-topbar">
+            <div class="game-brand">
+                <span class="game-brand-mark">绣</span>
+                <span><strong>抛绣球</strong><small>一球穿心 · 步步高分</small></span>
+            </div>
+            <div class="game-scoreboard" aria-live="polite">
+                <span><small>本局</small><strong id="gameScore">0</strong></span>
+                <i></i>
+                <span><small>最佳</small><strong id="gameBest">0</strong></span>
+            </div>
+            <div class="game-actions">
+                <button id="gameSound" type="button" aria-label="关闭音效" title="音效开关"><svg class="ic sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15 9a4 4 0 010 6M18 6a8 8 0 010 12"/></svg><svg class="ic sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4zM16 9l5 6M21 9l-5 6"/></svg></button>
+                <button id="gameReset" type="button" aria-label="重新开始">重来</button>
+                <button id="gameClose" type="button" aria-label="关闭游戏">×</button>
+            </div>
+        </header>
+        <canvas id="gameCanvas" tabindex="0" aria-label="游戏画面：按住蓄力，上下滑动调整角度，松手抛出绣球"></canvas>
+        <div class="game-angle" aria-hidden="true"><span>角度</span><strong id="gameAngle">45°</strong></div>
+        <div class="game-power" aria-hidden="true"><span id="gamePowerFill"></span><b>蓄力</b></div>
+        <div id="gameCoach" class="game-coach">
+            <span class="coach-hand">☝</span>
+            <strong>按住旋转蓄力</strong>
+            <small>上下滑动调角度 · 松手抛出</small>
+        </div>
+        <div id="gameMessage" class="game-message" aria-live="polite"></div>
+        <div class="game-footer"><span>长按 / 空格</span><i></i><span>上下滑动 / ↑ ↓</span><i></i><span>松开投掷</span></div>
+    </div>
+</section>
+
 <script src="lib/three.min.js"></script>
+<script src="throw-game.js"></script>
 <script>
 /* ========== 数据：八瓣 × 八章 ========== */
 const DATA = [
